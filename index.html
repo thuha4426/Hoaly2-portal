@@ -7234,19 +7234,22 @@
         // Date parsing helper functions
         function parseDateFromRetrieve(val) {
           if (!val) return null;
-          const matches = val.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-          if (matches) {
-            const day = parseInt(matches[1], 10);
-            const month = parseInt(matches[2], 10);
-            const year = parseInt(matches[3], 10);
+          const dateStr = parseSheetDate(val);
+          if (!dateStr) return null;
+          const parts = dateStr.split('-');
+          if (parts.length === 3) {
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
             return new Date(year, month - 1, day);
           }
-          return null;
+          const d = new Date(dateStr);
+          return isNaN(d.getTime()) ? null : d;
         }
 
         // Parse date ranges like "22/06 - 27/06/2026"
         function parseWeekRange(weekStr) {
-          const regex = /(\d{2})\/(\d{2})\s*-\s*(\d{2})\/(\d{2})\/(\d{4})/;
+          const regex = /(\d{1,2})\/(\d{1,2})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/;
           const match = weekStr.match(regex);
           if (match) {
             const startDay = parseInt(match[1], 10);
@@ -9100,7 +9103,7 @@
       wIds.forEach(wId => {
         if (!weekMonthMap[wId]) {
           const wName = delayKpiData.weeks[wId].name;
-          const matches = wName.match(/\/(\d{2})/g);
+          const matches = wName.match(/\/(\d{1,2})/g);
           if (matches && matches.length >= 2) {
             const monthNum = parseInt(matches[1].substring(1), 10).toString();
             weekMonthMap[wId] = monthNum;
@@ -9430,9 +9433,9 @@
           chartDataValues.push(countTotal);
           chartLabels.push(displayNames[r] || r);
           
-          const pctCombined = totalRetrieved > 0 ? (countTotal / totalRetrieved * 100).toFixed(1) : "0.0";
-          const pctNLDetail = totalRetrieved > 0 ? (countNL / totalRetrieved * 100).toFixed(1) : "0.0";
-          const pctPLDetail = totalRetrieved > 0 ? (countPL / totalRetrieved * 100).toFixed(1) : "0.0";
+          const pctCombined = totalDelayed > 0 ? (countTotal / totalDelayed * 100).toFixed(1) : "0.0";
+          const pctNLDetail = data.delNL > 0 ? (countNL / data.delNL * 100).toFixed(1) : "0.0";
+          const pctPLDetail = data.delPL > 0 ? (countPL / data.delPL * 100).toFixed(1) : "0.0";
           
           const fmtPct = p => p.endsWith('.0') ? parseFloat(p).toFixed(0) : p;
           
@@ -9737,13 +9740,4 @@
             </button>
           </td>
         `;
-        body.appendChild(row);
-      });
-    }
-
-    function renderStandardsTab() {
-      renderStandardsTable();
-    }
-  </script>
-</body>
-</html>
+        body.appendChild(r
