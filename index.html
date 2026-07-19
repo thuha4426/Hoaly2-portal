@@ -6975,30 +6975,39 @@
       };
 
       const fetchWithFallback = async (url) => {
-        try {
-          const response = await fetch(url);
-          if (response.ok) return response;
-        } catch (e) {
-          console.warn("Direct fetch failed for " + url + ", trying proxy 1 (corsproxy.io)...", e);
-        }
-        
-        try {
-          const proxyUrl1 = "https://corsproxy.io/?" + encodeURIComponent(url);
-          const response = await fetch(proxyUrl1);
-          if (response.ok) return response;
-        } catch (e) {
-          console.warn("Proxy 1 failed for " + url + ", trying proxy 2 (allorigins)...", e);
-        }
+        // Proxy list — tried in order until one succeeds
+        const proxies = [
+          (u) => u,                                                                      // Direct (works if Sheet is published publicly)
+          (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,                 // Proxy 1 (corrected)
+          (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,        // Proxy 2
+          (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,   // Proxy 3 (replaced dead thingproxy)
+          (u) => `https://cors-anywhere.herokuapp.com/${u}`,                           // Proxy 4 (fallback)
+        ];
 
-        try {
-          const proxyUrl2 = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
-          const response = await fetch(proxyUrl2);
-          if (response.ok) return response;
-        } catch (e) {
-          console.error("Proxy 2 failed for " + url, e);
+        let lastErr = null;
+        for (let i = 0; i < proxies.length; i++) {
+          const proxyUrl = proxies[i](url);
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout per attempt
+            const response = await fetch(proxyUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (response.ok) {
+              if (i > 0) console.log(`[Sync] Proxy ${i} succeeded for: ${url}`);
+              return response;
+            } else {
+              console.warn(`[Sync] Proxy ${i} returned HTTP ${response.status} for: ${url}`);
+            }
+          } catch (e) {
+            lastErr = e;
+            if (e.name === 'AbortError') {
+              console.warn(`[Sync] Proxy ${i} timed out for: ${url}`);
+            } else {
+              console.warn(`[Sync] Proxy ${i} failed for: ${url}`, e.message || e);
+            }
+          }
         }
-        
-        throw new Error("All fetch attempts failed for: " + url);
+        throw new Error(`Không thể tải dữ liệu sau 5 lần thử. Vui lòng kiểm tra:\n1. Google Sheet đã được Công bố lên web (Publish to web) chưa?\n2. Link Sheet có đúng định dạng /pub?output=csv không?\n3. Kết nối mạng có ổn định không?\nURL: ${url}`);
       };
 
       // 1. Fetch tab Personnel (Nhân sự)
@@ -7163,7 +7172,7 @@
 
       if (parsedNl.length === 0 && parsedPl.length === 0 && parsedPers.length === 0 && parsedMethods.length === 0 && parsedTraining.length === 0 && parsedModeling.length === 0 && parsedImprovement.length === 0) {
         if (!silent) {
-          showToast("Đồng bộ thất bại. Vui lòng kiểm tra quyền chia sẻ của Google Sheet (Bất kỳ ai có liên kết đều xem được).", "error");
+          showToast("❌ Đồng bộ thất bại! Kiểm tra: (1) Sheet đã Publish to web chưa? (2) Link có dạng /pub?output=csv không? (3) Mạng ổn định không? Xem chi tiết lỗi trong Console (F12).", "error");
         }
         return;
       }
@@ -7214,6 +7223,14 @@
 
       // Process Delay and Retrieve datasets
       if (parsedDelayCSV && parsedRetrieveCSV) {
+        // Group raw delayed logs by week
+        const delayDetails = {
+          w1: [],
+          w2: [],
+          w3: [],
+          w4: []
+        };
+
         // Date parsing helper functions
         function parseDateFromRetrieve(val) {
           if (!val) return null;
@@ -7227,6 +7244,7 @@
           return null;
         }
 
+        // Parse date ranges like "22/06 - 27/06/2026"
         function parseWeekRange(weekStr) {
           const regex = /(\d{2})\/(\d{2})\s*-\s*(\d{2})\/(\d{2})\/(\d{4})/;
           const match = weekStr.match(regex);
@@ -7251,10 +7269,12 @@
           const d = date.getDate();
           const val = y * 10000 + m * 100 + d;
           
-          for (const weekStr of Object.keys(delayDetails)) {
-            const range = parseWeekRange(weekStr);
+          for (const wId of Object.keys(delayKpiData.weeks)) {
+            if (wId === 'all') continue;
+            const weekName = delayKpiData.weeks[wId].name;
+            const range = parseWeekRange(weekName);
             if (range && val >= range.startDateVal && val <= range.endDateVal) {
-              return weekStr;
+              return wId;
             }
           }
           return null;
@@ -7283,14 +7303,6 @@
             retrieveCounts[weekKey].retPL++;
           }
         });
-
-        // Group raw delayed logs by week
-        const delayDetails = {
-          w1: [],
-          w2: [],
-          w3: [],
-          w4: []
-        };
 
         parsedDelayCSV.forEach((row, idx) => {
           if (idx === 0) return; // skip header
@@ -8010,65 +8022,46 @@
           }
         }
       });
-
-      // 3. Test Type distribution (filtered by selected period)
-      const ctxType = document.getElementById('method-type-chart').getContext('2d');
-      const typeCounts = {};
-      filteredDataForPeriod.forEach(x => {
-        const typeStr = x.type || 'Chưa phân loại';
-        typeCounts[typeStr] = (typeCounts[typeStr] || 0) + 1;
-      });
-      
-      const typeLabels = Object.keys(typeCounts);
-      const typeData = Object.values(typeCounts);
-
-      if (methodTypeChart) {
-        methodTypeChart.destroy();
-      }
-      
-      methodTypeChart = new Chart(ctxType, {
-        type: 'doughnut',
-        data: {
-          labels: typeLabels,
-          datasets: [{
-            data: typeData,
-            backgroundColor: [
-              '#3b82f6',
-              '#10b981',
-              '#8b5cf6',
-              '#f59e0b',
-              '#ec4899',
-              '#14b8a6',
-              '#6366f1'
-            ],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'right',
-              labels: { color: '#94a3b8', font: { family: 'Outfit', size: 10 } }
-            },
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  const label = context.label || '';
-                  const val = context.parsed || 0;
-                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                  const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-                  return ` ${label}: ${val} mẫu (${pct}%)`;
-                }
-              }
-            }
-          }
-        }
-      });
     }
 
     // --- CSV PARSING UTILS ---
+    function removeVietnameseAccents(str) {
+      if (!str) return '';
+      return str.toString()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'd')
+        .toLowerCase()
+        .trim();
+    }
+
+    function findHeaderRow(rows, indicators) {
+      if (!rows || rows.length === 0) return { index: -1, headers: [] };
+      const normIndicators = indicators.map(ind => removeVietnameseAccents(ind));
+      for (let i = 0; i < Math.min(rows.length, 15); i++) {
+        const row = rows[i];
+        if (!row || !Array.isArray(row)) continue;
+        const normCells = row.map(cell => removeVietnameseAccents(cell));
+        let matchCount = 0;
+        for (const ind of normIndicators) {
+          if (normCells.some(cell => cell.includes(ind))) {
+            matchCount++;
+          }
+        }
+        if (matchCount >= 2) {
+          return {
+            index: i,
+            headers: normCells
+          };
+        }
+      }
+      return {
+        index: 0,
+        headers: rows[0].map(cell => removeVietnameseAccents(cell))
+      };
+    }
+
     function parseCSV(text) {
       if (!text) return [];
       const firstLine = text.split('\n')[0];
@@ -8138,19 +8131,11 @@
     function mapCSVToPersonnel(rows) {
       if (rows.length <= 1) return [];
       
-      let headerRowIdx = 0;
-      let headerRow = rows[0].map(h => (h || '').toString().trim().toLowerCase());
-      
-      const possibleHeader1 = (rows[1] || []).map(h => (h || '').toString().trim().toLowerCase());
-      const isRow1Header = possibleHeader1.some(h => h.includes('ma') || h.includes('ten') || h.includes('ngay') || h.includes('nhan'));
-      
-      if (isRow1Header) {
-        headerRowIdx = 1;
-        headerRow = possibleHeader1;
-      }
+      const indicators = ['mã nv', 'họ tên', 'ngày vào', 'nhân sự'];
+      const { index: headerRowIdx, headers: headerRow } = findHeaderRow(rows, indicators);
       
       let colMaNV = headerRow.findIndex(h => h.includes('ma') || h.includes('manv'));
-      let colName = headerRow.findIndex(h => h.includes('ten') || h.includes('ho & ten') || h.includes('ho ten'));
+      let colName = headerRow.findIndex(h => h.includes('ten') || h.includes('ho & ten') || h.includes('ho ten') || h.includes('ho va ten'));
       let colJoinDate = headerRow.findIndex(h => h.includes('nhan') || h.includes('ngay vao') || h.includes('ngay'));
       
       if (colMaNV === -1) colMaNV = 1;
@@ -8159,17 +8144,21 @@
       
       const monthMap = {};
       
-      for (let colIdx = 4; colIdx < Math.max(rows[0]?.length || 0, rows[1]?.length || 0); colIdx++) {
+      const r0 = rows[headerRowIdx] || [];
+      const r1 = rows[headerRowIdx + 1] || [];
+      for (let colIdx = 4; colIdx < Math.max(r0.length, r1.length); colIdx++) {
         let label = '';
-        if (rows[0] && colIdx < rows[0].length) {
-          const l0 = (rows[0][colIdx] || '').toString().trim();
-          if (l0.toLowerCase().includes('tháng') || l0.toLowerCase().includes('thang')) {
+        if (colIdx < r0.length) {
+          const l0 = (r0[colIdx] || '').toString().trim();
+          const l0Norm = removeVietnameseAccents(l0);
+          if (l0Norm.includes('thang')) {
             label = l0;
           }
         }
-        if (!label && rows[1] && colIdx < rows[1].length) {
-          const l1 = (rows[1][colIdx] || '').toString().trim();
-          if (l1.toLowerCase().includes('tháng') || l1.toLowerCase().includes('thang')) {
+        if (!label && colIdx < r1.length) {
+          const l1 = (r1[colIdx] || '').toString().trim();
+          const l1Norm = removeVietnameseAccents(l1);
+          if (l1Norm.includes('thang')) {
             label = l1;
           }
         }
@@ -8183,7 +8172,8 @@
       }
 
       if (Object.keys(monthMap).length === 0) {
-        headerRow.forEach((h, colIdx) => {
+        const rawHeaders = rows[headerRowIdx] || [];
+        rawHeaders.forEach((h, colIdx) => {
           const normalized = normalizeMonthHeader(h);
           if (normalized) {
             monthMap[colIdx] = normalized;
@@ -8222,47 +8212,47 @@
     function mapCSVToMethods(rows) {
       if (rows.length <= 1) return [];
       
-      const headerRow = rows[0].map(h => (h || '').toString().trim().toLowerCase());
+      const indicators = ['ngày', 'sản phẩm', 'phương pháp', 'loại test', 'kết quả', 'knv'];
+      const { index: headerRowIdx, headers: headerRow } = findHeaderRow(rows, indicators);
       
-      const colDate = headerRow.findIndex(h => h.includes('ngày') || h.includes('ngay')) !== -1 ? 
-                      headerRow.findIndex(h => h.includes('ngày') || h.includes('ngay')) : 0;
-      const colThangThucTe = headerRow.findIndex(h => h.includes('thực tế') || h.includes('thuc te')) !== -1 ? 
-                             headerRow.findIndex(h => h.includes('thực tế') || h.includes('thuc te')) : 3;
-      const colProduct = headerRow.findIndex(h => h.includes('sản phẩm') || h.includes('san pham')) !== -1 ?
-                         headerRow.findIndex(h => h.includes('sản phẩm') || h.includes('san pham')) : 4;
-      const colChiTieu = headerRow.findIndex(h => h.includes('chỉ tiêu') || h.includes('chi tieu')) !== -1 ? 
-                         headerRow.findIndex(h => h.includes('chỉ tiêu') || h.includes('chi tieu')) : 5;
-      const colActive = headerRow.findIndex(h => h.includes('hoạt chất') || h.includes('hoat chat')) !== -1 ? 
-                        headerRow.findIndex(h => h.includes('hoạt chất') || h.includes('hoat chat')) : 6;
-      const colMethod = headerRow.findIndex(h => h.includes('phương pháp') || h.includes('phuong phap') || h === 'pp') !== -1 ? 
-                        headerRow.findIndex(h => h.includes('phương pháp') || h.includes('phuong phap') || h === 'pp') : 7;
-      const colType = headerRow.findIndex(h => h.includes('loại test') || h.includes('loai test')) !== -1 ? 
-                      headerRow.findIndex(h => h.includes('loại test') || h.includes('loai test')) : 8;
-      const colResult = headerRow.findIndex(h => h.includes('kết quả') || h.includes('ket qua')) !== -1 ? 
-                        headerRow.findIndex(h => h.includes('kết quả') || h.includes('ket qua')) : 10;
-      const colTester = headerRow.findIndex(h => h.includes('knv') || h.includes('người test') || h.includes('kiểm nghiệm viên')) !== -1 ? 
-                        headerRow.findIndex(h => h.includes('knv') || h.includes('người test') || h.includes('kiểm nghiệm viên')) : 11;
-      const colPoints = headerRow.findIndex(h => h === 'mức' || h === 'muc') !== -1 ? 
-                        headerRow.findIndex(h => h === 'mức' || h === 'muc') : 13;
-      const colReward = headerRow.findIndex(h => h === 'thưởng' || h === 'thuong') !== -1 ? 
-                        headerRow.findIndex(h => h === 'thưởng' || h === 'thuong') : 16;
+      const colDate = headerRow.findIndex(h => h.includes('ngay')) !== -1 ? 
+                      headerRow.findIndex(h => h.includes('ngay')) : 0;
+      const colThangThucTe = headerRow.findIndex(h => h.includes('thuc te')) !== -1 ? 
+                             headerRow.findIndex(h => h.includes('thuc te')) : 3;
+      const colProduct = headerRow.findIndex(h => h.includes('san pham')) !== -1 ?
+                         headerRow.findIndex(h => h.includes('san pham')) : 4;
+      const colChiTieu = headerRow.findIndex(h => h.includes('chi tieu')) !== -1 ? 
+                         headerRow.findIndex(h => h.includes('chi tieu')) : 5;
+      const colActive = headerRow.findIndex(h => h.includes('hoat chat')) !== -1 ? 
+                        headerRow.findIndex(h => h.includes('hoat chat')) : 6;
+      const colMethod = headerRow.findIndex(h => h.includes('phuong phap') || h === 'pp') !== -1 ? 
+                        headerRow.findIndex(h => h.includes('phuong phap') || h === 'pp') : 7;
+      const colType = headerRow.findIndex(h => h.includes('loai test')) !== -1 ? 
+                      headerRow.findIndex(h => h.includes('loai test')) : 8;
+      const colResult = headerRow.findIndex(h => h.includes('ket qua')) !== -1 ? 
+                        headerRow.findIndex(h => h.includes('ket qua')) : 10;
+      const colTester = headerRow.findIndex(h => h.includes('knv') || h.includes('nguoi test') || h.includes('kiem nghiem vien')) !== -1 ? 
+                        headerRow.findIndex(h => h.includes('knv') || h.includes('nguoi test') || h.includes('kiem nghiem vien')) : 11;
+      const colPoints = headerRow.findIndex(h => h === 'muc') !== -1 ? 
+                        headerRow.findIndex(h => h === 'muc') : 13;
+      const colReward = headerRow.findIndex(h => h === 'thuong') !== -1 ? 
+                        headerRow.findIndex(h => h === 'thuong') : 16;
       
-      const colShareReward = headerRow.findIndex(h => h.includes('chia thưởng') || h.includes('chia thuong')) !== -1 ? 
-                             headerRow.findIndex(h => h.includes('chia thưởng') || h.includes('chia thuong')) : 17;
-      const colReceiveFirst = headerRow.findIndex(h => h.includes('nhận lần 1') || h.includes('nhan lan 1')) !== -1 ? 
-                              headerRow.findIndex(h => h.includes('nhận lần 1') || h.includes('nhan lan 1')) : 19;
-      const colNhanThuong = headerRow.findIndex(h => h.includes('nhận thưởng') || h.includes('nhan thuong')) !== -1 ? 
-                            headerRow.findIndex(h => h.includes('nhận thưởng') || h.includes('nhan thuong')) : 18;
-      const colChot = headerRow.findIndex(h => h === 'chốt' || h === 'chot') !== -1 ? 
-                      headerRow.findIndex(h => h === 'chốt' || h === 'chot') : 15;
+      const colShareReward = headerRow.findIndex(h => h.includes('chia thuong')) !== -1 ? 
+                             headerRow.findIndex(h => h.includes('chia thuong')) : 17;
+      const colReceiveFirst = headerRow.findIndex(h => h.includes('nhan lan 1')) !== -1 ? 
+                              headerRow.findIndex(h => h.includes('nhan lan 1')) : 19;
+      const colNhanThuong = headerRow.findIndex(h => h.includes('nhan thuong')) !== -1 ? 
+                            headerRow.findIndex(h => h.includes('nhan thuong')) : 18;
+      const colChot = headerRow.findIndex(h => h === 'chot') !== -1 ? 
+                      headerRow.findIndex(h => h === 'chot') : 15;
 
-      const dataRows = rows.slice(1);
+      const dataRows = rows.slice(headerRowIdx + 1);
       
       const parseVietnameseFloat = (val) => {
         if (val === undefined || val === null) return 0;
         let s = val.toString().trim();
         s = s.replace(/\s/g, ''); // remove any whitespaces
-        // Robust Vietnamese float parsing: remove all dots (thousand separators) and replace comma with dot
         s = s.replace(/\./g, '').replace(',', '.');
         const res = parseFloat(s);
         return isNaN(res) ? 0 : res;
@@ -8314,19 +8304,16 @@
           }
         }
 
-        // We do NOT return null if !result so we can track uncompleted tests
         if (!tester && !product && !chiTieu) return null;
 
         let month = '';
         let year = '2026';
         
-        // 1. Get month from thangThucTe first if valid
         const mVal = parseInt(thangThucTe);
         if (!isNaN(mVal)) {
           month = mVal.toString().padStart(2, '0');
         }
         
-        // 2. Parse year and fallback month from dateStr
         if (dateStr) {
           const parts = dateStr.split('/');
           if (parts.length === 3) {
@@ -8337,12 +8324,10 @@
           }
         }
         
-        // Default month if still empty
         if (!month) {
           month = '07';
         }
         
-        // Shift December 2025 to 2026 if month is 01
         if (year === '2025' && month === '01') {
           year = '2026';
         }
@@ -8381,37 +8366,38 @@
 
     function mapCSVToOOS(rows, defaultType) {
       if (rows.length <= 1) return [];
-      const headers = rows[0].map(h => (h || '').toString().trim().toLowerCase());
+      
+      const indicators = ['ngày', 'số k', 'nguyên liệu', 'tiêu chí', 'kết quả', 'kiểm nghiệm viên'];
+      const { index: headerRowIdx, headers } = findHeaderRow(rows, indicators);
       
       const colMap = {
-        date: headers.findIndex(h => h.includes('ngày')),
-        soK: headers.findIndex(h => h.includes('số k')),
-        materialName: headers.findIndex(h => h.includes('nguyên liệu') || h.includes('tên nguyên') || h.includes('phụ liệu') || h.includes('mẫu')),
-        failuresCount: headers.findIndex(h => h.includes('số lần') || h.includes('lần không đạt')),
-        criteria: headers.findIndex(h => h.includes('tiêu chí')),
-        requirement: headers.findIndex(h => h.includes('yêu cầu')),
-        result: headers.findIndex(h => h.includes('kết quả')),
-        knv: headers.findIndex(h => h.includes('kiểm nghiệm viên') || h.includes('knv')),
-        feedback: headers.findIndex(h => h.includes('nội dung phản hồi')),
-        type: headers.findIndex(h => h.includes('phân loại')),
+        date: headers.findIndex(h => h.includes('ngay')),
+        soK: headers.findIndex(h => h.includes('so k')),
+        materialName: headers.findIndex(h => h.includes('nguyen lieu') || h.includes('ten nguyen') || h.includes('phu lieu') || h.includes('mau')),
+        failuresCount: headers.findIndex(h => h.includes('so lan') || h.includes('lan khong dat')),
+        criteria: headers.findIndex(h => h.includes('tieu chi')),
+        requirement: headers.findIndex(h => h.includes('yeu cau')),
+        result: headers.findIndex(h => h.includes('ket qua')),
+        knv: headers.findIndex(h => h.includes('kiem nghiem vien') || h.includes('knv')),
+        feedback: headers.findIndex(h => h.includes('noi dung phan hoi') || h.includes('phan hoi')),
+        type: headers.findIndex(h => h.includes('phan loai')),
         
-        nl: headers.findIndex(h => h.includes('lỗi do nl')),
-        knvCause: headers.findIndex(h => h.includes('lỗi do knv')),
-        std: headers.findIndex(h => h.includes('lỗi do tiêu chuẩn')),
+        nl: headers.findIndex(h => h.includes('loi do nl')),
+        knvCause: headers.findIndex(h => h.includes('loi do knv')),
+        std: headers.findIndex(h => h.includes('loi do tieu chuan') || h.includes('loi do tc')),
         rdPass: headers.findIndex(h => h.includes('rd pass')),
-        supplier: headers.findIndex(h => h.includes('nhà cung cấp')),
-        retest: headers.findIndex(h => h.includes('làm lại') || h.includes('đổi tay')),
-        oosVs: headers.findIndex(h => h.includes('oos-vs')),
-        notes: headers.findIndex(h => h.includes('ghi chú')),
+        supplier: headers.findIndex(h => h.includes('nha cung cap') || h.includes('ncc')),
+        retest: headers.findIndex(h => h.includes('lam lai') || h.includes('doi tay')),
+        oosVs: headers.findIndex(h => h.includes('oos-vs') || h.includes('oos vs')),
+        notes: headers.findIndex(h => h.includes('ghi chu')),
         
-        // QC error subcategories columns mapping
-        thietBi: headers.findIndex(h => h.includes('thiết bị') || h.includes('thiet bi') || h.includes('lỗi thiết bị')),
-        chatChuan: headers.findIndex(h => h.includes('chất chuẩn') || h.includes('chat chuan') || h.includes('lỗi chất chuẩn')),
-        dungDich: headers.findIndex(h => h.includes('dung dịch') || h.includes('dung dich') || h.includes('chuẩn độ')),
-        baoQuan: headers.findIndex(h => h.includes('bảo quản') || h.includes('bao quan') || h.includes('điều kiện bảo quản'))
+        thietBi: headers.findIndex(h => h.includes('thiet bi')),
+        chatChuan: headers.findIndex(h => h.includes('chat chuan')),
+        dungDich: headers.findIndex(h => h.includes('dung dich') || h.includes('chuan do')),
+        baoQuan: headers.findIndex(h => h.includes('bao quan'))
       };
 
-      const dataRows = rows.slice(1);
+      const dataRows = rows.slice(headerRowIdx + 1);
       return dataRows.map((row, idx) => {
         const getVal = (colIdx) => (colIdx !== -1 && colIdx < row.length) ? (row[colIdx] || '').toString().trim() : '';
         const soKVal = getVal(colMap.soK);
@@ -8454,7 +8440,7 @@
         let itemType = defaultType;
         if (colMap.type !== -1) {
           const typeVal = getVal(colMap.type).toLowerCase();
-          if (typeVal.includes('phụ') || typeVal.includes('pl')) {
+          if (typeVal.includes('phu') || typeVal.includes('pl')) {
             itemType = 'PL';
           } else {
             itemType = 'NL';
@@ -8499,16 +8485,19 @@
 
     function mapCSVToTraining(rows) {
       if (rows.length <= 1) return [];
-      const headers = rows[0].map(h => (h || '').toString().trim().toLowerCase());
+      
+      const indicators = ['chủ đề', 'người đào tạo', 'người tham gia', 'trạng thái'];
+      const { index: headerRowIdx, headers } = findHeaderRow(rows, indicators);
+      
       const colMap = {
-        date: headers.findIndex(h => h.includes('ngày') || h.includes('ngay')),
-        topic: headers.findIndex(h => h.includes('chủ đề') || h.includes('chu de') || h.includes('nội dung') || h.includes('noi dung') || h.includes('topic')),
-        trainer: headers.findIndex(h => h.includes('người đào tạo') || h.includes('nguoi dao tao') || h.includes('giảng viên') || h.includes('trainer')),
-        trainees: headers.findIndex(h => h.includes('người tham gia') || h.includes('nguoi tham gia') || h.includes('học viên') || h.includes('hoc vien') || h.includes('trainees')),
-        status: headers.findIndex(h => h.includes('trạng thái') || h.includes('trang thai') || h.includes('status'))
+        date: headers.findIndex(h => h.includes('ngay')),
+        topic: headers.findIndex(h => h.includes('chu de') || h.includes('noi dung') || h.includes('topic')),
+        trainer: headers.findIndex(h => h.includes('nguoi dao tao') || h.includes('giang vien') || h.includes('trainer')),
+        trainees: headers.findIndex(h => h.includes('nguoi tham gia') || h.includes('hoc vien') || h.includes('trainees')),
+        status: headers.findIndex(h => h.includes('trang thai') || h.includes('status'))
       };
 
-      const dataRows = rows.slice(1);
+      const dataRows = rows.slice(headerRowIdx + 1);
       return dataRows.map((row, idx) => {
         const getVal = (colIdx) => (colIdx !== -1 && colIdx < row.length) ? (row[colIdx] || '').toString().trim() : '';
         const topic = getVal(colMap.topic);
