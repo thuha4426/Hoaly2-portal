@@ -1059,9 +1059,226 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Style for Bonding Gallery */
+    .bonding-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .bonding-form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .bonding-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .bonding-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .bonding-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+    }
+    .bonding-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      border-color: var(--border-hover);
+    }
+    .bonding-img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: #f1f5f9;
+    }
+    .bonding-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .bonding-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+    }
+    .bonding-info {
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .bonding-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+    .bonding-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.75rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .btn-delete-bonding {
+      background: transparent;
+      border: none;
+      color: var(--color-danger);
+      cursor: pointer;
+      padding: 0.25rem;
+      font-size: 0.9rem;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .btn-delete-bonding:hover {
+      opacity: 1;
+    }
+    
+    /* Layout standard forms */
+    .logger-form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .logger-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    /* Mobile Header and Sidebar Drawer Overlay */
+    .mobile-header {
+      display: none;
+    }
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 199;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Upload zone styling */
+    .upload-dropzone {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      margin-top: 0.5rem;
+    }
+    .upload-dropzone:hover {
+      border-color: var(--color-primary);
+      background: var(--color-primary-glow);
+    }
+    .upload-dropzone.has-file {
+      border-style: solid;
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.05);
+    }
+
+    @media (max-width: 992px) {
+      .mobile-header {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border-color);
+        z-index: 150;
+        align-items: center;
+        padding: 0 1.5rem;
+        gap: 1rem;
+      }
+      .mobile-title {
+        font-weight: 700;
+        color: var(--text-main);
+        font-size: 1.1rem;
+      }
+      .portal-sidebar {
+        left: -280px;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.15);
+      }
+      .portal-sidebar.open {
+        left: 0;
+      }
+      .portal-main {
+        margin-left: 0;
+        max-width: 100%;
+        padding: 5.5rem 1rem 2rem 1rem;
+      }
+      .bonding-form-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .logger-form-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .filter-bar {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr !important;
+      }
+      .overview-hero {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Mobile Header -->
+  <div class="mobile-header">
+    <button id="mobile-menu-toggle" class="btn" style="padding: 0.5rem; border: none; background: transparent; font-size: 1.25rem;">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="mobile-title">QC Portal</div>
+  </div>
+
+  <!-- Sidebar Overlay for Mobile -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <!-- Top Navigation Portal Header -->
   <div class="portal-layout">
@@ -1081,23 +1298,32 @@
         <button class="sidebar-tab nav-tab" data-tab="tab-targets">
           <i class="fa-solid fa-bullseye"></i> Mục tiêu Quý
         </button>
-        <button class="sidebar-tab nav-tab" data-tab="tab-training">
-          <i class="fa-solid fa-graduation-cap"></i> Đào tạo
-        </button>
-        <button class="sidebar-tab nav-tab" data-tab="tab-modeling">
-          <i class="fa-solid fa-microscope"></i> Hiệu suất làm mẫu
-        </button>
-        <button class="sidebar-tab nav-tab" data-tab="tab-improvement">
-          <i class="fa-solid fa-lightbulb"></i> Cải tiến
-        </button>
         <button class="sidebar-tab nav-tab" data-tab="tab-personnel">
           <i class="fa-solid fa-users"></i> Quản lý Nhân sự
+        </button>
+        <button class="sidebar-tab nav-tab" data-tab="tab-training">
+          <i class="fa-solid fa-graduation-cap"></i> Đào tạo
         </button>
         <button class="sidebar-tab nav-tab" data-tab="tab-oos">
           <i class="fa-solid fa-chart-bar"></i> Sự cố OOS
         </button>
+        <button class="sidebar-tab nav-tab" data-tab="tab-delays">
+          <i class="fa-solid fa-clock-rotate-left"></i> Chậm phiếu NL/PL
+        </button>
+        <button class="sidebar-tab nav-tab" data-tab="tab-modeling">
+          <i class="fa-solid fa-microscope"></i> Hiệu suất làm mẫu
+        </button>
         <button class="sidebar-tab nav-tab" data-tab="tab-methods">
           <i class="fa-solid fa-flask-vial"></i> Test phương pháp
+        </button>
+        <button class="sidebar-tab nav-tab" data-tab="tab-standards">
+          <i class="fa-solid fa-book"></i> Tiêu chuẩn NL
+        </button>
+        <button class="sidebar-tab nav-tab" data-tab="tab-bonding">
+          <i class="fa-solid fa-heart"></i> Gắn kết QC
+        </button>
+        <button class="sidebar-tab nav-tab" data-tab="tab-improvement">
+          <i class="fa-solid fa-lightbulb"></i> Cải tiến
         </button>
       </div>
       <div class="sidebar-footer">
@@ -1198,7 +1424,7 @@
               </div>
             </div>
             <!-- 5. Liên hoan ngọt -->
-            <div class="ov-kpi-item">
+            <div class="ov-kpi-item" style="cursor:pointer;" onclick="switchSidebarTab('tab-bonding')">
               <div class="ov-kpi-icon" style="background:rgba(236,72,153,0.1); color:#db2777;"><i class="fa-solid fa-cookie-bite"></i></div>
               <div class="ov-kpi-body" style="flex:1;">
                 <span class="ov-kpi-name">Gắn kết - Liên hoan ngọt</span>
@@ -1207,7 +1433,7 @@
               </div>
             </div>
             <!-- 6. Liên hoan mặn -->
-            <div class="ov-kpi-item">
+            <div class="ov-kpi-item" style="cursor:pointer;" onclick="switchSidebarTab('tab-bonding')">
               <div class="ov-kpi-icon" style="background:rgba(236,72,153,0.1); color:#db2777;"><i class="fa-solid fa-bowl-food"></i></div>
               <div class="ov-kpi-body" style="flex:1;">
                 <span class="ov-kpi-name">Gắn kết - Liên hoan mặn</span>
@@ -1225,19 +1451,19 @@
               </div>
             </div>
             <!-- 8. Lỗi NL chậm -->
-            <div class="ov-kpi-item">
-              <div class="ov-kpi-icon" style="background:rgba(6,182,212,0.1); color:#0891b2;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="ov-kpi-item" style="cursor:pointer;" onclick="switchSidebarTab('tab-delays')">
+              <div class="ov-kpi-icon" style="background:rgba(6,182,212,0.1); color:#0891b2;"><i class="fa-solid fa-clock-rotate-left"></i></div>
               <div class="ov-kpi-body" style="flex:1;">
-                <span class="ov-kpi-name">Tỷ lệ lỗi NL chậm do QC</span>
+                <span class="ov-kpi-name">Tỷ lệ chậm phiếu NL, PL</span>
                 <span class="ov-kpi-val" id="ov-val-loiCham">0 / 0</span>
                 <div class="ov-kpi-bar"><div id="ov-bar-loiCham" class="ov-kpi-fill" style="width:0%;background:linear-gradient(90deg,#0891b2,#22d3ee);"></div></div>
               </div>
             </div>
             <!-- 9. Rà soát tiêu chuẩn NL -->
-            <div class="ov-kpi-item" style="grid-column: span 2;">
-              <div class="ov-kpi-icon" style="background:rgba(139,92,246,0.1); color:#7c3aed;"><i class="fa-solid fa-book-open"></i></div>
+            <div class="ov-kpi-item" style="grid-column: span 2; cursor:pointer;" onclick="switchSidebarTab('tab-standards')">
+              <div class="ov-kpi-icon" style="background:rgba(139,92,246,0.1); color:#7c3aed;"><i class="fa-solid fa-book"></i></div>
               <div class="ov-kpi-body" style="flex:1;">
-                <span class="ov-kpi-name">Rà soát, update tiêu chuẩn NL</span>
+                <span class="ov-kpi-name">Số tiêu chuẩn NL ban hành</span>
                 <span class="ov-kpi-val" id="ov-val-raSoatTieuChuan">0 / 0</span>
                 <div class="ov-kpi-bar"><div id="ov-bar-raSoatTieuChuan" class="ov-kpi-fill" style="width:0%;background:linear-gradient(90deg,#7c3aed,#a78bfa);"></div></div>
               </div>
@@ -1450,8 +1676,8 @@
                 <tr>
                   <td style="vertical-align:middle;">
                     <div class="okr-icon-label">
-                      <i class="fa-solid fa-triangle-exclamation" style="color:#06b6d4;"></i>
-                      <span>Tỷ lệ lỗi NL chậm do QC</span>
+                      <i class="fa-solid fa-clock-rotate-left" style="color:#06b6d4;"></i>
+                      <span>Tỷ lệ chậm phiếu NL, PL</span>
                     </div>
                   </td>
                   <td style="vertical-align:middle;">
@@ -1487,8 +1713,8 @@
                 <tr>
                   <td style="vertical-align:middle;">
                     <div class="okr-icon-label">
-                      <i class="fa-solid fa-book-open" style="color:#06b6d4;"></i>
-                      <span>Rà soát, update, ban hành tiêu chuẩn NL</span>
+                      <i class="fa-solid fa-book" style="color:#06b6d4;"></i>
+                      <span>Số tiêu chuẩn NL ban hành</span>
                     </div>
                   </td>
                   <td style="vertical-align:middle;">
@@ -1909,7 +2135,7 @@
         <!-- Chart 1: Monthly Trend -->
         <div class="glass-card" id="card-monthly-trend-container">
           <div class="card-title">
-            <i class="fa-solid fa-chart-line"></i> Xu hướng OOS theo tháng <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted); margin-left:0.35rem;">(không tính OOS vi sinh)</span>
+            <i class="fa-solid fa-chart-line"></i> Xu hướng OOS theo tháng
           </div>
           <div class="chart-container">
             <canvas id="chart-monthly-trend"></canvas>
@@ -1918,7 +2144,7 @@
         <!-- Chart 2: Cause Breakdown -->
         <div class="glass-card">
           <div class="card-title">
-            <i class="fa-solid fa-chart-pie"></i> Phân tích nguyên nhân OOS <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted); margin-left:0.35rem;">(không tính OOS vi sinh)</span>
+            <i class="fa-solid fa-chart-pie"></i> Phân tích nguyên nhân OOS
           </div>
           <div class="chart-container">
             <canvas id="chart-cause-breakdown"></canvas>
@@ -1926,41 +2152,158 @@
         </div>
       </div>
 
-      <!-- Deep-dive section (Lỗi do NL analysis + Top Lists) -->
-      <div class="grid-deep-dive">
-        <!-- Deep dive: NL Causes percentages -->
-        <div class="glass-card">
-          <div class="card-title" style="border-left-color: var(--color-success);">
-            <i class="fa-solid fa-flask"></i> Khi có "Lỗi do NL" (Nguyên liệu không đạt)
-          </div>
-          <div class="gauge-flex-container">
-            <!-- Gauge 1: RD Pass -->
-            <div class="gauge-wrapper">
-              <div class="progress-ring-container">
-                <svg width="120" height="120" class="progress-ring">
-                  <circle class="progress-ring-bg" cx="60" cy="60" r="50"></circle>
-                  <circle id="ring-rd-pass" class="progress-ring-circle rd" cx="60" cy="60" r="50"></circle>
-                </svg>
-                <div id="text-rd-pass-percent" class="progress-text">0%</div>
-              </div>
-              <div class="gauge-label">RD Pass</div>
-              <div id="text-rd-pass-count" class="gauge-desc">0 / 0 ca</div>
+      <!-- Bảng phân tích chuyên sâu sự cố OOS -->
+      <div style="margin-bottom: 2rem;">
+        <h3 style="margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; font-size:1.15rem; color:var(--text-main); font-weight:600;">
+          <i class="fa-solid fa-chart-simple" style="color:var(--color-primary);"></i>
+          Phân tích chuyên sâu sự cố OOS
+        </h3>
+        
+        <div class="grid-2" style="margin-bottom:1.25rem; gap:1.25rem;">
+          
+          <!-- Card 1: Phân loại OOS Hóa Lý vs Vi sinh -->
+          <div class="glass-card">
+            <div class="card-title" style="border-left-color: var(--color-primary);">
+              <i class="fa-solid fa-viruses"></i> 1. Phân loại OOS (Hóa lý vs Vi sinh)
             </div>
-            <!-- Gauge 2: Phản hồi NCC -->
-            <div class="gauge-wrapper">
-              <div class="progress-ring-container">
-                <svg width="120" height="120" class="progress-ring">
-                  <circle class="progress-ring-bg" cx="60" cy="60" r="50"></circle>
-                  <circle id="ring-supplier" class="progress-ring-circle supplier" cx="60" cy="60" r="50"></circle>
-                </svg>
-                <div id="text-supplier-percent" class="progress-text">0%</div>
+            <div class="analysis-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.85rem;">
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
+                  <span style="color:var(--text-muted);">Tổng số ca OOS</span>
+                  <span style="font-weight:700;" id="ana-total-oos">0 ca (100%)</span>
+                </div>
+                <div style="height:6px; background:rgba(0,0,0,0.05); border-radius:10px;"><div style="width:100%; height:100%; background:var(--color-primary); border-radius:10px;"></div></div>
               </div>
-              <div class="gauge-label">Phản hồi nhà cung cấp</div>
-              <div id="text-supplier-count" class="gauge-desc">0 / 0 ca</div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
+                  <span style="color:var(--text-muted);">Sự cố Vi sinh (OOS-VS)</span>
+                  <span style="font-weight:700; color:var(--color-purple);" id="ana-vs-oos">0 ca (0%)</span>
+                </div>
+                <div style="height:6px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-vs-bar" style="width:0%; height:100%; background:var(--color-purple); border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
+                  <span style="color:var(--text-muted);">Sự cố Hóa lý</span>
+                  <span style="font-weight:700; color:var(--color-success);" id="ana-hl-oos">0 ca (0%)</span>
+                </div>
+                <div style="height:6px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-hl-bar" style="width:0%; height:100%; background:var(--color-success); border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
             </div>
           </div>
+          
+          <!-- Card 2: Nguyên nhân chính OOS -->
+          <div class="glass-card">
+            <div class="card-title" style="border-left-color: var(--color-warning);">
+              <i class="fa-solid fa-circle-nodes"></i> 2. Nguyên nhân chính OOS
+            </div>
+            <div class="analysis-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.7rem;">
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
+                  <span style="color:var(--text-muted);">Lỗi do Nguyên liệu</span>
+                  <span style="font-weight:700; color:var(--color-danger);" id="ana-cause-nl">0 ca (0%)</span>
+                </div>
+                <div style="height:6px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-cause-nl-bar" style="width:0%; height:100%; background:var(--color-danger); border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
+                  <span style="color:var(--text-muted);">Lỗi do Tiêu chuẩn</span>
+                  <span style="font-weight:700; color:var(--color-warning);" id="ana-cause-std">0 ca (0%)</span>
+                </div>
+                <div style="height:6px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-cause-std-bar" style="width:0%; height:100%; background:var(--color-warning); border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
+                  <span style="color:var(--text-muted);">Lỗi do QC (Thao tác/TB/Chuẩn...)</span>
+                  <span style="font-weight:700; color:var(--color-primary);" id="ana-cause-qc">0 ca (0%)</span>
+                </div>
+                <div style="height:6px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-cause-qc-bar" style="width:0%; height:100%; background:var(--color-primary); border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
+                  <span style="color:var(--text-muted);">Chưa xác định / Khác (Retest...)</span>
+                  <span style="font-weight:700; color:#64748b;" id="ana-cause-other">0 ca (0%)</span>
+                </div>
+                <div style="height:6px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-cause-other-bar" style="width:0%; height:100%; background:#64748b; border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+            </div>
+          </div>
+          
         </div>
         
+        <div class="grid-2" style="gap:1.25rem;">
+          
+          <!-- Card 3: Chi tiết lỗi QC -->
+          <div class="glass-card">
+            <div class="card-title" style="border-left-color: var(--color-danger);">
+              <i class="fa-solid fa-user-xmark"></i> 3. Chi tiết nguyên nhân lỗi QC
+            </div>
+            <div class="analysis-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.65rem;">
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem; font-size:0.8rem;">
+                  <span style="color:var(--text-muted);">Thao tác Kiểm nghiệm viên (KNV)</span>
+                  <span style="font-weight:700;" id="ana-qc-knv">0 ca (0%)</span>
+                </div>
+                <div style="height:5px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-qc-knv-bar" style="width:0%; height:100%; background:#3b82f6; border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem; font-size:0.8rem;">
+                  <span style="color:var(--text-muted);">Thiết bị kiểm nghiệm</span>
+                  <span style="font-weight:700;" id="ana-qc-tb">0 ca (0%)</span>
+                </div>
+                <div style="height:5px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-qc-tb-bar" style="width:0%; height:100%; background:#10b981; border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem; font-size:0.8rem;">
+                  <span style="color:var(--text-muted);">Điều kiện bảo quản mẫu</span>
+                  <span style="font-weight:700;" id="ana-qc-bq">0 ca (0%)</span>
+                </div>
+                <div style="height:5px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-qc-bq-bar" style="width:0%; height:100%; background:#f59e0b; border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem; font-size:0.8rem;">
+                  <span style="color:var(--text-muted);">Chất chuẩn</span>
+                  <span style="font-weight:700;" id="ana-qc-cc">0 ca (0%)</span>
+                </div>
+                <div style="height:5px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-qc-cc-bar" style="width:0%; height:100%; background:#8b5cf6; border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem; font-size:0.8rem;">
+                  <span style="color:var(--text-muted);">Dung dịch chuẩn độ</span>
+                  <span style="font-weight:700;" id="ana-qc-dd">0 ca (0%)</span>
+                </div>
+                <div style="height:5px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-qc-dd-bar" style="width:0%; height:100%; background:#ec4899; border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Card 4: Xử lý OOS do Nguyên liệu -->
+          <div class="glass-card">
+            <div class="card-title" style="border-left-color: var(--color-success);">
+              <i class="fa-solid fa-truck-ramp-box"></i> 4. Xử lý OOS do Nguyên liệu
+            </div>
+            <div class="analysis-list" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.85rem;">
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
+                  <span style="color:var(--text-muted);">Nguyên liệu được R&D Pass</span>
+                  <span style="font-weight:700; color:var(--color-success);" id="ana-nl-rd">0 ca (0%)</span>
+                </div>
+                <div style="height:6px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-nl-rd-bar" style="width:0%; height:100%; background:var(--color-success); border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
+                  <span style="color:var(--text-muted);">Phản hồi nhà cung cấp (NCC)</span>
+                  <span style="font-weight:700; color:var(--color-danger);" id="ana-nl-supplier">0 ca (0%)</span>
+                </div>
+                <div style="height:6px; background:rgba(0,0,0,0.05); border-radius:10px;"><div id="ana-nl-supplier-bar" style="width:0%; height:100%; background:var(--color-danger); border-radius:10px; transition: width 0.5s ease;"></div></div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      <!-- Deep-dive section (Top Lists) -->
+      <div class="grid-deep-dive" style="grid-template-columns: 1fr 1fr;">
         <!-- Top lists: Top Materials -->
         <div class="glass-card">
           <div class="card-title" style="border-left-color: var(--color-purple);">
@@ -2115,6 +2458,16 @@
             <p class="kpi-label">Tỷ lệ Đạt (Số lượng Đạt)</p>
           </div>
         </div>
+        
+        <div class="kpi-card" id="kpi-card-completed" style="cursor: pointer; transition: all 0.2s ease-in-out;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 15px rgba(124, 58, 237, 0.15)';" onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+          <div class="kpi-icon-wrapper" style="background: rgba(124, 58, 237, 0.1); color: rgb(124, 58, 237);">
+            <i class="fa-solid fa-folder-closed"></i>
+          </div>
+          <div class="kpi-info">
+            <h3 id="method-kpi-completed-files" class="kpi-value">0</h3>
+            <p class="kpi-label">Hồ sơ hoàn thành (Đạt hết chỉ tiêu)</p>
+          </div>
+        </div>
       </div>
 
       <!-- Hàng Biểu đồ Phân tích lớn (Main Charts Section Split) -->
@@ -2197,7 +2550,7 @@
       <!-- Hàng Tổng hợp trạng thái sản phẩm -->
       <div class="glass-card" style="margin-bottom: 1.5rem; display: flex; flex-direction: column; min-height: 250px;">
         <div class="card-header-with-action" style="flex-wrap: wrap; gap: 1rem;">
-          <h3 class="card-title" style="color: var(--color-warning);"><i class="fa-solid fa-clock-rotate-left"></i> Sản phẩm chưa test xong (Đang tiến hành)</h3>
+          <h3 id="product-progress-title" class="card-title" style="color: var(--color-warning);"><i class="fa-solid fa-clock-rotate-left"></i> Sản phẩm chưa test xong (Đang tiến hành)</h3>
           <div style="display: flex; gap: 1rem; align-items: center; font-size: 0.8rem; margin-left: auto;">
             <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer; color: var(--text-muted); font-weight: 500;">
               <input type="radio" name="uncompleted-filter" value="all" checked style="cursor: pointer;"> Tất cả
@@ -2208,6 +2561,9 @@
             <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer; color: var(--text-muted); font-weight: 500;">
               <input type="radio" name="uncompleted-filter" value="other" style="cursor: pointer;"> Còn chỉ tiêu khác
             </label>
+            <label style="display: flex; align-items: center; gap: 0.25rem; cursor: pointer; color: var(--text-muted); font-weight: 500;">
+              <input type="radio" name="uncompleted-filter" value="completed" style="cursor: pointer;"> Đã test xong
+            </label>
           </div>
         </div>
         <div class="table-container" style="flex-grow: 1; overflow-y: auto; max-height: 220px; padding: 0.5rem 1rem;">
@@ -2216,7 +2572,7 @@
               <tr>
                 <th style="width: 50px; text-align: center;">STT</th>
                 <th style="width: 250px;">Sản phẩm</th>
-                <th>Các chỉ tiêu chưa test xong</th>
+                <th id="th-progress-col-header">Các chỉ tiêu chưa test xong</th>
               </tr>
             </thead>
             <tbody id="method-uncompleted-tbody">
@@ -2268,11 +2624,344 @@
           </div>
         </div>
       </div>
-
     </div>
 
-  </main>
-</div>
+      <!-- ================= TAB: GẮN KẾT QC ================= -->
+      <div id="tab-bonding" class="tab-pane">
+        <div class="bonding-header">
+          <h2><i class="fa-solid fa-heart" style="color: #db2777;"></i> Hoạt động Gắn kết & Liên hoan QC</h2>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar" style="margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+          <div class="filter-group">
+            <label for="bonding-filter-year">Năm</label>
+            <select id="bonding-filter-year" class="form-control" onchange="renderBondingTab()">
+              <option value="2026" selected>2026</option>
+              <option value="2025">2025</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="bonding-filter-quarter">Quý</label>
+            <select id="bonding-filter-quarter" class="form-control" onchange="renderBondingTab()">
+              <option value="ALL">Tất cả các Quý</option>
+              <option value="Q1">Quý 1 (T1-T3)</option>
+              <option value="Q2">Quý 2 (T4-T6)</option>
+              <option value="Q3" selected>Quý 3 (T7-T9)</option>
+              <option value="Q4">Quý 4 (T10-T12)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="toggleBondingForm()" style="margin-left: auto;">
+            <i class="fa-solid fa-plus"></i> Đăng hoạt động mới
+          </button>
+        </div>
+
+        <!-- Form đăng hoạt động -->
+        <div id="bonding-form-card" class="bonding-form-card" style="display: none;">
+          <h3 style="margin-bottom:1rem;font-size:1.05rem;"><i class="fa-solid fa-camera"></i> Đăng hoạt động mới</h3>
+          <div class="bonding-form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div class="filter-group">
+              <label>Tên hoạt động / Chú thích</label>
+              <input type="text" id="bonding-caption" class="form-control" placeholder="Nhập tên hoạt động...">
+            </div>
+            <div class="filter-group">
+              <label>Ngày diễn ra</label>
+              <input type="date" id="bonding-date" class="form-control">
+            </div>
+            <div class="filter-group">
+              <label>Phân loại Gắn kết</label>
+              <select id="bonding-type" class="form-control">
+                <option value="ngot">Liên hoan ngọt (Trà sữa, bánh ngọt, trái cây...)</option>
+                <option value="man">Liên hoan mặn (Lẩu, nướng, ăn nhậu...)</option>
+              </select>
+            </div>
+            <div class="filter-group" style="grid-column: span 2;">
+              <label>Chọn ảnh từ máy tính / Điện thoại</label>
+              <div class="upload-dropzone" onclick="document.getElementById('bonding-file').click()">
+                <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.8rem;color:var(--color-primary);margin-bottom:0.5rem;"></i>
+                <span>Bấm vào đây để chọn ảnh hoặc chụp hình</span>
+                <span style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;">Hỗ trợ ảnh PNG, JPG, JPEG</span>
+                <input type="file" id="bonding-file" accept="image/*" style="display:none;" onchange="updateUploadZoneFilename()">
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1rem;">
+            <button class="btn" onclick="toggleBondingForm()">Hủy</button>
+            <button class="btn btn-primary" onclick="saveNewBondingEvent()">Đăng hoạt động</button>
+          </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div id="bonding-gallery-grid" class="bonding-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+
+      <!-- ================= TAB: CHẬM PHIẾU NL/PL ================= -->
+      <div id="tab-delays" class="tab-pane">
+        <div class="bonding-header">
+          <h2><i class="fa-solid fa-clock" style="color:#ef4444;"></i> Nhật ký Chậm phiếu Nguyên liệu / Phụ liệu</h2>
+          <button class="btn btn-primary" onclick="toggleDelayForm()"><i class="fa-solid fa-plus"></i> Ghi nhận chậm phiếu</button>
+        </div>
+
+        <!-- Form nhập log chậm (để ẩn) -->
+        <div id="delay-form-card" class="logger-form-card" style="display: none;">
+          <h3 style="margin-bottom:1rem;font-size:1.05rem;"><i class="fa-solid fa-square-plus"></i> Ghi nhận mẫu chậm mới</h3>
+          <div class="logger-form-grid">
+            <div class="filter-group">
+              <label>Ngày kiểm</label>
+              <input type="date" id="delay-date" class="form-control">
+            </div>
+            <div class="filter-group">
+              <label>Tên vật tư</label>
+              <input type="text" id="delay-material" class="form-control" placeholder="Ví dụ: Sodium Chloride...">
+            </div>
+            <div class="filter-group">
+              <label>Phân loại</label>
+              <select id="delay-type" class="form-control">
+                <option value="NL">Nguyên liệu (NL)</option>
+                <option value="PL">Phụ liệu (PL)</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Kiểm nghiệm viên</label>
+              <input type="text" id="delay-knv" class="form-control" placeholder="Ví dụ: Nguyễn Văn A...">
+            </div>
+            <div class="filter-group">
+              <label>Trạng thái</label>
+              <select id="delay-status" class="form-control">
+                <option value="delayed">Chậm phiếu</option>
+                <option value="ontime">Đúng hạn</option>
+              </select>
+            </div>
+            <div class="filter-group" id="delay-days-group">
+              <label>Số ngày trễ</label>
+              <input type="number" id="delay-days" class="form-control" min="1" value="1">
+            </div>
+          </div>
+          <div style="display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1rem;">
+            <button class="btn" onclick="toggleDelayForm()">Hủy</button>
+            <button class="btn btn-primary" onclick="saveNewDelayLog()">Lưu nhật ký</button>
+          </div>
+        </div>
+
+        <!-- ROW 1: TỔNG HỢP THEO THÁNG (Đẩy lên trên cùng!) -->
+        <div class="glass-card" style="padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+            <h4 style="margin: 0; font-size: 1rem; color: var(--color-primary); font-weight: bold;">
+              <i class="fa-solid fa-calendar-days"></i> TỔNG HỢP THEO THÁNG
+            </h4>
+            
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <label style="margin: 0; font-size: 0.85rem; font-weight: bold; color: var(--text-muted);">Chọn Tháng:</label>
+              <select id="kpi-month-select" class="form-control" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.85rem; height: auto;" onchange="onMonthSelectChange(this.value)">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <!-- Cột trái: Highlighted monthly statistics cards (Nổi bật hơn!) -->
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; justify-content: center;">
+              <div style="font-size: 0.88rem; font-weight: bold; color: var(--text-main); margin-bottom: 0.25rem;">
+                <span id="kpi-month-title" style="color:var(--color-primary); font-weight: 800; font-size: 1.05rem;">Tháng -</span>
+                <span id="kpi-month-weeks-desc" style="color:var(--text-muted); font-weight:normal; font-size:0.75rem; margin-left:0.35rem;">(Chưa cấu hình)</span>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- Card 1: Tổng % chậm -->
+                <div style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.015)); border: 1px solid rgba(239, 68, 68, 0.2); padding: 0.85rem; border-radius: 8px; display: flex; flex-direction: column; gap: 0.25rem; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.05);">
+                  <span style="font-size: 0.72rem; font-weight: bold; color: #ef4444; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.25rem;">
+                    <i class="fa-solid fa-circle-exclamation"></i> Tổng % chậm
+                  </span>
+                  <span id="kpi-month-val-total-pct" style="font-size: 1.7rem; font-weight: 800; color: #ef4444; line-height: 1.1; margin-top: 0.15rem;">-</span>
+                  <span id="kpi-month-val-total-count" style="font-size: 0.73rem; color: var(--text-muted); font-weight: 500;">(- mẫu)</span>
+                </div>
+                
+                <!-- Card 2: % chậm do QC -->
+                <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(245, 158, 11, 0.015)); border: 1px solid rgba(245, 158, 11, 0.2); padding: 0.85rem; border-radius: 8px; display: flex; flex-direction: column; gap: 0.25rem; box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.05);">
+                  <span style="font-size: 0.72rem; font-weight: bold; color: #d97706; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 0.25rem;">
+                    <i class="fa-solid fa-user-shield"></i> % chậm do QC
+                  </span>
+                  <span id="kpi-month-val-qc-pct" style="font-size: 1.7rem; font-weight: 800; color: #d97706; line-height: 1.1; margin-top: 0.15rem;">-</span>
+                  <span id="kpi-month-val-qc-count" style="font-size: 0.73rem; color: var(--text-muted); font-weight: 500;">(- mẫu)</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Cột phải: Cấu hình phân bổ tuần -->
+            <div style="background: rgba(0,0,0,0.01); padding: 0.75rem; border-radius: 6px; border: 1px dashed var(--border-color); display: flex; flex-direction: column; gap: 0.5rem; justify-content: space-between;">
+              <div>
+                <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
+                  <i class="fa-solid fa-calendar-check"></i> Cấu hình tháng cho từng tuần từ Google Sheets:
+                </label>
+                <div id="cfg-weeks-container" style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.8rem;">
+                  <!-- Populate dynamically -->
+                </div>
+              </div>
+              <button class="btn btn-primary" style="width: 100%; padding: 0.25rem; font-size: 0.8rem; height: auto;" onclick="saveWeekMonthConfig()">
+                <i class="fa-solid fa-circle-check"></i> Xác nhận và Lưu cấu hình
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2: TỔNG HỢP THEO TUẦN -->
+        <div class="glass-card" style="padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+            <h4 style="margin: 0; font-size: 1rem; color: var(--color-primary); font-weight: bold;">
+              <i class="fa-solid fa-calendar-week"></i> <span id="kpi-title">TỔNG HỢP THEO TUẦN</span>
+            </h4>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <label style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Chọn tuần:</label>
+              <select id="kpi-week-select" class="form-control" style="width: auto; padding: 0.15rem 0.5rem; font-size: 0.8rem; height: auto;" onchange="updateKpiDashboard(this.value)">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+          </div>
+          
+          <!-- Retrieved summary details line -->
+          <div style="margin-bottom: 0.6rem;">
+            <div style="font-size: 0.82rem; color: var(--text-main); font-weight: bold; background: rgba(99, 102, 241, 0.08); padding: 0.25rem 0.6rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(99, 102, 241, 0.15);">
+              <span><i class="fa-solid fa-flask"></i> <span id="kpi-summary-label-nl">NL lấy trong tuần</span>: <span id="kpi-summary-ret-nl" style="color:var(--color-primary);">-</span></span>
+              <span style="color: var(--border-color);">|</span>
+              <span><i class="fa-solid fa-box-open"></i> <span id="kpi-summary-label-pl">PL lấy trong tuần</span>: <span id="kpi-summary-ret-pl" style="color:#d97706;">-</span></span>
+            </div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <!-- Cột trái: Tỷ lệ chậm NL & PL -->
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; justify-content: center;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: rgba(0, 0, 0, 0.015); padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border-color);">
+                <!-- NL -->
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                  <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: bold;"><i class="fa-solid fa-flask"></i> NGUYÊN LIỆU (NL)</span>
+                  <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                    <span id="kpi-val-nl" style="font-size: 1.1rem; font-weight: bold; color: #ef4444; transition: color 0.3s;">-</span>
+                    <span id="kpi-pct-nl" style="font-size: 1.1rem; font-weight: bold; color: #ef4444; transition: color 0.3s;">-%</span>
+                  </div>
+                  <div style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                    <div id="kpi-bar-nl" style="width: 0%; height: 100%; background: #ef4444; transition: width 0.5s ease, background-color 0.5s;"></div>
+                  </div>
+                </div>
+                <!-- PL -->
+                <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                  <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: bold;"><i class="fa-solid fa-box-open"></i> PHỤ LIỆU (PL)</span>
+                  <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                    <span id="kpi-val-pl" style="font-size: 1.1rem; font-weight: bold; color: #f59e0b; transition: color 0.3s;">-</span>
+                    <span id="kpi-pct-pl" style="font-size: 1.1rem; font-weight: bold; color: #f59e0b; transition: color 0.3s;">-%</span>
+                  </div>
+                  <div style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                    <div id="kpi-bar-pl" style="width: 0%; height: 100%; background: #f59e0b; transition: width 0.5s ease, background-color 0.5s;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Cột phải: Pie Chart -->
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; justify-content: center;">
+              <h5 style="margin: 0; font-size: 0.82rem; color: var(--text-muted); font-weight: bold;">
+                <i class="fa-solid fa-chart-pie"></i> PHÂN TÍCH LÝ DO CHẬM (TỔNG SỐ: <span id="kpi-total-delayed">-</span> MẪU CHẬM KHÔNG TRÙNG)
+              </h5>
+              <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.015); padding: 0.65rem; border-radius: 6px; border: 1px solid var(--border-color); flex: 1;">
+                <div style="width: 100px; height: 100px; position: relative; flex-shrink: 0;">
+                  <canvas id="kpi-reasons-chart"></canvas>
+                </div>
+                <div id="kpi-reasons-legend" style="flex: 1; display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.74rem;">
+                  <!-- Dynamically populated legend -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 3: DANH SÁCH CHI TIẾT (Ở cuối cùng!) -->
+        <div class="glass-card" style="padding: 1rem;">
+          <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem; color: var(--text-muted); font-weight: bold;">
+            <i class="fa-solid fa-list-check"></i> Xem danh sách chi tiết các mẫu bị chậm của tuần đang chọn (Số K, Lý do, Ghi chú)
+          </h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <!-- NL List -->
+            <div>
+              <h5 style="margin-bottom: 0.5rem; font-size: 0.82rem; color: var(--color-primary); font-weight: bold;">
+                <i class="fa-solid fa-flask"></i> Nguyên liệu (NL) chậm (<span id="kpi-detail-count-nl">0 mẫu</span>):
+              </h5>
+              <div class="table-container" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; background: #ffffff;">
+                <ul id="kpi-detail-list-nl" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.25rem;">
+                  <!-- Dynamically populated -->
+                </ul>
+              </div>
+            </div>
+            <!-- PL List -->
+            <div>
+              <h5 style="margin-bottom: 0.5rem; font-size: 0.82rem; color: #f59e0b; font-weight: bold;">
+                <i class="fa-solid fa-box-open"></i> Phụ liệu (PL) chậm (<span id="kpi-detail-count-pl">0 mẫu</span>):
+              </h5>
+              <div class="table-container" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.5rem; background: #ffffff;">
+                <ul id="kpi-detail-list-pl" style="margin: 0; padding-left: 1.2rem; font-size: 0.8rem; display: flex; flex-direction: column; gap: 0.25rem;">
+                  <!-- Dynamically populated -->
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="tab-standards" class="tab-pane">
+        <div class="bonding-header">
+          <h2><i class="fa-solid fa-book" style="color:#7c3aed;"></i> Ban hành Tiêu chuẩn Nguyên liệu theo Quý</h2>
+          <button class="btn btn-primary" onclick="toggleStandardForm()"><i class="fa-solid fa-plus"></i> Ban hành tiêu chuẩn mới</button>
+        </div>
+
+        <!-- Form đăng tiêu chuẩn ban hành -->
+        <div id="standard-form-card" class="logger-form-card" style="display: none;">
+          <h3 style="margin-bottom:1rem;font-size:1.05rem;"><i class="fa-solid fa-square-plus"></i> Thêm tiêu chuẩn ban hành mới</h3>
+          <div class="logger-form-grid">
+            <div class="filter-group">
+              <label>Ngày ban hành</label>
+              <input type="date" id="standard-date" class="form-control">
+            </div>
+            <div class="filter-group">
+              <label>Mã Tiêu chuẩn</label>
+              <input type="text" id="standard-code" class="form-control" placeholder="Ví dụ: TC-NL-Paracetamol-01">
+            </div>
+            <div class="filter-group">
+              <label>Tên Nguyên liệu</label>
+              <input type="text" id="standard-material" class="form-control" placeholder="Tên nguyên liệu...">
+            </div>
+            <div class="filter-group">
+              <label>Phiên bản / Ghi chú</label>
+              <input type="text" id="standard-version" class="form-control" placeholder="Phiên bản (Ví dụ: Lần 2)...">
+            </div>
+          </div>
+          <div style="display:flex; gap:0.5rem; justify-content:flex-end; margin-top:1rem;">
+            <button class="btn" onclick="toggleStandardForm()">Hủy</button>
+            <button class="btn btn-primary" onclick="saveNewStandardLog()">Lưu hồ sơ</button>
+          </div>
+        </div>
+
+        <!-- Table list -->
+        <div class="table-container glass-card" style="padding:0; margin-top:0.5rem;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">STT</th>
+                <th>Ngày ban hành</th>
+                <th>Mã Tiêu chuẩn</th>
+                <th>Tên Nguyên liệu</th>
+                <th>Phiên bản / Ghi chú</th>
+                <th style="width: 100px; text-align: center;">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="standard-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
 
   <!-- Modal: View Detail (for OOS) -->
   <div id="detail-modal" class="modal-overlay">
@@ -2473,6 +3162,16 @@
           <div class="sync-form-group">
             <label for="sync-gid-improvement">GID tab Cải tiến</label>
             <input type="text" id="sync-gid-improvement" class="form-control" style="width:100%;" placeholder="">
+          </div>
+          <div class="sync-form-group">
+            <label for="sync-gid-delay">GID tab Chậm phiếu (KPI)</label>
+            <input type="text" id="sync-gid-delay" class="form-control" style="width:100%;" placeholder="1365140269">
+          </div>
+        </div>
+        <div class="sync-row" style="margin-top: 0.75rem;">
+          <div class="sync-form-group">
+            <label for="sync-gid-retrieved">GID tab Lấy mẫu (Tổng mẫu)</label>
+            <input type="text" id="sync-gid-retrieved" class="form-control" style="width:100%;" placeholder="1577407961">
           </div>
           <div class="sync-form-group"></div>
         </div>
@@ -2898,6 +3597,40 @@
     let improvementData = [];
     let overviewTargets = {};
 
+    // State variables for new tabs
+    let bondingData = [];
+    let delayLogs = [];
+    let standardsLogs = [];
+
+    const getSeedBondingData = () => [
+      {
+        id: "event_1",
+        date: "2026-07-02",
+        caption: "Liên hoan bánh ngọt chào đón KNV mới",
+        type: "ngot",
+        src: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'><rect width='100%' height='100%' fill='%23fbcfe8'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='bold' font-size='22' fill='%23db2777'>Liên hoan ngọt 🍰</text></svg>"
+      },
+      {
+        id: "event_2",
+        date: "2026-07-15",
+        caption: "Tiệc lẩu nướng kết nối đội ngũ",
+        type: "man",
+        src: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'><rect width='100%' height='100%' fill='%23c084fc'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='bold' font-size='22' fill='%237c3aed'>Liên hoan mặn 🍲</text></svg>"
+      }
+    ];
+
+    const getSeedDelayLogs = () => [
+      { id: "delay_1", date: "2026-07-03", material: "Paracetamol Nguyên liệu", type: "NL", knv: "QC01", status: "ontime", days: 0 },
+      { id: "delay_2", date: "2026-07-05", material: "Bao bì hộp Carton", type: "PL", knv: "QC02", status: "delayed", days: 3 },
+      { id: "delay_3", date: "2026-07-12", material: "Clindamycin Phosphate", type: "NL", knv: "QC03", status: "ontime", days: 0 },
+      { id: "delay_4", date: "2026-07-14", material: "Màng ghép nhôm", type: "PL", knv: "QC04", status: "ontime", days: 0 }
+    ];
+
+    const getSeedStandardsLogs = () => [
+      { id: "std_1", date: "2026-07-04", code: "TC-NL-Para-01", material: "Paracetamol", version: "Lần 2" },
+      { id: "std_2", date: "2026-07-10", code: "TC-NL-Aspirin-02", material: "Aspirin", version: "Lần 1" }
+    ];
+
     // New default mock datasets for Overview
     const DEFAULT_TRAINING_DATA = [
       { id: 't_1', date: '2026-06-15', topic: 'Đào tạo SOP kiểm nghiệm mẫu Paracetamol', trainer: 'Quản lý QC', trainees: 'QC01, QC02', status: 'Hoàn thành' },
@@ -3065,6 +3798,12 @@
         if (document.getElementById('sync-gid-improvement')) {
           document.getElementById('sync-gid-improvement').value = settings.gidImprovement || '';
         }
+        if (document.getElementById('sync-gid-delay')) {
+          document.getElementById('sync-gid-delay').value = settings.gidDelay || '1365140269';
+        }
+        if (document.getElementById('sync-gid-retrieved')) {
+          document.getElementById('sync-gid-retrieved').value = settings.gidRetrieved || '1577407961';
+        }
       } else {
         // Pre-fill fields and save defaults
         const defaultSettings = {
@@ -3076,7 +3815,9 @@
           gidMethod: DEFAULT_GID_METHOD,
           gidTraining: '',
           gidModeling: DEFAULT_GID_MODELING,
-          gidImprovement: ''
+          gidImprovement: '',
+          gidDelay: '1365140269',
+          gidRetrieved: '1577407961'
         };
         localStorage.setItem('qc_oos_sync_settings', JSON.stringify(defaultSettings));
 
@@ -3095,10 +3836,80 @@
         if (document.getElementById('sync-gid-improvement')) {
           document.getElementById('sync-gid-improvement').value = defaultSettings.gidImprovement;
         }
+        if (document.getElementById('sync-gid-delay')) {
+          document.getElementById('sync-gid-delay').value = defaultSettings.gidDelay;
+        }
+        if (document.getElementById('sync-gid-retrieved')) {
+          document.getElementById('sync-gid-retrieved').value = defaultSettings.gidRetrieved;
+        }
+      }
+
+      // Load Bonding data safely
+      const storedBonding = localStorage.getItem('qc_bonding_data');
+      if (storedBonding) {
+        try {
+          const parsed = JSON.parse(storedBonding);
+          if (Array.isArray(parsed)) {
+            bondingData = parsed;
+          } else {
+            bondingData = getSeedBondingData();
+          }
+        } catch(e) {
+          bondingData = getSeedBondingData();
+        }
+      } else {
+        bondingData = getSeedBondingData();
+        localStorage.setItem('qc_bonding_data', JSON.stringify(bondingData));
+      }
+
+      // Load Delays data safely
+      const storedDelays = localStorage.getItem('qc_delay_logs');
+      if (storedDelays) {
+        try {
+          const parsed = JSON.parse(storedDelays);
+          if (Array.isArray(parsed)) {
+            delayLogs = parsed;
+          } else {
+            delayLogs = getSeedDelayLogs();
+          }
+        } catch(e) {
+          delayLogs = getSeedDelayLogs();
+        }
+      } else {
+        delayLogs = getSeedDelayLogs();
+        localStorage.setItem('qc_delay_logs', JSON.stringify(delayLogs));
+      }
+
+      // Load Standards data safely
+      const storedStandards = localStorage.getItem('qc_standards_logs');
+      if (storedStandards) {
+        try {
+          const parsed = JSON.parse(storedStandards);
+          if (Array.isArray(parsed)) {
+            standardsLogs = parsed;
+          } else {
+            standardsLogs = getSeedStandardsLogs();
+          }
+        } catch(e) {
+          standardsLogs = getSeedStandardsLogs();
+        }
+      } else {
+        standardsLogs = getSeedStandardsLogs();
+        localStorage.setItem('qc_standards_logs', JSON.stringify(standardsLogs));
       }
     }
 
     function initUI() {
+      // Mobile sidebar events
+      document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
+        document.querySelector('.portal-sidebar').classList.add('open');
+        document.getElementById('sidebar-overlay').classList.add('show');
+      });
+      document.getElementById('sidebar-overlay').addEventListener('click', () => {
+        document.querySelector('.portal-sidebar').classList.remove('open');
+        document.getElementById('sidebar-overlay').classList.remove('show');
+      });
+
       // Portal Tab Switching
       document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', () => {
@@ -3110,6 +3921,12 @@
           tab.classList.add('active');
           document.getElementById(tabId).classList.add('active');
           
+          // Close mobile sidebar menu if active
+          if (window.innerWidth < 992) {
+            document.querySelector('.portal-sidebar').classList.remove('open');
+            document.getElementById('sidebar-overlay').classList.remove('show');
+          }
+
           // Re-render appropriate charts
           setTimeout(() => {
             renderDashboard();
@@ -3231,6 +4048,23 @@
           renderProductSummariesTableOnly();
         });
       });
+
+      // Click KPI card Completed to auto-filter and scroll to list
+      const kpiCompletedCard = document.getElementById('kpi-card-completed');
+      if (kpiCompletedCard) {
+        kpiCompletedCard.addEventListener('click', () => {
+          const radioCompleted = document.querySelector('input[name="uncompleted-filter"][value="completed"]');
+          if (radioCompleted) {
+            radioCompleted.checked = true;
+            renderProductSummariesTableOnly();
+            
+            const progressTitle = document.getElementById('product-progress-title');
+            if (progressTitle) {
+              progressTitle.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }
+        });
+      }
 
       // Pagination (Method Testing)
       document.getElementById('btn-method-prev').addEventListener('click', () => {
@@ -3992,6 +4826,23 @@
       const year = document.getElementById('overview-filter-year').value;
       const quarter = document.getElementById('overview-filter-quarter').value;
       
+      // Helper to check if a date string falls in the selected year and quarter
+      const isDateInQuarter = (dateStr, qYear, qQuarter) => {
+        if (!dateStr) return false;
+        const dateObj = new Date(dateStr);
+        if (isNaN(dateObj.getTime())) return false;
+        
+        const y = dateObj.getFullYear().toString();
+        if (y !== qYear) return false;
+        
+        const month = dateObj.getMonth() + 1; // 1-12
+        if (qQuarter === 'Q1') return month >= 1 && month <= 3;
+        if (qQuarter === 'Q2') return month >= 4 && month <= 6;
+        if (qQuarter === 'Q3') return month >= 7 && month <= 9;
+        if (qQuarter === 'Q4') return month >= 10 && month <= 12;
+        return false;
+      };
+
       // Compute actuals
       const actualPersonnel = getActivePersonnelInQuarter(year, quarter);
       const actualTestpp = getPassedProductsInQuarter(year, quarter);
@@ -4001,12 +4852,21 @@
       // Get targets
       const target = getOverviewTargetsForQuarter(year, quarter);
       
-      // Compute actuals for non-automated ones dynamically/mocked based on targets
-      const actualGanKetNgot = target.ganKetNgot > 0 ? (quarter === 'Q3' && year === '2026' ? 2 : Math.min(2, target.ganKetNgot)) : 0;
-      const actualGanKetMan = target.ganKetMan > 0 ? (quarter === 'Q3' && year === '2026' ? 1 : Math.min(1, target.ganKetMan)) : 0;
+      // Compute actuals for non-automated ones dynamically from new state datasets
+      const actualGanKetNgot = bondingData.filter(event => 
+        event.type === 'ngot' && isDateInQuarter(event.date, year, quarter)
+      ).length;
+      const actualGanKetMan = bondingData.filter(event => 
+        event.type === 'man' && isDateInQuarter(event.date, year, quarter)
+      ).length;
       const actualHieuChuan = target.hieuChuan !== undefined ? target.hieuChuan : 100;
-      const actualLoiCham = 4; // Actual is 4% (meaning < 8% target is achieved!)
-      const actualRaSoat = target.raSoatTieuChuan > 0 ? (quarter === 'Q3' && year === '2026' ? 80 : Math.min(80, target.raSoatTieuChuan)) : 0;
+      
+      // Link with monthly week-mapping configuration (only count QC delays / retrieved samples)
+      const actualLoiCham = getCalculatedQuarterDelayRate(year, quarter);
+      const actualLoiChamStr = actualLoiCham.toFixed(1);
+      
+      // Calculate standards issued count
+      const actualRaSoat = standardsLogs.filter(log => isDateInQuarter(log.date, year, quarter)).length;
       
       // Compute percentages
       const pctPersonnel = target.personnel > 0 ? Math.min(100, Math.round((actualPersonnel / target.personnel) * 100)) : 100;
@@ -4065,7 +4925,7 @@
       document.getElementById('ov-val-hieuChuan').textContent = `${actualHieuChuan}% / ${target.hieuChuan}% thiết bị (${pctHieuChuan}%)`;
       document.getElementById('ov-bar-hieuChuan').style.width = `${pctHieuChuan}%`;
       
-      document.getElementById('ov-val-loiCham').textContent = `${actualLoiCham}% / < ${target.loiCham}% (Đạt) (${pctLoiCham}%)`;
+      document.getElementById('ov-val-loiCham').textContent = `${actualLoiChamStr}% / < ${target.loiCham}% (${actualLoiCham <= target.loiCham ? 'Đạt' : 'Vượt trần'}) (${pctLoiCham}%)`;
       document.getElementById('ov-bar-loiCham').style.width = `${pctLoiCham}%`;
       
       document.getElementById('ov-val-raSoatTieuChuan').textContent = `${actualRaSoat} / ${target.raSoatTieuChuan} tiêu chuẩn (${pctRaSoat}%)`;
@@ -4349,6 +5209,12 @@
         renderOOSDashboard();
       } else if (activeTab === 'tab-methods') {
         renderMethodsDashboard();
+      } else if (activeTab === 'tab-bonding') {
+        renderBondingTab();
+      } else if (activeTab === 'tab-delays') {
+        renderDelayTab();
+      } else if (activeTab === 'tab-standards') {
+        renderStandardsTab();
       }
     }
 
@@ -5341,8 +6207,8 @@
       // 4. Render Cause Breakdown Chart
       renderCauseChart();
 
-      // 5. Render NL Deep Dive Rings
-      renderNLDeepDive();
+      // 5. Render OOS Deep Analysis Dashboard
+      renderOOSDeepAnalysis();
 
       // 6. Render Top Materials & Top KNVs
       renderTopMaterialsList();
@@ -5390,6 +6256,146 @@
       window.requestAnimationFrame(step);
     }
 
+    function getQcSubcategory(item) {
+      if (!item.causes || (!item.causes.knv && !item.causes.retest)) return null;
+      
+      if (item.causes.thietBi) return 'thietBi';
+      if (item.causes.chatChuan) return 'chatChuan';
+      if (item.causes.dungDich) return 'dungDich';
+      if (item.causes.baoQuan) return 'baoQuan';
+      
+      const searchTxt = ((item.notes || '') + ' ' + (item.feedback || '') + ' ' + (item.result || '') + ' ' + (item.criteria || '')).toLowerCase();
+      
+      if (searchTxt.includes('thiết bị') || searchTxt.includes('thiet bi') || searchTxt.includes('máy') || searchTxt.includes('may') || searchTxt.includes('hplc') || searchTxt.includes('sắc ký') || searchTxt.includes('sac ky') || searchTxt.includes('uv-vis') || searchTxt.includes('cân') || searchTxt.includes('can') || searchTxt.includes('tủ sấy') || searchTxt.includes('tu say') || searchTxt.includes('lò nung') || searchTxt.includes('lo nung') || searchTxt.includes('nhiệt kế') || searchTxt.includes('nhiet ke')) {
+        return 'thietBi';
+      }
+      if (searchTxt.includes('chất chuẩn') || searchTxt.includes('chat chuan') || searchTxt.includes('chuẩn đối chiếu') || searchTxt.includes('chuan doi chieu') || searchTxt.includes('standard')) {
+        return 'chatChuan';
+      }
+      if (searchTxt.includes('dung dịch chuẩn') || searchTxt.includes('dung dich chuan') || searchTxt.includes('dd chuẩn') || searchTxt.includes('dd chuan') || searchTxt.includes('chuẩn độ') || searchTxt.includes('chuan do') || searchTxt.includes('h2so4') || searchTxt.includes('naoh') || searchTxt.includes('kmno4') || searchTxt.includes('chất chỉ thị') || searchTxt.includes('chat chi thi')) {
+        return 'dungDich';
+      }
+      if (searchTxt.includes('bảo quản') || searchTxt.includes('bao quan') || searchTxt.includes('nhiệt độ') || searchTxt.includes('nhiet do') || searchTxt.includes('độ ẩm') || searchTxt.includes('do am') || searchTxt.includes('ánh sáng') || searchTxt.includes('anh sang') || searchTxt.includes('hút ẩm') || searchTxt.includes('hut am') || searchTxt.includes('môi trường') || searchTxt.includes('moi truong')) {
+        return 'baoQuan';
+      }
+      
+      return 'knvThaoTac';
+    }
+
+    function renderOOSDeepAnalysis() {
+      const total = filteredData.length;
+      
+      // 1. Phân loại OOS Hóa Lý vs Vi sinh
+      const vsCount = filteredData.filter(d => d.causes.oosVs === true).length;
+      const hlCount = total - vsCount;
+      
+      const vsPercent = total > 0 ? Math.round((vsCount / total) * 100) : 0;
+      const hlPercent = total > 0 ? Math.round((hlCount / total) * 100) : 0;
+      
+      const elTotal = document.getElementById('ana-total-oos');
+      if (elTotal) elTotal.textContent = `${total} ca (100%)`;
+      
+      const elVs = document.getElementById('ana-vs-oos');
+      if (elVs) elVs.textContent = `${vsCount} ca (${vsPercent}%)`;
+      const elVsBar = document.getElementById('ana-vs-bar');
+      if (elVsBar) elVsBar.style.width = `${vsPercent}%`;
+      
+      const elHl = document.getElementById('ana-hl-oos');
+      if (elHl) elHl.textContent = `${hlCount} ca (${hlPercent}%)`;
+      const elHlBar = document.getElementById('ana-hl-bar');
+      if (elHlBar) elHlBar.style.width = `${hlPercent}%`;
+      
+      // 2. Nguyên nhân chính OOS
+      const causeNlCount = filteredData.filter(d => d.causes.nl === true).length;
+      const causeStdCount = filteredData.filter(d => d.causes.std === true).length;
+      const causeQcCount = filteredData.filter(d => d.causes.knv === true || d.causes.retest === true).length;
+      const causeOtherCount = Math.max(0, total - (causeNlCount + causeStdCount + causeQcCount));
+      
+      const causeNlPercent = total > 0 ? Math.round((causeNlCount / total) * 100) : 0;
+      const causeStdPercent = total > 0 ? Math.round((causeStdCount / total) * 100) : 0;
+      const causeQcPercent = total > 0 ? Math.round((causeQcCount / total) * 100) : 0;
+      const causeOtherPercent = total > 0 ? Math.max(0, 100 - (causeNlPercent + causeStdPercent + causeQcPercent)) : 0;
+      
+      const elCauseNl = document.getElementById('ana-cause-nl');
+      if (elCauseNl) elCauseNl.textContent = `${causeNlCount} ca (${causeNlPercent}%)`;
+      const elCauseNlBar = document.getElementById('ana-cause-nl-bar');
+      if (elCauseNlBar) elCauseNlBar.style.width = `${causeNlPercent}%`;
+      
+      const elCauseStd = document.getElementById('ana-cause-std');
+      if (elCauseStd) elCauseStd.textContent = `${causeStdCount} ca (${causeStdPercent}%)`;
+      const elCauseStdBar = document.getElementById('ana-cause-std-bar');
+      if (elCauseStdBar) elCauseStdBar.style.width = `${causeStdPercent}%`;
+      
+      const elCauseQc = document.getElementById('ana-cause-qc');
+      if (elCauseQc) elCauseQc.textContent = `${causeQcCount} ca (${causeQcPercent}%)`;
+      const elCauseQcBar = document.getElementById('ana-cause-qc-bar');
+      if (elCauseQcBar) elCauseQcBar.style.width = `${causeQcPercent}%`;
+
+      const elCauseOther = document.getElementById('ana-cause-other');
+      if (elCauseOther) elCauseOther.textContent = `${causeOtherCount} ca (${causeOtherPercent}%)`;
+      const elCauseOtherBar = document.getElementById('ana-cause-other-bar');
+      if (elCauseOtherBar) elCauseOtherBar.style.width = `${causeOtherPercent}%`;
+      
+      // 3. Chi tiết nguyên nhân lỗi QC
+      let qcKnv = 0, qcTb = 0, qcBq = 0, qcCc = 0, qcDd = 0;
+      filteredData.forEach(d => {
+        const sub = getQcSubcategory(d);
+        if (sub === 'knvThaoTac') qcKnv++;
+        else if (sub === 'thietBi') qcTb++;
+        else if (sub === 'baoQuan') qcBq++;
+        else if (sub === 'chatChuan') qcCc++;
+        else if (sub === 'dungDich') qcDd++;
+      });
+      
+      const qcKnvPercent = causeQcCount > 0 ? Math.round((qcKnv / causeQcCount) * 100) : 0;
+      const qcTbPercent = causeQcCount > 0 ? Math.round((qcTb / causeQcCount) * 100) : 0;
+      const qcBqPercent = causeQcCount > 0 ? Math.round((qcBq / causeQcCount) * 100) : 0;
+      const qcCcPercent = causeQcCount > 0 ? Math.round((qcCc / causeQcCount) * 100) : 0;
+      const qcDdPercent = causeQcCount > 0 ? Math.round((qcDd / causeQcCount) * 100) : 0;
+      
+      const elQcKnv = document.getElementById('ana-qc-knv');
+      if (elQcKnv) elQcKnv.textContent = `${qcKnv} ca (${qcKnvPercent}%)`;
+      const elQcKnvBar = document.getElementById('ana-qc-knv-bar');
+      if (elQcKnvBar) elQcKnvBar.style.width = `${qcKnvPercent}%`;
+      
+      const elQcTb = document.getElementById('ana-qc-tb');
+      if (elQcTb) elQcTb.textContent = `${qcTb} ca (${qcTbPercent}%)`;
+      const elQcTbBar = document.getElementById('ana-qc-tb-bar');
+      if (elQcTbBar) elQcTbBar.style.width = `${qcTbPercent}%`;
+      
+      const elQcBq = document.getElementById('ana-qc-bq');
+      if (elQcBq) elQcBq.textContent = `${qcBq} ca (${qcBqPercent}%)`;
+      const elQcBqBar = document.getElementById('ana-qc-bq-bar');
+      if (elQcBqBar) elQcBqBar.style.width = `${qcBqPercent}%`;
+      
+      const elQcCc = document.getElementById('ana-qc-cc');
+      if (elQcCc) elQcCc.textContent = `${qcCc} ca (${qcCcPercent}%)`;
+      const elQcCcBar = document.getElementById('ana-qc-cc-bar');
+      if (elQcCcBar) elQcCcBar.style.width = `${qcCcPercent}%`;
+      
+      const elQcDd = document.getElementById('ana-qc-dd');
+      if (elQcDd) elQcDd.textContent = `${qcDd} ca (${qcDdPercent}%)`;
+      const elQcDdBar = document.getElementById('ana-qc-dd-bar');
+      if (elQcDdBar) elQcDdBar.style.width = `${qcDdPercent}%`;
+      
+      // 4. Xử lý OOS do Nguyên liệu
+      const rdCount = filteredData.filter(d => d.causes.nl === true && d.causes.rdPass === true).length;
+      const supplierCount = filteredData.filter(d => d.causes.nl === true && d.causes.supplier === true).length;
+      
+      const rdPercent = causeNlCount > 0 ? Math.round((rdCount / causeNlCount) * 100) : 0;
+      const supplierPercent = causeNlCount > 0 ? Math.round((supplierCount / causeNlCount) * 100) : 0;
+      
+      const elNlRd = document.getElementById('ana-nl-rd');
+      if (elNlRd) elNlRd.textContent = `${rdCount} ca (${rdPercent}%)`;
+      const elNlRdBar = document.getElementById('ana-nl-rd-bar');
+      if (elNlRdBar) elNlRdBar.style.width = `${rdPercent}%`;
+      
+      const elNlSupplier = document.getElementById('ana-nl-supplier');
+      if (elNlSupplier) elNlSupplier.textContent = `${supplierCount} ca (${supplierPercent}%)`;
+      const elNlSupplierBar = document.getElementById('ana-nl-supplier-bar');
+      if (elNlSupplierBar) elNlSupplierBar.style.width = `${supplierPercent}%`;
+    }
+
     function renderMonthlyTrendChart(selectedYear) {
       const monthLabels = ["Th 1", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7", "Th 8", "Th 9", "Th 10", "Th 11", "Th 12"];
       
@@ -5410,8 +6416,7 @@
         // Lọc theo loại (Type)
         if (selectedType !== 'Tất cả' && item.type !== selectedType) return;
 
-        // Bỏ qua các ca OOS Vi sinh (OOS-VS)
-        if (item.causes.oosVs === true) return;
+
 
         const monthIdx = dateObj.getMonth();
         if (item.type === 'NL') {
@@ -5484,13 +6489,14 @@
     }
 
     function renderCauseChart() {
-      const causes = ["Lỗi do NL", "Lỗi do KNV", "Lỗi do tiêu chuẩn", "Làm lại/Đổi tay KNV đạt"];
+      const causes = ["Lỗi do NL", "Lỗi do KNV", "Lỗi do tiêu chuẩn", "Làm lại/Đổi tay KNV đạt", "OOS Vi sinh (VS)"];
       
       const counts = [
         filteredData.filter(d => d.causes.nl === true).length,
         filteredData.filter(d => d.causes.knv === true).length,
         filteredData.filter(d => d.causes.std === true).length,
-        filteredData.filter(d => d.causes.retest === true).length
+        filteredData.filter(d => d.causes.retest === true).length,
+        filteredData.filter(d => d.causes.oosVs === true).length
       ];
 
       const ctx = document.getElementById('chart-cause-breakdown').getContext('2d');
@@ -5506,7 +6512,8 @@
               'rgba(239, 68, 68, 0.85)', // NL - Red
               'rgba(59, 130, 246, 0.85)', // KNV - Blue
               'rgba(139, 92, 246, 0.85)', // TC - Purple
-              'rgba(16, 185, 129, 0.85)'  // Retest - Green
+              'rgba(16, 185, 129, 0.85)',  // Retest - Green
+              'rgba(236, 72, 153, 0.85)'   // Vi sinh - Pink
             ],
             borderColor: 'transparent',
             borderWidth: 0,
@@ -5909,6 +6916,8 @@
       const gidTraining = document.getElementById('sync-gid-training')?.value.trim() || '';
       const gidModeling = document.getElementById('sync-gid-modeling')?.value.trim() || '';
       const gidImprovement = document.getElementById('sync-gid-improvement')?.value.trim() || '';
+      const gidDelay = document.getElementById('sync-gid-delay')?.value.trim() || '';
+      const gidRetrieved = document.getElementById('sync-gid-retrieved')?.value.trim() || '';
 
       if (!urlInput) {
         if (!silent) showToast("Vui lòng điền link Google Sheet chính!", "error");
@@ -5951,7 +6960,9 @@
         gidMethod,
         gidTraining,
         gidModeling,
-        gidImprovement
+        gidImprovement,
+        gidDelay,
+        gidRetrieved
       }));
       
       if (!silent) {
@@ -6131,11 +7142,51 @@
         }
       }
 
+      // 8. Fetch GID tab Chậm phiếu (KPI)
+      let parsedDelayCSV = null;
+      if (gidDelay) {
+        try {
+          const url = buildUrl(gidDelay);
+          const response = await fetchWithFallback(url);
+          if (response.ok) {
+            const csvText = await response.text();
+            parsedDelayCSV = parseCSV(csvText);
+            successCount++;
+          }
+        } catch (e) {
+          console.error("Lỗi đồng bộ tab Chậm phiếu:", e);
+        }
+      }
+
+      // 9. Fetch GID tab Lấy mẫu (Tổng mẫu)
+      let parsedRetrieveCSV = null;
+      if (gidRetrieved) {
+        try {
+          const url = buildUrl(gidRetrieved);
+          const response = await fetchWithFallback(url);
+          if (response.ok) {
+            const csvText = await response.text();
+            parsedRetrieveCSV = parseCSV(csvText);
+            successCount++;
+          }
+        } catch (e) {
+          console.error("Lỗi đồng bộ tab Lấy mẫu:", e);
+        }
+      }
+
       if (parsedNl.length === 0 && parsedPl.length === 0 && parsedPers.length === 0 && parsedMethods.length === 0 && parsedTraining.length === 0 && parsedModeling.length === 0 && parsedImprovement.length === 0) {
         if (!silent) {
           showToast("Đồng bộ thất bại. Vui lòng kiểm tra quyền chia sẻ của Google Sheet (Bất kỳ ai có liên kết đều xem được).", "error");
         }
         return;
+      }
+
+      // Load delayKpiData if saved
+      const storedDelayKpi = localStorage.getItem('qc_delay_kpi_data');
+      if (storedDelayKpi) {
+        try {
+          delayKpiData = JSON.parse(storedDelayKpi);
+        } catch(e) {}
       }
 
       // Save OOS data if updated
@@ -6172,6 +7223,222 @@
       if (parsedImprovement.length > 0) {
         improvementData = parsedImprovement;
         localStorage.setItem('qc_improvement_data_v4', JSON.stringify(improvementData));
+      }
+
+      // Process Delay and Retrieve datasets
+      if (parsedDelayCSV && parsedRetrieveCSV) {
+        // Date parsing helper functions
+        function parseDateFromRetrieve(val) {
+          if (!val) return null;
+          const matches = val.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+          if (matches) {
+            const day = parseInt(matches[1], 10);
+            const month = parseInt(matches[2], 10);
+            const year = parseInt(matches[3], 10);
+            return new Date(year, month - 1, day);
+          }
+          return null;
+        }
+
+        function parseWeekRange(weekStr) {
+          const regex = /(\d{2})\/(\d{2})\s*-\s*(\d{2})\/(\d{2})\/(\d{4})/;
+          const match = weekStr.match(regex);
+          if (match) {
+            const startDay = parseInt(match[1], 10);
+            const startMonth = parseInt(match[2], 10);
+            const endDay = parseInt(match[3], 10);
+            const endMonth = parseInt(match[4], 10);
+            const year = parseInt(match[5], 10);
+            const startYear = startMonth > endMonth ? year - 1 : year;
+            const startDateVal = startYear * 10000 + startMonth * 100 + startDay;
+            const endDateVal = year * 10000 + endMonth * 100 + endDay;
+            return { startDateVal, endDateVal };
+          }
+          return null;
+        }
+
+        function getWeekFromDate(date) {
+          if (!date) return null;
+          const y = date.getFullYear();
+          const m = date.getMonth() + 1;
+          const d = date.getDate();
+          const val = y * 10000 + m * 100 + d;
+          
+          for (const weekStr of Object.keys(delayDetails)) {
+            const range = parseWeekRange(weekStr);
+            if (range && val >= range.startDateVal && val <= range.endDateVal) {
+              return weekStr;
+            }
+          }
+          return null;
+        }
+
+        // Count retrieved totals by week
+        const retrieveCounts = {};
+        Object.keys(delayDetails).forEach(weekStr => {
+          retrieveCounts[weekStr] = { retNL: 0, retPL: 0 };
+        });
+
+        parsedRetrieveCSV.forEach((row, idx) => {
+          if (idx === 0) return; // skip header
+          const sampleCode = row[2]?.trim(); // Số K
+          const dateStr = row[25]?.trim(); // Ngày lấy
+          if (!sampleCode || !dateStr) return;
+          
+          const date = parseDateFromRetrieve(dateStr);
+          const weekKey = getWeekFromDate(date);
+          if (!weekKey) return;
+          
+          const type = sampleCode.startsWith('BB') ? 'PL' : 'NL';
+          if (type === 'NL') {
+            retrieveCounts[weekKey].retNL++;
+          } else {
+            retrieveCounts[weekKey].retPL++;
+          }
+        });
+
+        // Group raw delayed logs by week
+        const delayDetails = {
+          w1: [],
+          w2: [],
+          w3: [],
+          w4: []
+        };
+
+        parsedDelayCSV.forEach((row, idx) => {
+          if (idx === 0) return; // skip header
+          const sampleCode = row[2]?.trim(); // Số K
+          const matName = row[4]?.trim(); // Tên vật tư
+          const reasonCSV = row[13]?.trim() || ''; // Lý do
+          const noteCSV = row[14]?.trim() || ''; // Ghi Chú
+          const weekStr = row[17]?.trim() || ''; // tuần
+          
+          if (!sampleCode) return;
+          
+          let weekKey = '';
+          if (weekStr.includes('22/06')) weekKey = 'w1';
+          else if (weekStr.includes('29/06')) weekKey = 'w2';
+          else if (weekStr.includes('06/07')) weekKey = 'w3';
+          else if (weekStr.includes('13/07')) weekKey = 'w4';
+          
+          if (!weekKey) return;
+          
+          const type = sampleCode.startsWith('BB') ? 'PL' : 'NL';
+          
+          let reason = 'Lý do khác';
+          const lowerReason = reasonCSV.toLowerCase();
+          if (lowerReason.includes('viện')) reason = 'Gửi viện';
+          else if (lowerReason.includes('qc') || lowerReason.includes('kpv') || lowerReason.includes('knv')) reason = 'QC chậm';
+          else if (lowerReason.includes('chuẩn')) reason = 'Chờ chuẩn';
+          
+          delayDetails[weekKey].push({
+            k: sampleCode,
+            material: matName,
+            type: type,
+            reason: reason,
+            note: noteCSV
+          });
+        });
+
+        // Apply deduplication (Rule 4: each sample only delayed once)
+        const seenSamples = new Set();
+        // Dynamic week list from keys of delayDetails
+        const weeksOrder = Object.keys(delayDetails).sort((a, b) => {
+          // Sort chronologically using range start dates
+          const rA = parseWeekRange(a);
+          const rB = parseWeekRange(b);
+          if (!rA || !rB) return 0;
+          return rA.startDateVal - rB.startDateVal;
+        });
+
+        // Clear existing weeks from delayKpiData except 'all'
+        delayKpiData.weeks = { all: delayKpiData.weeks.all };
+        
+        weeksOrder.forEach((weekStr, idx) => {
+          const wId = 'w_' + idx;
+          const rawDetails = delayDetails[weekStr] || [];
+          const uniqueDetails = [];
+          let delNL = 0;
+          let delPL = 0;
+          
+          const reasons = {
+            "Gửi viện": { nl: 0, pl: 0 },
+            "QC chậm": { nl: 0, pl: 0 },
+            "Chờ chuẩn": { nl: 0, pl: 0 },
+            "Lý do khác": { nl: 0, pl: 0 }
+          };
+          
+          rawDetails.forEach(item => {
+            if (!seenSamples.has(item.k)) {
+              seenSamples.add(item.k);
+              uniqueDetails.push(item);
+              
+              if (item.type === 'NL') {
+                delNL++;
+                if (reasons[item.reason]) {
+                  reasons[item.reason].nl++;
+                }
+              } else {
+                delPL++;
+                if (reasons[item.reason]) {
+                  reasons[item.reason].pl++;
+                }
+              }
+            }
+          });
+          
+          const retCount = retrieveCounts[weekStr] || { retNL: 0, retPL: 0 };
+          
+          delayKpiData.weeks[wId] = {
+            name: weekStr,
+            retNL: retCount.retNL,
+            retPL: retCount.retPL,
+            delNL: delNL,
+            delPL: delPL,
+            reasons: reasons,
+            details: uniqueDetails
+          };
+        });
+
+        // Recompute week "all" total values
+        let allRetNL = 0;
+        let allRetPL = 0;
+        let allDelNL = 0;
+        let allDelPL = 0;
+        const allReasons = {
+          "Gửi viện": { nl: 0, pl: 0 },
+          "QC chậm": { nl: 0, pl: 0 },
+          "Chờ chuẩn": { nl: 0, pl: 0 },
+          "Lý do khác": { nl: 0, pl: 0 }
+        };
+        let allDetails = [];
+        
+        Object.keys(delayKpiData.weeks).forEach(wId => {
+          if (wId === 'all') return;
+          const wData = delayKpiData.weeks[wId];
+          allRetNL += wData.retNL;
+          allRetPL += wData.retPL;
+          allDelNL += wData.delNL;
+          allDelPL += wData.delPL;
+          allDetails.push(...wData.details);
+          for (const r in allReasons) {
+            allReasons[r].nl += wData.reasons[r].nl;
+            allReasons[r].pl += wData.reasons[r].pl;
+          }
+        });
+        
+        delayKpiData.weeks.all = {
+          name: "Tất cả các tuần",
+          retNL: allRetNL,
+          retPL: allRetPL,
+          delNL: allDelNL,
+          delPL: allDelPL,
+          reasons: allReasons,
+          details: allDetails
+        };
+
+        localStorage.setItem('qc_delay_kpi_data', JSON.stringify(delayKpiData));
+        console.log('Synced and computed delayKpiData successfully.');
       }
 
       localStorage.setItem('qc_last_sync_time', Date.now().toString());
@@ -6236,17 +7503,50 @@
         return monthsList.includes(m.month);
       });
 
-      // Filter year and period methods for charts and KPIs (completed only)
-      const filteredYearCompleted = filteredYear.filter(m => m.result);
-      const filteredPeriodCompleted = filteredPeriod.filter(m => m.result);
+      const isViSinhMethod = (m) => {
+        const meth = (m.method || '').toLowerCase().trim();
+        const chi = (m.chiTieu || '').toLowerCase().trim();
+        return meth.includes('vi sinh') || meth === 'vs' || 
+               chi.includes('vi sinh') || chi === 'vs' || 
+               chi.includes('vô khuẩn') || chi.includes('nhiễm khuẩn');
+      };
+
+      // Filter year and period methods for charts and KPIs (completed only, excluding vi sinh)
+      const filteredYearCompleted = filteredYear.filter(m => m.result && !isViSinhMethod(m));
+      const filteredPeriodCompleted = filteredPeriod.filter(m => m.result && !isViSinhMethod(m));
       renderMethodCharts(filteredYearCompleted, filteredPeriodCompleted);
 
-      // Calculate KPIs (completed only)
+      // Calculate KPIs (completed only, excluding vi sinh)
       const totalCount = filteredPeriodCompleted.length;
       const passedCount = filteredPeriodCompleted.filter(m => m.result.toLowerCase().trim() === 'đạt' || m.result.toLowerCase().trim() === 'dat').length;
       const passRate = totalCount > 0 ? Math.round((passedCount / totalCount) * 100) : 0;
       document.getElementById('method-kpi-total').textContent = totalCount;
       document.getElementById('method-kpi-pass-rate').textContent = `${passRate}% (${passedCount}/${totalCount} Đạt)`;
+
+      // Calculate Completed Dossiers (excluding vi sinh)
+      const periodTestsNonViSinh = filteredPeriod.filter(m => !isViSinhMethod(m));
+      const productGroups = {};
+      periodTestsNonViSinh.forEach(m => {
+        if (!m.product) return;
+        if (!productGroups[m.product]) {
+          productGroups[m.product] = [];
+        }
+        productGroups[m.product].push(m);
+      });
+
+      let completedDossiers = 0;
+      Object.keys(productGroups).forEach(productName => {
+        const tests = productGroups[productName];
+        // All tests for this product must be completed (have result) and passed (Đạt)
+        const allPassed = tests.every(m => 
+          m.result && 
+          (m.result.toLowerCase().trim() === 'đạt' || m.result.toLowerCase().trim() === 'dat')
+        );
+        if (allPassed && tests.length > 0) {
+          completedDossiers++;
+        }
+      });
+      document.getElementById('method-kpi-completed-files').textContent = completedDossiers;
 
       // Determine selected quarters for KNV Performance Table
       let selectedQuarters = [];
@@ -6429,6 +7729,7 @@
     }
 
     let uncompletedProductsGlobal = [];
+    let completedProductsGlobal = [];
 
     function renderProductSummaries(yearMethods) {
       const productRowsMap = {};
@@ -6442,6 +7743,7 @@
       });
 
       uncompletedProductsGlobal = [];
+      completedProductsGlobal = [];
 
       Object.keys(productRowsMap).forEach(product => {
         const prows = productRowsMap[product];
@@ -6451,6 +7753,14 @@
           const remaining = prows.filter(r => !r.result).map(r => r.chiTieu || r.active || 'Chỉ tiêu chưa rõ');
           const uniqueRemaining = Array.from(new Set(remaining));
           uncompletedProductsGlobal.push({ product, remaining: uniqueRemaining });
+        } else {
+          // All tests are completed. Let's check if all are passed ("Đạt")
+          const allPassed = prows.every(r => r.result && (r.result.toLowerCase().trim() === 'đạt' || r.result.toLowerCase().trim() === 'dat'));
+          if (allPassed && prows.length > 0) {
+            const completedCriteria = prows.map(r => r.chiTieu || r.active || 'Chỉ tiêu');
+            const uniqueCompleted = Array.from(new Set(completedCriteria));
+            completedProductsGlobal.push({ product, completed: uniqueCompleted });
+          }
         }
       });
 
@@ -6464,37 +7774,76 @@
       if (!tbody) return;
       tbody.innerHTML = '';
       
-      let filtered = uncompletedProductsGlobal;
-      if (filterVal === 'visinh') {
-        filtered = uncompletedProductsGlobal.filter(p => 
-          p.remaining.some(r => r.toLowerCase().includes('vi sinh') || r.toLowerCase().includes('vs'))
-        );
-      } else if (filterVal === 'other') {
-        filtered = uncompletedProductsGlobal.filter(p => 
-          p.remaining.some(r => !r.toLowerCase().includes('vi sinh') && !r.toLowerCase().includes('vs'))
-        );
-      }
+      const titleEl = document.getElementById('product-progress-title');
+      const thHeaderEl = document.getElementById('th-progress-col-header');
+      
+      if (filterVal === 'completed') {
+        if (titleEl) {
+          titleEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> Sản phẩm đã test xong (Hoàn thành)';
+          titleEl.style.color = 'var(--color-success)';
+        }
+        if (thHeaderEl) {
+          thHeaderEl.textContent = 'Các chỉ tiêu đã hoàn thành (Đạt)';
+        }
+        
+        if (completedProductsGlobal.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style:italic;">Không có sản phẩm nào hoàn thành</td></tr>`;
+        } else {
+          completedProductsGlobal.forEach((p, idx) => {
+            const tags = p.completed.map(r => {
+              return `<span style="font-size:0.75rem; background:rgba(16,185,129,0.1); color:var(--color-success); border:1px solid rgba(16,185,129,0.2); border-radius:4px; padding:0.15rem 0.4rem; margin-right:0.35rem; display:inline-block; font-weight:600;">${r}</span>`;
+            }).join('');
 
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style:italic;">Không có sản phẩm nào</td></tr>`;
+            tbody.innerHTML += `
+              <tr>
+                <td style="width: 50px; text-align: center;">${idx + 1}</td>
+                <td style="font-weight:600; color:var(--text-bright); width: 250px;">${p.product}</td>
+                <td>${tags}</td>
+              </tr>
+            `;
+          });
+        }
       } else {
-        filtered.forEach((p, idx) => {
-          const tags = p.remaining.map(r => {
-            const isViSinh = r.toLowerCase().includes('vi sinh') || r.toLowerCase().includes('vs');
-            const bg = isViSinh ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)';
-            const color = isViSinh ? 'var(--color-danger)' : 'var(--color-warning)';
-            const border = isViSinh ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)';
-            return `<span style="font-size:0.75rem; background:${bg}; color:${color}; border:1px solid ${border}; border-radius:4px; padding:0.15rem 0.4rem; margin-right:0.35rem; display:inline-block; font-weight:600;">${r}</span>`;
-          }).join('');
+        if (titleEl) {
+          titleEl.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i> Sản phẩm chưa test xong (Đang tiến hành)';
+          titleEl.style.color = 'var(--color-warning)';
+        }
+        if (thHeaderEl) {
+          thHeaderEl.textContent = 'Các chỉ tiêu chưa test xong';
+        }
 
-          tbody.innerHTML += `
-            <tr>
-              <td style="width: 50px; text-align: center;">${idx + 1}</td>
-              <td style="font-weight:600; color:var(--text-bright); width: 250px;">${p.product}</td>
-              <td>${tags}</td>
-            </tr>
-          `;
-        });
+        let filtered = uncompletedProductsGlobal;
+        if (filterVal === 'visinh') {
+          filtered = uncompletedProductsGlobal.filter(p => 
+            p.remaining.some(r => r.toLowerCase().includes('vi sinh') || r.toLowerCase().includes('vs'))
+          );
+        } else if (filterVal === 'other') {
+          filtered = uncompletedProductsGlobal.filter(p => 
+            p.remaining.some(r => !r.toLowerCase().includes('vi sinh') && !r.toLowerCase().includes('vs'))
+          );
+        }
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--text-muted); font-style:italic;">Không có sản phẩm nào</td></tr>`;
+        } else {
+          filtered.forEach((p, idx) => {
+            const tags = p.remaining.map(r => {
+              const isViSinh = r.toLowerCase().includes('vi sinh') || r.toLowerCase().includes('vs');
+              const bg = isViSinh ? 'rgba(239,68,68,0.1)' : 'rgba(245,158,11,0.1)';
+              const color = isViSinh ? 'var(--color-danger)' : 'var(--color-warning)';
+              const border = isViSinh ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)';
+              return `<span style="font-size:0.75rem; background:${bg}; color:${color}; border:1px solid ${border}; border-radius:4px; padding:0.15rem 0.4rem; margin-right:0.35rem; display:inline-block; font-weight:600;">${r}</span>`;
+            }).join('');
+
+            tbody.innerHTML += `
+              <tr>
+                <td style="width: 50px; text-align: center;">${idx + 1}</td>
+                <td style="font-weight:600; color:var(--text-bright); width: 250px;">${p.product}</td>
+                <td>${tags}</td>
+              </tr>
+            `;
+          });
+        }
       }
     }
 
@@ -7066,7 +8415,13 @@
         supplier: headers.findIndex(h => h.includes('nhà cung cấp')),
         retest: headers.findIndex(h => h.includes('làm lại') || h.includes('đổi tay')),
         oosVs: headers.findIndex(h => h.includes('oos-vs')),
-        notes: headers.findIndex(h => h.includes('ghi chú'))
+        notes: headers.findIndex(h => h.includes('ghi chú')),
+        
+        // QC error subcategories columns mapping
+        thietBi: headers.findIndex(h => h.includes('thiết bị') || h.includes('thiet bi') || h.includes('lỗi thiết bị')),
+        chatChuan: headers.findIndex(h => h.includes('chất chuẩn') || h.includes('chat chuan') || h.includes('lỗi chất chuẩn')),
+        dungDich: headers.findIndex(h => h.includes('dung dịch') || h.includes('dung dich') || h.includes('chuẩn độ')),
+        baoQuan: headers.findIndex(h => h.includes('bảo quản') || h.includes('bao quan') || h.includes('điều kiện bảo quản'))
       };
 
       const dataRows = rows.slice(1);
@@ -7138,7 +8493,11 @@
             rdPass: getBool(colMap.rdPass),
             supplier: getBool(colMap.supplier),
             retest: getBool(colMap.retest),
-            oosVs: getBool(colMap.oosVs)
+            oosVs: getBool(colMap.oosVs),
+            thietBi: getBool(colMap.thietBi),
+            chatChuan: getBool(colMap.chatChuan),
+            dungDich: getBool(colMap.dungDich),
+            baoQuan: getBool(colMap.baoQuan)
           },
           notes: getVal(colMap.notes)
         };
@@ -7380,6 +8739,1034 @@
           outcome: getVal(colMap.outcome)
         };
       }).filter(item => item !== null);
+    }
+
+    // ==========================================
+    // ============= GẮN KẾT LOGIC ==============
+    // ==========================================
+    function compressAndSaveImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const max_width = 600;
+          let width = img.width;
+          let height = img.height;
+          if (width > max_width) {
+            height = Math.round((height * max_width) / width);
+            width = max_width;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const base64 = canvas.toDataURL('image/jpeg', 0.7); // compress to 70% quality JPEG
+          callback(base64);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function toggleBondingForm() {
+      const form = document.getElementById('bonding-form-card');
+      if (form.style.display === 'none') {
+        form.style.display = 'block';
+        document.getElementById('bonding-date').value = new Date().toISOString().split('T')[0];
+      } else {
+        form.style.display = 'none';
+      }
+    }
+
+    function saveNewBondingEvent() {
+      const caption = document.getElementById('bonding-caption').value.trim();
+      const date = document.getElementById('bonding-date').value;
+      const type = document.getElementById('bonding-type').value;
+      const fileInput = document.getElementById('bonding-file');
+      
+      if (!caption) {
+        showToast("Vui lòng nhập tên hoạt động / chú thích!", "error");
+        return;
+      }
+      if (!date) {
+        showToast("Vui lòng chọn ngày diễn ra!", "error");
+        return;
+      }
+      if (fileInput.files.length === 0) {
+        showToast("Vui lòng chọn một ảnh để đăng!", "error");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      compressAndSaveImage(file, (base64) => {
+        const newEvent = {
+          id: 'event_' + Math.random().toString(36).substring(2, 7) + '_' + Date.now(),
+          caption: caption,
+          date: date,
+          type: type,
+          src: base64
+        };
+
+        bondingData.unshift(newEvent);
+        localStorage.setItem('qc_bonding_data', JSON.stringify(bondingData));
+        showToast("Đã đăng hoạt động gắn kết mới thành công!", "success");
+        
+        // Reset form
+        document.getElementById('bonding-caption').value = '';
+        fileInput.value = '';
+        updateUploadZoneFilename();
+        document.getElementById('bonding-form-card').style.display = 'none';
+
+        renderBondingTab();
+        renderDashboard();
+      });
+    }
+
+    function deleteBondingEvent(id) {
+      if (confirm("Bạn có chắc chắn muốn xóa hoạt động gắn kết này không?")) {
+        bondingData = bondingData.filter(event => event.id !== id);
+        localStorage.setItem('qc_bonding_data', JSON.stringify(bondingData));
+        showToast("Đã xóa hoạt động!", "success");
+        renderBondingTab();
+        renderDashboard();
+      }
+    }
+
+    function renderBondingTab() {
+      const year = document.getElementById('bonding-filter-year').value;
+      const quarter = document.getElementById('bonding-filter-quarter').value;
+      const grid = document.getElementById('bonding-gallery-grid');
+      grid.innerHTML = '';
+
+      const filtered = bondingData.filter(event => {
+        if (!event.date) return false;
+        const d = new Date(event.date);
+        if (isNaN(d.getTime())) return false;
+        
+        const itemYear = d.getFullYear().toString();
+        if (itemYear !== year) return false;
+        
+        if (quarter === 'ALL') return true;
+        
+        const month = d.getMonth() + 1; // 1-12
+        if (quarter === 'Q1') return month >= 1 && month <= 3;
+        if (quarter === 'Q2') return month >= 4 && month <= 6;
+        if (quarter === 'Q3') return month >= 7 && month <= 9;
+        if (quarter === 'Q4') return month >= 10 && month <= 12;
+        return false;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column: span 3; text-align: center; padding: 3rem; color: var(--text-muted);">
+          <i class="fa-solid fa-images" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+          <p>Không có hoạt động gắn kết nào trong quý này.</p>
+        </div>`;
+        return;
+      }
+
+      filtered.forEach(event => {
+        const dateObj = new Date(event.date);
+        const dateStr = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString('vi-VN') : event.date;
+        const badgeText = event.type === 'ngot' ? 'Liên hoan ngọt' : 'Liên hoan mặn';
+        const badgeColor = event.type === 'ngot' ? 'background: #db2777; color: #ffffff;' : 'background: #7c3aed; color: #ffffff;';
+
+        const card = document.createElement('div');
+        card.className = 'bonding-card glass-card';
+        card.innerHTML = `
+          <div class="bonding-img-wrapper">
+            <span class="badge bonding-badge" style="${badgeColor}">${badgeText}</span>
+            <img src="${event.src}" class="bonding-img" alt="${event.caption}">
+          </div>
+          <div class="bonding-info">
+            <h4 class="bonding-title">${event.caption}</h4>
+            <div class="bonding-footer">
+              <span><i class="fa-solid fa-calendar-days"></i> ${dateStr}</span>
+              <button class="btn-delete-bonding" onclick="deleteBondingEvent('${event.id}')" title="Xóa ảnh">
+                <i class="fa-solid fa-trash"></i> Xóa
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function updateUploadZoneFilename() {
+      const fileInput = document.getElementById('bonding-file');
+      const dropzone = document.querySelector('.upload-dropzone');
+      if (fileInput.files.length > 0) {
+        dropzone.classList.add('has-file');
+        const span = dropzone.querySelector('span');
+        span.textContent = `Đã chọn: ${fileInput.files[0].name}`;
+        const icon = dropzone.querySelector('i');
+        icon.className = "fa-solid fa-circle-check";
+        icon.style.color = "#22c55e";
+      } else {
+        dropzone.classList.remove('has-file');
+        const span = dropzone.querySelector('span');
+        span.textContent = `Bấm vào đây để chọn ảnh hoặc chụp hình`;
+        const icon = dropzone.querySelector('i');
+        icon.className = "fa-solid fa-cloud-arrow-up";
+        icon.style.color = "var(--color-primary)";
+      }
+    }
+
+    // ==========================================
+    // ============ CHẬM PHIẾU LOGIC ============
+    // ==========================================
+    function populateKnvDropdown(selectId) {
+      const select = document.getElementById(selectId);
+      select.innerHTML = '';
+      
+      let names = [...new Set(personnelData.map(p => p.name).filter(Boolean))];
+      if (names.length === 0) {
+        names = ["Trần Thị B", "Nguyễn Văn A", "Lê Văn C", "Phạm Minh D"];
+      }
+
+      names.sort().forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      });
+    }
+
+    function toggleDelayForm() {
+      const form = document.getElementById('delay-form-card');
+      if (form.style.display === 'none') {
+        form.style.display = 'block';
+        document.getElementById('delay-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('delay-material').value = '';
+        document.getElementById('delay-days').value = '1';
+        populateKnvDropdown('delay-knv');
+        toggleDelayDaysInput();
+      } else {
+        form.style.display = 'none';
+      }
+    }
+
+    function toggleDelayDaysInput() {
+      const status = document.getElementById('delay-status').value;
+      const group = document.getElementById('delay-days-group');
+      if (status === 'delayed') {
+        group.style.display = 'block';
+      } else {
+        group.style.display = 'none';
+      }
+    }
+
+    function saveNewDelayLog() {
+      const date = document.getElementById('delay-date').value;
+      const material = document.getElementById('delay-material').value.trim();
+      const type = document.getElementById('delay-type').value;
+      const knv = document.getElementById('delay-knv').value;
+      const status = document.getElementById('delay-status').value;
+      const days = parseInt(document.getElementById('delay-days').value) || 0;
+
+      if (!date) {
+        showToast("Vui lòng chọn ngày kiểm nghiệm!", "error");
+        return;
+      }
+      if (!material) {
+        showToast("Vui lòng nhập tên vật tư!", "error");
+        return;
+      }
+      if (!knv) {
+        showToast("Vui lòng chọn kiểm nghiệm viên!", "error");
+        return;
+      }
+
+      const newLog = {
+        id: 'delay_' + Math.random().toString(36).substring(2, 7) + '_' + Date.now(),
+        date: date,
+        material: material,
+        type: type,
+        knv: knv,
+        status: status,
+        days: status === 'delayed' ? days : 0
+      };
+
+      delayLogs.unshift(newLog);
+      localStorage.setItem('qc_delay_logs', JSON.stringify(delayLogs));
+      showToast("Đã lưu nhật ký chậm phiếu!", "success");
+
+      document.getElementById('delay-form-card').style.display = 'none';
+      renderDelayTable();
+      renderDashboard();
+    }
+
+    function deleteDelayLog(id) {
+      if (confirm("Bạn có chắc chắn muốn xóa nhật ký chậm phiếu này?")) {
+        delayLogs = delayLogs.filter(log => log.id !== id);
+        localStorage.setItem('qc_delay_logs', JSON.stringify(delayLogs));
+        showToast("Đã xóa nhật ký!", "success");
+        renderDelayTable();
+        renderDashboard();
+      }
+    }
+
+    function renderDelayTable() {
+      // Table is removed
+    }
+
+    function getMonthAggregatedData(month) {
+      const storedMap = localStorage.getItem('qc_week_month_map');
+      let weekMonthMap = {};
+      if (storedMap) {
+        try {
+          weekMonthMap = JSON.parse(storedMap);
+        } catch(e) {}
+      }
+      
+      const selectedWeeks = [];
+      for (const wId in weekMonthMap) {
+        if (weekMonthMap[wId] === month && delayKpiData.weeks[wId]) {
+          selectedWeeks.push(wId);
+        }
+      }
+      
+      let retNL = 0;
+      let retPL = 0;
+      let delNL = 0;
+      let delPL = 0;
+      const reasons = {
+        "Gửi viện": { nl: 0, pl: 0 },
+        "QC chậm": { nl: 0, pl: 0 },
+        "Chờ chuẩn": { nl: 0, pl: 0 },
+        "Lý do khác": { nl: 0, pl: 0 }
+      };
+      let details = [];
+      const seenDelayed = new Set();
+      
+      const allWeeksInOrder = Object.keys(delayKpiData.weeks).filter(w => w !== 'all');
+      allWeeksInOrder.forEach(wId => {
+        const weekData = delayKpiData.weeks[wId];
+        if (!weekData) return;
+        
+        if (selectedWeeks.includes(wId)) {
+          retNL += weekData.retNL;
+          retPL += weekData.retPL;
+        }
+        
+        weekData.details.forEach(item => {
+          if (!seenDelayed.has(item.k)) {
+            seenDelayed.add(item.k);
+            if (selectedWeeks.includes(wId)) {
+              if (item.type === 'NL') {
+                delNL++;
+                if (reasons[item.reason]) reasons[item.reason].nl++;
+              } else {
+                delPL++;
+                if (reasons[item.reason]) reasons[item.reason].pl++;
+              }
+              details.push(item);
+            }
+          }
+        });
+      });
+      
+      return {
+        name: `Tất cả các tuần của Tháng ${month}`,
+        retNL,
+        retPL,
+        delNL,
+        delPL,
+        reasons,
+        details
+      };
+    }
+
+    function populateWeekSelectForMonth(month) {
+      const storedMap = localStorage.getItem('qc_week_month_map');
+      let weekMonthMap = {};
+      if (storedMap) {
+        try {
+          weekMonthMap = JSON.parse(storedMap);
+        } catch(e) {}
+      }
+      
+      const wIds = Object.keys(delayKpiData.weeks).filter(w => w !== 'all');
+      const filteredWeeks = wIds.filter(wId => weekMonthMap[wId] === month);
+      
+      const weekSel = document.getElementById('kpi-week-select');
+      if (weekSel) {
+        weekSel.innerHTML = '';
+        
+        const allOpt = document.createElement('option');
+        allOpt.value = 'all';
+        allOpt.textContent = `Tất cả các tuần (Tháng ${month})`;
+        weekSel.appendChild(allOpt);
+        
+        filteredWeeks.forEach(wId => {
+          const opt = document.createElement('option');
+          opt.value = wId;
+          opt.textContent = delayKpiData.weeks[wId].name;
+          weekSel.appendChild(opt);
+        });
+        
+        weekSel.value = 'all';
+      }
+    }
+
+    function loadWeekMonthConfig() {
+      const wIds = Object.keys(delayKpiData.weeks).filter(w => w !== 'all');
+      
+      const storedMap = localStorage.getItem('qc_week_month_map');
+      let weekMonthMap = {};
+      if (storedMap) {
+        try {
+          weekMonthMap = JSON.parse(storedMap);
+        } catch(e) {}
+      }
+      
+      // Auto-fill defaults if missing
+      wIds.forEach(wId => {
+        if (!weekMonthMap[wId]) {
+          const wName = delayKpiData.weeks[wId].name;
+          const matches = wName.match(/\/(\d{2})/g);
+          if (matches && matches.length >= 2) {
+            const monthNum = parseInt(matches[1].substring(1), 10).toString();
+            weekMonthMap[wId] = monthNum;
+          } else {
+            weekMonthMap[wId] = '6';
+          }
+        }
+      });
+      
+      const container = document.getElementById('cfg-weeks-container');
+      if (container) {
+        container.innerHTML = '';
+        wIds.forEach(wId => {
+          const wData = delayKpiData.weeks[wId];
+          const currentMonth = weekMonthMap[wId];
+          
+          const row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.alignItems = 'center';
+          row.style.justifyContent = 'space-between';
+          row.style.gap = '0.5rem';
+          
+          let monthOptions = '';
+          for (let m = 1; m <= 12; m++) {
+            monthOptions += `<option value="${m}" ${currentMonth === m.toString() ? 'selected' : ''}>Tháng ${m}</option>`;
+          }
+          
+          row.innerHTML = `
+            <span>${wData.name}:</span>
+            <select id="cfg-week-month-${wId}" class="form-control" style="width: auto; padding: 0.15rem 0.35rem; font-size: 0.8rem; height: auto;">
+              ${monthOptions}
+            </select>
+          `;
+          container.appendChild(row);
+        });
+      }
+      
+      const mappedMonths = [...new Set(Object.values(weekMonthMap))].sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+      const monthSel = document.getElementById('kpi-month-select');
+      if (monthSel) {
+        const prevVal = monthSel.value;
+        monthSel.innerHTML = '';
+        mappedMonths.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.textContent = `Tháng ${m} / 2026`;
+          monthSel.appendChild(opt);
+        });
+        if (mappedMonths.includes(prevVal)) {
+          monthSel.value = prevVal;
+        } else if (mappedMonths.length > 0) {
+          monthSel.value = mappedMonths[0];
+        }
+      }
+      
+      // Repopulate the week select filtered by active month
+      const activeMonth = monthSel ? monthSel.value : '7';
+      populateWeekSelectForMonth(activeMonth);
+      
+      return weekMonthMap;
+    }
+
+    function saveWeekMonthConfig() {
+      const wIds = Object.keys(delayKpiData.weeks).filter(w => w !== 'all');
+      const weekMonthMap = {};
+      wIds.forEach(wId => {
+        const sel = document.getElementById('cfg-week-month-' + wId);
+        if (sel) {
+          weekMonthMap[wId] = sel.value;
+        }
+      });
+      localStorage.setItem('qc_week_month_map', JSON.stringify(weekMonthMap));
+      showToast("Đã lưu cấu hình phân bổ tuần thành công!", "success");
+      
+      loadWeekMonthConfig();
+      calculateCustomMonthly();
+      renderDashboard();
+    }
+
+    function getCalculatedQuarterDelayRate(year, quarter) {
+      let targetMonths = [];
+      if (quarter === 'Q1') targetMonths = ['1', '2', '3'];
+      else if (quarter === 'Q2') targetMonths = ['4', '5', '6'];
+      else if (quarter === 'Q3') targetMonths = ['7', '8', '9'];
+      else if (quarter === 'Q4') targetMonths = ['10', '11', '12'];
+      
+      const storedMap = localStorage.getItem('qc_week_month_map');
+      let weekMonthMap = {};
+      if (storedMap) {
+        try {
+          weekMonthMap = JSON.parse(storedMap);
+        } catch(e) {}
+      }
+      
+      const selectedWeeks = [];
+      for (const wId in weekMonthMap) {
+        if (targetMonths.includes(weekMonthMap[wId])) {
+          selectedWeeks.push(wId);
+        }
+      }
+      
+      if (selectedWeeks.length === 0) return 0;
+      
+      let totalRet = 0;
+      const allWeeksInOrder = Object.keys(delayKpiData.weeks).filter(w => w !== 'all');
+      const seenDelayed = new Set();
+      let totalDelQC = 0;
+      
+      allWeeksInOrder.forEach(wId => {
+        const weekData = delayKpiData.weeks[wId];
+        if (!weekData) return;
+        
+        if (selectedWeeks.includes(wId)) {
+          totalRet += (weekData.retNL + weekData.retPL);
+        }
+        
+        weekData.details.forEach(item => {
+          if (!seenDelayed.has(item.k)) {
+            seenDelayed.add(item.k);
+            if (selectedWeeks.includes(wId)) {
+              if (item.reason === 'QC chậm') {
+                totalDelQC++;
+              }
+            }
+          }
+        });
+      });
+      
+      return totalRet > 0 ? parseFloat((totalDelQC / totalRet * 100).toFixed(1)) : 0.0;
+    }
+
+    function onMonthSelectChange(month) {
+      localStorage.setItem('qc_kpi_selected_month', month);
+      document.getElementById('kpi-month-title').textContent = 'Tháng ' + month + '/2026';
+      
+      calculateCustomMonthly();
+      populateWeekSelectForMonth(month);
+      updateKpiDashboard('all');
+    }
+
+    function calculateCustomMonthly() {
+      const monthSelect = document.getElementById('kpi-month-select');
+      if (!monthSelect) return;
+      const month = monthSelect.value;
+      
+      const storedMap = localStorage.getItem('qc_week_month_map');
+      let weekMonthMap = {};
+      if (storedMap) {
+        try {
+          weekMonthMap = JSON.parse(storedMap);
+        } catch(e) {}
+      }
+      
+      const selectedWeeks = [];
+      for (const wId in weekMonthMap) {
+        if (weekMonthMap[wId] === month && delayKpiData.weeks[wId]) {
+          selectedWeeks.push(wId);
+        }
+      }
+
+      const descSpan = document.getElementById('kpi-month-weeks-desc');
+      
+      const valTotalPct = document.getElementById('kpi-month-val-total-pct');
+      const valTotalCount = document.getElementById('kpi-month-val-total-count');
+      const valQcPct = document.getElementById('kpi-month-val-qc-pct');
+      const valQcCount = document.getElementById('kpi-month-val-qc-count');
+
+      if (selectedWeeks.length === 0) {
+        descSpan.textContent = '(Không có tuần nào)';
+        if (valTotalPct) valTotalPct.textContent = '0.00%';
+        if (valTotalCount) valTotalCount.textContent = '(0/0 mẫu)';
+        if (valQcPct) valQcPct.textContent = '0.00%';
+        if (valQcCount) valQcCount.textContent = '(0/0 mẫu)';
+        return;
+      }
+      
+      const weekNamesMap = {};
+      Object.keys(delayKpiData.weeks).forEach(wId => {
+        if (wId !== 'all') {
+          const namePart = delayKpiData.weeks[wId].name.split(':')[0];
+          weekNamesMap[wId] = namePart;
+        }
+      });
+      descSpan.textContent = '(' + selectedWeeks.map(w => weekNamesMap[w] || w).join(', ') + ')';
+
+      let totalRet = 0;
+      const allWeeksInOrder = Object.keys(delayKpiData.weeks).filter(w => w !== 'all');
+      const seenDelayed = new Set();
+      let totalDelUnique = 0;
+      let totalDelQC = 0;
+      
+      allWeeksInOrder.forEach(wId => {
+        const weekData = delayKpiData.weeks[wId];
+        if (!weekData) return;
+        
+        if (selectedWeeks.includes(wId)) {
+          totalRet += (weekData.retNL + weekData.retPL);
+        }
+        
+        weekData.details.forEach(item => {
+          if (!seenDelayed.has(item.k)) {
+            seenDelayed.add(item.k);
+            if (selectedWeeks.includes(wId)) {
+              totalDelUnique++;
+              if (item.reason === 'QC chậm') {
+                totalDelQC++;
+              }
+            }
+          }
+        });
+      });
+
+      const pctTotal = totalRet > 0 ? (totalDelUnique / totalRet * 100).toFixed(2) : '0.00';
+      const pctQC = totalRet > 0 ? (totalDelQC / totalRet * 100).toFixed(2) : '0.00';
+
+      if (valTotalPct) {
+        valTotalPct.textContent = pctTotal + '%';
+        valTotalPct.style.color = pctTotal > 20 ? "#ef4444" : (pctTotal > 10 ? "#d97706" : "#059669");
+      }
+      if (valTotalCount) {
+        valTotalCount.textContent = '(' + totalDelUnique + '/' + totalRet + ' mẫu)';
+      }
+      if (valQcPct) {
+        valQcPct.textContent = pctQC + '%';
+        valQcPct.style.color = pctQC > 15 ? "#ef4444" : (pctQC > 5 ? "#d97706" : "#059669");
+      }
+      if (valQcCount) {
+        valQcCount.textContent = '(' + totalDelQC + '/' + totalRet + ' mẫu)';
+      }
+    }
+
+    function renderDelayTab() {
+      renderDelayTable();
+      loadWeekMonthConfig();
+      
+      let savedMonth = localStorage.getItem('qc_kpi_selected_month');
+      const monthSelect = document.getElementById('kpi-month-select');
+      if (monthSelect) {
+        if (savedMonth && [...monthSelect.options].some(o => o.value === savedMonth)) {
+          monthSelect.value = savedMonth;
+        } else if (monthSelect.options.length > 0) {
+          savedMonth = monthSelect.options[0].value;
+          monthSelect.value = savedMonth;
+        }
+      }
+      if (savedMonth) {
+        onMonthSelectChange(savedMonth);
+      } else {
+        updateKpiDashboard('all');
+      }
+    }
+
+    function updateKpiDashboard(weekId) {
+      let data = null;
+      if (weekId === 'all') {
+        const monthSelect = document.getElementById('kpi-month-select');
+        const month = monthSelect ? monthSelect.value : '7';
+        data = getMonthAggregatedData(month);
+      } else {
+        data = delayKpiData.weeks[weekId];
+      }
+      
+      if (!data) return;
+
+      const titleElem = document.getElementById('kpi-title');
+      if (titleElem) titleElem.textContent = data.name;
+
+      // Update retrieved counts info line & labels
+      const summaryRetNL = document.getElementById('kpi-summary-ret-nl');
+      const summaryRetPL = document.getElementById('kpi-summary-ret-pl');
+      const labelNL = document.getElementById('kpi-summary-label-nl');
+      const labelPL = document.getElementById('kpi-summary-label-pl');
+      
+      if (summaryRetNL) summaryRetNL.textContent = data.retNL;
+      if (summaryRetPL) summaryRetPL.textContent = data.retPL;
+      
+      if (labelNL) labelNL.textContent = weekId === 'all' ? 'NL lấy trong tháng' : 'NL lấy trong tuần';
+      if (labelPL) labelPL.textContent = weekId === 'all' ? 'PL lấy trong tháng' : 'PL lấy trong tuần';
+
+      const totalRetrieved = data.retNL + data.retPL;
+
+      const pctNL = totalRetrieved > 0 ? (data.delNL / totalRetrieved * 100).toFixed(2) : "0.00";
+      document.getElementById('kpi-val-nl').textContent = data.delNL + " / " + totalRetrieved;
+      document.getElementById('kpi-pct-nl').textContent = pctNL + "%";
+      const barNL = document.getElementById('kpi-bar-nl');
+      barNL.style.width = pctNL + "%";
+      barNL.style.backgroundColor = pctNL > 40 ? "#ef4444" : (pctNL > 10 ? "#f59e0b" : "#10b981");
+      document.getElementById('kpi-val-nl').style.color = pctNL > 40 ? "#ef4444" : (pctNL > 10 ? "#d97706" : "#059669");
+      document.getElementById('kpi-pct-nl').style.color = pctNL > 40 ? "#ef4444" : (pctNL > 10 ? "#d97706" : "#059669");
+
+      const pctPL = totalRetrieved > 0 ? (data.delPL / totalRetrieved * 100).toFixed(2) : "0.00";
+      document.getElementById('kpi-val-pl').textContent = data.delPL + " / " + totalRetrieved;
+      document.getElementById('kpi-pct-pl').textContent = pctPL + "%";
+      const barPL = document.getElementById('kpi-bar-pl');
+      barPL.style.width = pctPL + "%";
+      barPL.style.backgroundColor = pctPL > 40 ? "#ef4444" : (pctPL > 10 ? "#f59e0b" : "#10b981");
+      document.getElementById('kpi-val-pl').style.color = pctPL > 40 ? "#ef4444" : (pctPL > 10 ? "#d97706" : "#059669");
+      document.getElementById('kpi-pct-pl').style.color = pctPL > 40 ? "#ef4444" : (pctPL > 10 ? "#d97706" : "#059669");
+
+      const totalDelayed = data.delNL + data.delPL;
+      document.getElementById('kpi-total-delayed').textContent = totalDelayed;
+
+      const reasons = ["Gửi viện", "QC chậm", "Chờ chuẩn", "Lý do khác"];
+      const displayNames = {
+        "Gửi viện": "Mẫu gửi viện",
+        "QC chậm": "QC chậm / KNV chậm",
+        "Chờ chuẩn": "Chờ chuẩn",
+        "Lý do khác": "Lý do khác"
+      };
+      
+      const chartColors = ['#6366f1', '#f43f5e', '#10b981', '#8b5cf6'];
+      
+
+      const legendContainer = document.getElementById('kpi-reasons-legend');
+      if (legendContainer) {
+        legendContainer.innerHTML = '';
+        
+        const chartDataValues = [];
+        const chartLabels = [];
+        
+        reasons.forEach((r, idx) => {
+          const breakDown = data.reasons[r] || { nl: 0, pl: 0 };
+          const countNL = breakDown.nl || 0;
+          const countPL = breakDown.pl || 0;
+          const countTotal = countNL + countPL;
+          
+          chartDataValues.push(countTotal);
+          chartLabels.push(displayNames[r] || r);
+          
+          const pctCombined = totalRetrieved > 0 ? (countTotal / totalRetrieved * 100).toFixed(1) : "0.0";
+          const pctNLDetail = totalRetrieved > 0 ? (countNL / totalRetrieved * 100).toFixed(1) : "0.0";
+          const pctPLDetail = totalRetrieved > 0 ? (countPL / totalRetrieved * 100).toFixed(1) : "0.0";
+          
+          const fmtPct = p => p.endsWith('.0') ? parseFloat(p).toFixed(0) : p;
+          
+          const color = chartColors[idx];
+          const dispName = displayNames[r] || r;
+          
+          const row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.alignItems = 'baseline';
+          row.style.gap = '0.35rem';
+          row.style.color = 'var(--text-main)';
+          row.innerHTML = `
+            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background-color:${color}; flex-shrink:0;"></span>
+            <span style="font-weight:600;">${dispName}:</span>
+            <span>${fmtPct(pctCombined)}%</span>
+            <span style="color:var(--text-muted); font-size:0.73rem; margin-left:0.15rem;">(NL: ${fmtPct(pctNLDetail)}%, PL: ${fmtPct(pctPLDetail)}%)</span>
+          `;
+          legendContainer.appendChild(row);
+        });
+
+        const canvas = document.getElementById('kpi-reasons-chart');
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (window.myKpiReasonsChart) {
+            window.myKpiReasonsChart.destroy();
+          }
+          
+          const totalDel = chartDataValues.reduce((a, b) => a + b, 0);
+          const datasets = [{
+            data: totalDel > 0 ? chartDataValues : [1],
+            backgroundColor: totalDel > 0 ? chartColors : ['#e2e8f0'],
+            borderWidth: 1,
+            borderColor: '#ffffff'
+          }];
+
+          window.myKpiReasonsChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+              labels: chartLabels,
+              datasets: datasets
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  enabled: totalDel > 0,
+                  callbacks: {
+                    label: function(context) {
+                      const val = context.raw;
+                      const label = context.label;
+                      return `${label}: ${val} mẫu`;
+                    }
+                  }
+                }
+              }
+            }
+          });
+        }
+      }
+
+      const nlList = document.getElementById('kpi-detail-list-nl');
+      const plList = document.getElementById('kpi-detail-list-pl');
+      const nlCountSpan = document.getElementById('kpi-detail-count-nl');
+      const plCountSpan = document.getElementById('kpi-detail-count-pl');
+      
+      const nlDetails = data.details.filter(item => item.type === 'NL');
+      const plDetails = data.details.filter(item => item.type === 'PL');
+      
+      if (nlCountSpan) nlCountSpan.textContent = nlDetails.length + " mẫu";
+      if (plCountSpan) plCountSpan.textContent = plDetails.length + " mẫu";
+      
+      if (nlList) {
+        nlList.innerHTML = nlDetails.map(item => {
+          const noteText = item.note ? '(' + item.note + ')' : '';
+          const materialText = item.material ? ' - ' + item.material : '';
+          return '<li style="padding: 0.25rem 0; border-bottom: 1px solid #f1f5f9; line-height:1.4;"><strong>' + item.k + '</strong>' + materialText + ': ' + item.reason + ' ' + noteText + '</li>';
+        }).join('') || '<li style="color:var(--text-muted); padding: 0.5rem 0;">Không có mẫu nào chậm.</li>';
+      }
+
+      if (plList) {
+        plList.innerHTML = plDetails.map(item => {
+          const noteText = item.note ? '(' + item.note + ')' : '';
+          const materialText = item.material ? ' - ' + item.material : '';
+          return '<li style="padding: 0.25rem 0; border-bottom: 1px solid #f1f5f9; line-height:1.4;"><strong>' + item.k + '</strong>' + materialText + ': ' + item.reason + ' ' + noteText + '</li>';
+        }).join('') || '<li style="color:var(--text-muted); padding: 0.5rem 0;">Không có mẫu nào chậm.</li>';
+      }
+    }
+
+    let delayKpiData = {
+      weeks: {
+        "all": {
+          name: "Tất cả các tuần (22/06 - 18/07)",
+          retNL: 179, retPL: 73,
+          delNL: 37, delPL: 10,
+          reasons: {
+            "Gửi viện": { nl: 8, pl: 5 },
+            "QC chậm": { nl: 17, pl: 3 },
+            "Chờ chuẩn": { nl: 1, pl: 0 },
+            "Lý do khác": { nl: 11, pl: 2 }
+          },
+          details: [] // Filled dynamically
+        },
+        "w1": {
+          name: "Tuần 1: 22/06 - 27/06/2026",
+          retNL: 30, retPL: 11,
+          delNL: 19, delPL: 6,
+          reasons: {
+            "Gửi viện": { nl: 6, pl: 4 },
+            "QC chậm": { nl: 5, pl: 1 },
+            "Chờ chuẩn": { nl: 1, pl: 0 },
+            "Lý do khác": { nl: 7, pl: 1 }
+          },
+          details: [
+            { k: "M26-19", type: "NL", reason: "Mẫu gửi viện", note: "gửi viện" },
+            { k: "M26-597", type: "NL", reason: "chờ chuẩn", note: "Chờ chuẩn" },
+            { k: "M26-630", type: "NL", reason: "lý do khác", note: "Chờ xin MOA" },
+            { k: "M26-723", type: "NL", reason: "Mẫu gửi viện", note: "gửi viện" },
+            { k: "M26-828", type: "NL", reason: "Mẫu gửi viện", note: "Gửi viện" },
+            { k: "M26-869", type: "NL", reason: "Mẫu gửi viện", note: "gửi viện" },
+            { k: "M26-911", type: "NL", reason: "Mẫu gửi viện", note: "Gửi viện" },
+            { k: "M26-906", type: "NL", reason: "lý do khác", note: "thực tế k có mẫu này" },
+            { k: "M26-914", type: "NL", reason: "lý do khác", note: "Độ nhớt k đạt, làm lại nhiều lần" },
+            { k: "M26-932", type: "NL", reason: "lý do khác", note: "Hoạt lực khoảng khuẩn 30 ngày" },
+            { k: "M26-946", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "M26-963", type: "NL", reason: "Mẫu gửi viện", note: "Hoạt lực kháng khuẩn" },
+            { k: "M26-915", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "M26-924", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "M26-953", type: "NL", reason: "lý do khác", note: "K đạt chỉ số xà phòng làm lại -> Phản hồi ncc" },
+            { k: "M26-984", type: "NL", reason: "QC chậm", note: "Lấy mẫu báo sai k phải làm, thực tế có làm" },
+            { k: "M26-985", type: "NL", reason: "lý do khác", note: "" },
+            { k: "M26-954", type: "NL", reason: "lý do khác", note: "K lấy mẫu này" },
+            { k: "M26-952", type: "NL", reason: "QC chậm", note: "CHậm phiếu" },
+            { k: "BB26-343", type: "PL", reason: "Mẫu gửi viện", note: "Gửi viện" },
+            { k: "BB26-349", type: "PL", reason: "Mẫu gửi viện", note: "Gửi viện" },
+            { k: "BB26-354", type: "PL", reason: "lý do khác", note: "Màng k đạt-> chờ chốt-> Phản hồi nhà cc" },
+            { k: "BB26-380", type: "PL", reason: "Mẫu gửi viện", note: "gửi viện" },
+            { k: "BB26-379", type: "PL", reason: "Mẫu gửi viện", note: "gửi viện" },
+            { k: "BB26-408", type: "PL", reason: "QC chậm", note: "KNV chậm" }
+          ]
+        },
+        "w2": {
+          name: "Tuần 2: 29/06 - 04/07/2026",
+          retNL: 45, retPL: 12,
+          delNL: 6, delPL: 2,
+          reasons: {
+            "Gửi viện": { nl: 2, pl: 0 },
+            "QC chậm": { nl: 3, pl: 2 },
+            "Chờ chuẩn": { nl: 0, pl: 0 },
+            "Lý do khác": { nl: 1, pl: 0 }
+          },
+          details: [
+            { k: "M26-903", type: "NL", reason: "Mẫu gửi viện", note: "" },
+            { k: "M26-902", type: "NL", reason: "Mẫu gửi viện", note: "Xong" },
+            { k: "M26-1011", type: "NL", reason: "QC chậm", note: "Chậm phân lịch ĐL, tạp" },
+            { k: "M26-1015", type: "NL", reason: "lý do khác", note: "K đạt so màu" },
+            { k: "M26-1019", type: "NL", reason: "QC chậm", note: "Phân lịch chậm CBQ" },
+            { k: "M26-1001", type: "NL", reason: "QC chậm", note: "KNV chậm" },
+            { k: "BB26-430", type: "PL", reason: "QC chậm", note: "KNV châm" },
+            { k: "BB26-429", type: "PL", reason: "QC chậm", note: "KNV châm" }
+          ]
+        },
+        "w3": {
+          name: "Tuần 3: 06/07 - 11/07/2026",
+          retNL: 54, retPL: 23,
+          delNL: 5, delPL: 1,
+          reasons: {
+            "Gửi viện": { nl: 0, pl: 1 },
+            "QC chậm": { nl: 4, pl: 0 },
+            "Chờ chuẩn": { nl: 0, pl: 0 },
+            "Lý do khác": { nl: 1, pl: 0 }
+          },
+          details: [
+            { k: "M26-1053", type: "NL", reason: "lý do khác", note: "tạp chạy 3 lần chưa chốt đc" },
+            { k: "M26-1042", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "M26-1062", type: "NL", reason: "QC chậm", note: "ghép lịch chạy ICP định lượng kali" },
+            { k: "M26-1063", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "M26-1069", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "BB26-431", type: "PL", reason: "Mẫu gửi viện", note: "Xong" }
+          ]
+        },
+        "w4": {
+          name: "Tuần 4: 13/07 - 18/07/2026",
+          retNL: 50, retPL: 27,
+          delNL: 7, delPL: 1,
+          reasons: {
+            "Gửi viện": { nl: 0, pl: 0 },
+            "QC chậm": { nl: 5, pl: 0 },
+            "Chờ chuẩn": { nl: 0, pl: 0 },
+            "Lý do khác": { nl: 2, pl: 1 }
+          },
+          details: [
+            { k: "M26-1083", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "M26-1098", type: "NL", reason: "lý do khác", note: "" },
+            { k: "M26-1090", type: "NL", reason: "lý do khác", note: "NL vô khuẩn 14 ngày" },
+            { k: "M26-1080", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "M26-1109", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "M26-1087", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "M26-1079", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "BB26-454", type: "PL", reason: "lý do khác", note: "Phụ liệu vô khuẩn" }
+          ]
+        }
+      }
+    };
+
+    // Auto fill 'all' details
+    delayKpiData.weeks.all.details = [
+      ...delayKpiData.weeks.w1.details,
+      ...delayKpiData.weeks.w2.details,
+      ...delayKpiData.weeks.w3.details,
+      ...delayKpiData.weeks.w4.details
+    ];
+
+    // ==========================================
+    // ============ TIÊU CHUẨN LOGIC ============
+    // ==========================================
+    function toggleStandardForm() {
+      const form = document.getElementById('standard-form-card');
+      if (form.style.display === 'none') {
+        form.style.display = 'block';
+        document.getElementById('standard-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('standard-code').value = '';
+        document.getElementById('standard-material').value = '';
+        document.getElementById('standard-version').value = '';
+      } else {
+        form.style.display = 'none';
+      }
+    }
+
+    function saveNewStandardLog() {
+      const date = document.getElementById('standard-date').value;
+      const code = document.getElementById('standard-code').value.trim();
+      const material = document.getElementById('standard-material').value.trim();
+      const version = document.getElementById('standard-version').value.trim();
+
+      if (!date) {
+        showToast("Vui lòng chọn ngày ban hành!", "error");
+        return;
+      }
+      if (!code) {
+        showToast("Vui lòng nhập mã tiêu chuẩn!", "error");
+        return;
+      }
+      if (!material) {
+        showToast("Vui lòng nhập tên nguyên liệu!", "error");
+        return;
+      }
+
+      const newLog = {
+        id: 'std_' + Math.random().toString(36).substring(2, 7) + '_' + Date.now(),
+        date: date,
+        code: code,
+        material: material,
+        version: version || 'Lần 1'
+      };
+
+      standardsLogs.unshift(newLog);
+      localStorage.setItem('qc_standards_logs', JSON.stringify(standardsLogs));
+      showToast("Đã lưu hồ sơ ban hành tiêu chuẩn!", "success");
+
+      document.getElementById('standard-form-card').style.display = 'none';
+      renderStandardsTable();
+      renderDashboard();
+    }
+
+    function deleteStandardLog(id) {
+      if (confirm("Bạn có chắc chắn muốn xóa hồ sơ ban hành tiêu chuẩn này?")) {
+        standardsLogs = standardsLogs.filter(log => log.id !== id);
+        localStorage.setItem('qc_standards_logs', JSON.stringify(standardsLogs));
+        showToast("Đã xóa hồ sơ!", "success");
+        renderStandardsTable();
+        renderDashboard();
+      }
+    }
+
+    function renderStandardsTable() {
+      const body = document.getElementById('standard-table-body');
+      body.innerHTML = '';
+
+      if (standardsLogs.length === 0) {
+        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--text-muted);">Chưa có tiêu chuẩn nào được ghi nhận ban hành!</td></tr>`;
+        return;
+      }
+
+      standardsLogs.forEach((log, index) => {
+        const dateObj = new Date(log.date);
+        const dateStr = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString('vi-VN') : log.date;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="text-align: center;">${index + 1}</td>
+          <td>${dateStr}</td>
+          <td><code>${log.code}</code></td>
+          <td><strong>${log.material}</strong></td>
+          <td>${log.version}</td>
+          <td style="text-align: center;">
+            <button class="btn btn-outline" style="color:var(--color-danger); padding:0.25rem 0.5rem; font-size:0.8rem;" onclick="deleteStandardLog('${log.id}')">
+              <i class="fa-solid fa-trash"></i> Xóa
+            </button>
+          </td>
+        `;
+        body.appendChild(row);
+      });
+    }
+
+    function renderStandardsTab() {
+      renderStandardsTable();
     }
   </script>
 </body>
