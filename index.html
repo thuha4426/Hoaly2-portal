@@ -3637,11 +3637,7 @@
       { id: 't_2', date: '2026-07-10', topic: 'Vận hành máy đo phổ Raman thế hệ mới', trainer: 'Nguyễn Văn A', trainees: 'QC02, QC03, QC04', status: 'Hoàn thành' }
     ];
 
-    const DEFAULT_MODELING_DATA = [
-      { id: 'model_m_2026_7', nam: '2026', thang: '7', sx: 20, nc: 150, nl: 200, pl: 50, nuoc: 220, ir: 4, tong: 644 },
-      { id: 'model_m_2026_8', nam: '2026', thang: '8', sx: 0, nc: 0, nl: 0, pl: 0, nuoc: 0, ir: 0, tong: 0 },
-      { id: 'model_m_2026_9', nam: '2026', thang: '9', sx: 0, nc: 0, nl: 0, pl: 0, nuoc: 0, ir: 0, tong: 0 }
-    ];
+    const DEFAULT_MODELING_DATA = [];
 
     const DEFAULT_IMPROVEMENT_DATA = [
       { id: 'i_1', date: '2026-07-01', proposer: 'Nguyễn Văn A', description: 'Tự động hóa báo cáo KPI QC hàng ngày', status: 'Hoàn thành', outcome: 'Tiết kiệm 30 phút mỗi ngày cho đội ngũ QC.' },
@@ -3733,22 +3729,13 @@
       const storedModeling = localStorage.getItem('qc_modeling_data_v4');
       if (storedModeling) {
         try {
-          const parsed = JSON.parse(storedModeling);
-          // Check if it is the old format (e.g. has date instead of thang, or is an array with old objects)
-          if (Array.isArray(parsed) && (parsed.length === 0 || parsed[0] === undefined || parsed[0].nam === undefined || parsed[0].thang === undefined)) {
-            console.log("Migrating modeling data to monthly format");
-            modelingData = [...DEFAULT_MODELING_DATA];
-            localStorage.setItem('qc_modeling_data_v4', JSON.stringify(modelingData));
-          } else {
-            modelingData = parsed;
-          }
+          modelingData = JSON.parse(storedModeling);
         } catch(e) {
           modelingData = [...DEFAULT_MODELING_DATA];
           localStorage.setItem('qc_modeling_data_v4', JSON.stringify(modelingData));
         }
       } else {
         modelingData = [...DEFAULT_MODELING_DATA];
-        localStorage.setItem('qc_modeling_data_v4', JSON.stringify(modelingData));
       }
 
       // 6. Load Improvement Data
