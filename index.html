@@ -7595,26 +7595,39 @@
           details: allDetails
         };
 
+        const storedMap = localStorage.getItem('qc_week_month_map');
+        let existingMap = {};
+        if (storedMap) {
+          try {
+            existingMap = JSON.parse(storedMap);
+          } catch(e) {}
+        }
+
         const weekMonthMap = {};
         Object.keys(delayKpiData.weeks).forEach(wId => {
           if (wId === 'all') return;
-          const wName = delayKpiData.weeks[wId].name;
           
-          let calculatedMonth = '';
-          const regex = /(\d{1,2})\/(\d{1,2})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/;
-          const match = wName.match(regex);
-          if (match) {
-            calculatedMonth = parseInt(match[4], 10).toString();
+          // Ưu tiên giữ cấu hình cũ do người dùng đã lưu thủ công
+          if (existingMap[wId] !== undefined && existingMap[wId] !== '') {
+            weekMonthMap[wId] = existingMap[wId];
           } else {
-            const matches = wName.match(/\/(\d{1,2})/g);
-            if (matches && matches.length >= 2) {
-              calculatedMonth = parseInt(matches[1].substring(1), 10).toString();
+            const wName = delayKpiData.weeks[wId].name;
+            let calculatedMonth = '';
+            const regex = /(\d{1,2})\/(\d{1,2})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/;
+            const match = wName.match(regex);
+            if (match) {
+              calculatedMonth = parseInt(match[4], 10).toString();
+            } else {
+              const matches = wName.match(/\/(\d{1,2})/g);
+              if (matches && matches.length >= 2) {
+                calculatedMonth = parseInt(matches[1].substring(1), 10).toString();
+              }
             }
-          }
-          if (calculatedMonth) {
-            weekMonthMap[wId] = calculatedMonth;
-          } else {
-            weekMonthMap[wId] = '7';
+            if (calculatedMonth) {
+              weekMonthMap[wId] = calculatedMonth;
+            } else {
+              weekMonthMap[wId] = '7';
+            }
           }
         });
         localStorage.setItem('qc_week_month_map', JSON.stringify(weekMonthMap));
