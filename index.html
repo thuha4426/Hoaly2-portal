@@ -3126,6 +3126,10 @@
           <label for="sync-method-url">Đường dẫn Google Sheets cho Test PP (Để trống nếu dùng chung link trên)</label>
           <input type="text" id="sync-method-url" class="form-control" style="width:100%;" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
         </div>
+        <div class="sync-form-group" style="margin-top: 0.75rem;">
+          <label for="sync-web-app-url">Link Google Apps Script (Web App URL) để tự động lưu & đồng bộ dữ liệu nhập tay</label>
+          <input type="text" id="sync-web-app-url" class="form-control" style="width:100%;" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
         
         <div class="sync-row" style="margin-top: 0.75rem;">
           <div class="sync-form-group">
@@ -3688,10 +3692,13 @@
     const DEFAULT_GID_MODELING = "11612667";
 
     // --- INITIALIZATION ---
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       loadData();
       initUI();
       renderDashboard();
+      
+      // Tự động kéo dữ liệu từ đám mây (nếu có cấu hình Apps Script)
+      await pullFromCloud(true);
       
       // Tự động đồng bộ ngay khi mở trang nếu đã cấu hình Sheets
       const syncSettings = localStorage.getItem('qc_oos_sync_settings');
@@ -3810,6 +3817,9 @@
         if (document.getElementById('sync-gid-retrieved')) {
           document.getElementById('sync-gid-retrieved').value = settings.gidRetrieved || '1577407961';
         }
+        if (document.getElementById('sync-web-app-url')) {
+          document.getElementById('sync-web-app-url').value = settings.webAppUrl || '';
+        }
       } else {
         // Pre-fill fields and save defaults
         const defaultSettings = {
@@ -3823,7 +3833,8 @@
           gidModeling: DEFAULT_GID_MODELING,
           gidImprovement: '',
           gidDelay: '1365140269',
-          gidRetrieved: '1577407961'
+          gidRetrieved: '1577407961',
+          webAppUrl: ''
         };
         localStorage.setItem('qc_oos_sync_settings', JSON.stringify(defaultSettings));
 
@@ -3847,6 +3858,9 @@
         }
         if (document.getElementById('sync-gid-retrieved')) {
           document.getElementById('sync-gid-retrieved').value = defaultSettings.gidRetrieved;
+        }
+        if (document.getElementById('sync-web-app-url')) {
+          document.getElementById('sync-web-app-url').value = defaultSettings.webAppUrl;
         }
       }
 
@@ -4116,7 +4130,10 @@
       document.getElementById('btn-close-detail').addEventListener('click', () => closeModal('detail-modal'));
       document.getElementById('btn-close-pers-detail').addEventListener('click', () => closeModal('pers-detail-modal'));
       document.getElementById('btn-close-kpi-staff-list').addEventListener('click', () => closeModal('kpi-staff-list-modal'));
-      document.getElementById('btn-save-sync').addEventListener('click', () => performSync(false));
+      document.getElementById('btn-save-sync').addEventListener('click', async () => {
+        await performSync(false);
+        await pullFromCloud(false);
+      });
 
       // File Import Event Listeners
       const dropZone = document.getElementById('drop-zone');
@@ -4192,6 +4209,108 @@
       setTimeout(() => {
         toast.classList.remove('active');
       }, 3500);
+    }
+
+    // --- CLOUD AUTOMATIC SYNC VIA APPS SCRIPT ---
+    async function pushToCloud() {
+      const syncSettings = localStorage.getItem('qc_oos_sync_settings');
+      if (!syncSettings) return;
+      
+      let webAppUrl = '';
+      try {
+        const settings = JSON.parse(syncSettings);
+        webAppUrl = settings.webAppUrl;
+      } catch(e) {}
+      
+      if (!webAppUrl) return;
+      
+      const backupData = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('qc_') && key !== 'qc_oos_sync_settings') {
+          backupData[key] = localStorage.getItem(key);
+        }
+      }
+      
+      try {
+        const response = await fetch(webAppUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'save',
+            data: JSON.stringify(backupData)
+          })
+        });
+        
+        if (response.ok) {
+          console.log('[Cloud Sync] Auto-pushed manual data changes to Google Sheets.');
+        } else {
+          console.warn('[Cloud Sync] Failed to auto-push manual data changes. Status:', response.status);
+        }
+      } catch(err) {
+        console.error('[Cloud Sync] Error pushing to Apps Script Web App:', err);
+      }
+    }
+    
+    async function pullFromCloud(silent = false) {
+      const syncSettings = localStorage.getItem('qc_oos_sync_settings');
+      if (!syncSettings) return;
+      
+      let webAppUrl = '';
+      try {
+        const settings = JSON.parse(syncSettings);
+        webAppUrl = settings.webAppUrl;
+      } catch(e) {}
+      
+      if (!webAppUrl) return;
+      
+      if (!silent) {
+        showToast("Đang đồng bộ dữ liệu từ đám mây...", "info");
+      }
+      
+      try {
+        const url = webAppUrl + (webAppUrl.includes('?') ? '&' : '?') + 'action=get&_t=' + Date.now();
+        const response = await fetch(url, {
+          method: 'GET',
+          mode: 'cors'
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          if (result && result.status === 'success' && result.data) {
+            const backupData = JSON.parse(result.data);
+            let updated = false;
+            for (const key in backupData) {
+              if (backupData.hasOwnProperty(key) && key.startsWith('qc_')) {
+                const currentVal = localStorage.getItem(key);
+                if (currentVal !== backupData[key]) {
+                  localStorage.setItem(key, backupData[key]);
+                  updated = true;
+                }
+              }
+            }
+            if (updated) {
+              loadData();
+              renderDashboard();
+              showToast("Đã đồng bộ dữ liệu mới nhất từ đám mây!", "success");
+            } else if (!silent) {
+              showToast("Dữ liệu đám mây đã đồng bộ trùng khớp!", "success");
+            }
+          } else if (!silent) {
+            showToast("Không tìm thấy dữ liệu trên đám mây.", "warning");
+          }
+        } else if (!silent) {
+          showToast("Lỗi tải dữ liệu đám mây (HTTP " + response.status + ")", "error");
+        }
+      } catch(err) {
+        console.error('[Cloud Sync] Error pulling from Apps Script Web App:', err);
+        if (!silent) {
+          showToast("Lỗi kết nối đồng bộ đám mây (CORS/Mạng)", "error");
+        }
+      }
     }
 
     // --- LOCAL DATA BACKUP & RESTORE ---
@@ -4335,6 +4454,7 @@
       };
       
       localStorage.setItem('qc_overview_targets', JSON.stringify(overviewTargets));
+      pushToCloud();
       showToast(`Đã lưu mục tiêu ${quarter}/${year} thành công!`, "success");
       renderDashboard();
     }
@@ -4459,6 +4579,7 @@
       }
       
       localStorage.setItem('qc_training_data_v4', JSON.stringify(trainingData));
+      pushToCloud();
       closeModal('training-modal');
       showToast("Lưu thông tin đào tạo thành công!", "success");
       renderTrainingTab();
@@ -4468,6 +4589,7 @@
       if (confirm("Bạn có chắc chắn muốn xóa buổi đào tạo này?")) {
         trainingData = trainingData.filter(x => x.id !== id);
         localStorage.setItem('qc_training_data_v4', JSON.stringify(trainingData));
+        pushToCloud();
         showToast("Đã xóa buổi đào tạo thành công!", "success");
         renderTrainingTab();
       }
@@ -4694,6 +4816,7 @@
       }
       
       localStorage.setItem('qc_modeling_data_v4', JSON.stringify(modelingData));
+      pushToCloud();
       closeModal('modeling-modal');
       showToast("Cập nhật số liệu làm mẫu thành công!", "success");
       renderDashboard();
@@ -4773,6 +4896,7 @@
       if (confirm("Bạn có chắc chắn muốn xóa đề xuất cải tiến này?")) {
         improvementData = improvementData.filter(x => x.id !== id);
         localStorage.setItem('qc_improvement_data_v4', JSON.stringify(improvementData));
+        pushToCloud();
         showToast("Đã xóa cải tiến thành công!", "success");
         renderImprovementTab();
       }
@@ -5236,6 +5360,7 @@
       }
       
       localStorage.setItem('qc_improvement_data_v4', JSON.stringify(improvementData));
+      pushToCloud();
       closeModal('improvement-modal');
       showToast("Lưu cải tiến thành công!", "success");
       renderDashboard();
@@ -5245,6 +5370,7 @@
       if (confirm("Bạn có chắc chắn muốn xóa đề xuất cải tiến này?")) {
         improvementData = improvementData.filter(x => x.id !== id);
         localStorage.setItem('qc_improvement_data_v4', JSON.stringify(improvementData));
+        pushToCloud();
         showToast("Đã xóa cải tiến thành công!", "success");
         renderDashboard();
       }
@@ -7034,6 +7160,8 @@
         if (!methodInfo) return;
       }
 
+      const webAppUrlInput = document.getElementById('sync-web-app-url') ? document.getElementById('sync-web-app-url').value.trim() : '';
+
       // Save setting to localStorage
       localStorage.setItem('qc_oos_sync_settings', JSON.stringify({ 
         url: urlInput, 
@@ -7046,7 +7174,8 @@
         gidModeling,
         gidImprovement,
         gidDelay,
-        gidRetrieved
+        gidRetrieved,
+        webAppUrl: webAppUrlInput
       }));
       
       if (!silent) {
@@ -9081,6 +9210,7 @@
 
         bondingData.unshift(newEvent);
         localStorage.setItem('qc_bonding_data', JSON.stringify(bondingData));
+        pushToCloud();
         showToast("Đã đăng hoạt động gắn kết mới thành công!", "success");
         
         // Reset form
@@ -9098,6 +9228,7 @@
       if (confirm("Bạn có chắc chắn muốn xóa hoạt động gắn kết này không?")) {
         bondingData = bondingData.filter(event => event.id !== id);
         localStorage.setItem('qc_bonding_data', JSON.stringify(bondingData));
+        pushToCloud();
         showToast("Đã xóa hoạt động!", "success");
         renderBondingTab();
         renderDashboard();
@@ -9260,6 +9391,7 @@
 
       delayLogs.unshift(newLog);
       localStorage.setItem('qc_delay_logs', JSON.stringify(delayLogs));
+      pushToCloud();
       showToast("Đã lưu nhật ký chậm phiếu!", "success");
 
       document.getElementById('delay-form-card').style.display = 'none';
@@ -9271,6 +9403,7 @@
       if (confirm("Bạn có chắc chắn muốn xóa nhật ký chậm phiếu này?")) {
         delayLogs = delayLogs.filter(log => log.id !== id);
         localStorage.setItem('qc_delay_logs', JSON.stringify(delayLogs));
+        pushToCloud();
         showToast("Đã xóa nhật ký!", "success");
         renderDelayTable();
         renderDashboard();
@@ -9468,6 +9601,7 @@
         }
       });
       localStorage.setItem('qc_week_month_map', JSON.stringify(weekMonthMap));
+      pushToCloud();
       showToast("Đã lưu cấu hình phân bổ tuần thành công!", "success");
       
       loadWeekMonthConfig();
@@ -9990,6 +10124,7 @@
 
       standardsLogs.unshift(newLog);
       localStorage.setItem('qc_standards_logs', JSON.stringify(standardsLogs));
+      pushToCloud();
       showToast("Đã lưu hồ sơ ban hành tiêu chuẩn!", "success");
 
       document.getElementById('standard-form-card').style.display = 'none';
@@ -10001,6 +10136,7 @@
       if (confirm("Bạn có chắc chắn muốn xóa hồ sơ ban hành tiêu chuẩn này?")) {
         standardsLogs = standardsLogs.filter(log => log.id !== id);
         localStorage.setItem('qc_standards_logs', JSON.stringify(standardsLogs));
+        pushToCloud();
         showToast("Đã xóa hồ sơ!", "success");
         renderStandardsTable();
         renderDashboard();
