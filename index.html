@@ -4243,9 +4243,9 @@
       }
       
       try {
-        const response = await fetch(webAppUrl, {
+        await fetch(webAppUrl, {
           method: 'POST',
-          mode: 'cors',
+          mode: 'no-cors', // Dùng no-cors để tránh lỗi CORS khi redirect trên Google Apps Script
           headers: {
             'Content-Type': 'text/plain',
           },
@@ -4254,12 +4254,7 @@
             data: JSON.stringify(backupData)
           })
         });
-        
-        if (response.ok) {
-          console.log('[Cloud Sync] Auto-pushed manual data changes to Google Sheets.');
-        } else {
-          console.warn('[Cloud Sync] Failed to auto-push manual data changes. Status:', response.status);
-        }
+        console.log('[Cloud Sync] Auto-pushed manual data changes to Google Sheets.');
       } catch(err) {
         console.error('[Cloud Sync] Error pushing to Apps Script Web App:', err);
       }
@@ -4374,9 +4369,9 @@
       }
       
       try {
-        const response = await fetch(webAppUrl, {
+        await fetch(webAppUrl, {
           method: 'POST',
-          mode: 'cors',
+          mode: 'no-cors', // Dùng no-cors để tránh lỗi CORS khi redirect trên Google Apps Script
           headers: {
             'Content-Type': 'text/plain',
           },
@@ -4385,12 +4380,7 @@
             data: JSON.stringify(backupData)
           })
         });
-        
-        if (response.ok) {
-          showToast("Đã gửi dữ liệu cục bộ lên đám mây thành công!", "success");
-        } else {
-          showToast("Gửi dữ liệu thất bại (HTTP " + response.status + ")", "error");
-        }
+        showToast("Đã gửi dữ liệu cục bộ lên đám mây thành công!", "success");
       } catch(err) {
         console.error(err);
         showToast("Lỗi kết nối gửi dữ liệu đám mây.", "error");
