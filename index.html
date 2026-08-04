@@ -3204,6 +3204,24 @@
           </div>
         </div>
 
+        <!-- Sao lưu & Phục hồi dữ liệu nhập tay -->
+        <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
+          <h4 style="font-size: 0.85rem; font-weight:600; margin-bottom: 0.5rem;"><i class="fa-solid fa-database"></i> Sao lưu & Phục hồi dữ liệu nhập tay</h4>
+          <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.4;">
+            <i class="fa-solid fa-circle-info"></i> Do dữ liệu nhập tay (như số mẫu IR, cấu hình phân bổ tuần tháng 8, mục tiêu quý...) được lưu trực tiếp trên thiết bị hiện tại, bạn cần xuất file sao lưu để chuyển sang thiết bị hoặc tài khoản khác.
+          </p>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn" onclick="exportLocalDataBackup()" style="flex: 1; justify-content: center; font-size: 0.78rem; padding: 0.4rem 0.75rem;">
+              <i class="fa-solid fa-download"></i> Xuất file sao lưu
+            </button>
+            <button class="btn" onclick="document.getElementById('backup-file-input').click()" style="flex: 1; justify-content: center; font-size: 0.78rem; padding: 0.4rem 0.75rem;">
+              <i class="fa-solid fa-upload"></i> Phục hồi dữ liệu
+            </button>
+            <input type="file" id="backup-file-input" style="display:none;" accept=".json" onchange="importLocalDataBackup(this)">
+          </div>
+        </div>
+
+
         <div class="modal-full-field" style="margin-top:1.25rem; font-size:0.7rem; color:var(--text-muted); line-height: 1.4;">
           <p><i class="fa-solid fa-circle-info"></i> Hệ thống tự động nhận diện cột dựa theo tiêu đề (Không phụ thuộc vào thứ tự cột). Bạn có thể tải file Excel từ Google Sheet về máy rồi kéo thả vào đây để nạp nhanh ngoại tuyến!</p>
         </div>
@@ -3885,6 +3903,14 @@
         standardsLogs = getSeedStandardsLogs();
         localStorage.setItem('qc_standards_logs', JSON.stringify(standardsLogs));
       }
+
+      // Load Delay KPI data safely
+      const storedDelayKpi = localStorage.getItem('qc_delay_kpi_data');
+      if (storedDelayKpi) {
+        try {
+          delayKpiData = JSON.parse(storedDelayKpi);
+        } catch(e) {}
+      }
     }
 
     function initUI() {
@@ -4166,6 +4192,73 @@
       setTimeout(() => {
         toast.classList.remove('active');
       }, 3500);
+    }
+
+    // --- LOCAL DATA BACKUP & RESTORE ---
+    function exportLocalDataBackup() {
+      const backupData = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('qc_')) {
+          backupData[key] = localStorage.getItem(key);
+        }
+      }
+      
+      const jsonStr = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const date = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const filename = `qc_portal_backup_${date.getFullYear()}${pad(date.getMonth()+1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}.json`;
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      showToast("Đã xuất file sao lưu dữ liệu thành công!", "success");
+    }
+    
+    function importLocalDataBackup(input) {
+      const file = input.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const backupData = JSON.parse(e.target.result);
+          if (typeof backupData !== 'object' || backupData === null) {
+            throw new Error("Định dạng file không hợp lệ!");
+          }
+          
+          let importedCount = 0;
+          for (const key in backupData) {
+            if (backupData.hasOwnProperty(key) && key.startsWith('qc_')) {
+              localStorage.setItem(key, backupData[key]);
+              importedCount++;
+            }
+          }
+          
+          if (importedCount === 0) {
+            showToast("Không tìm thấy dữ liệu sao lưu hợp lệ trong file!", "error");
+            return;
+          }
+          
+          showToast(`Đã phục hồi thành công ${importedCount} mục dữ liệu! Đang tải lại trang...`, "success");
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+          
+        } catch (err) {
+          showToast("Lỗi khi đọc file sao lưu: " + err.message, "error");
+        }
+      };
+      reader.readAsText(file);
+      input.value = '';
     }
 
     /* =============== OVERVIEW TAB JAVASCRIPT LOGIC =============== */
@@ -7270,6 +7363,23 @@
           return null;
         }
 
+        function getDefaultWeekName(wId) {
+          const wNum = parseInt(wId.replace('w', ''), 10);
+          if (isNaN(wNum) || wNum < 1) return "";
+          const startMonday = new Date(2026, 5, 22); // Month is 0-indexed, 5 is June
+          const monday = new Date(startMonday.getTime() + (wNum - 1) * 7 * 24 * 60 * 60 * 1000);
+          const saturday = new Date(monday.getTime() + 5 * 24 * 60 * 60 * 1000);
+          
+          const pad = (n) => String(n).padStart(2, '0');
+          const dM = pad(monday.getDate());
+          const mM = pad(monday.getMonth() + 1);
+          const dS = pad(saturday.getDate());
+          const mS = pad(saturday.getMonth() + 1);
+          const yS = saturday.getFullYear();
+          
+          return `Tuần ${wNum}: ${dM}/${mM} - ${dS}/${mS}/${yS}`;
+        }
+
         function getWeekFromDate(date) {
           if (!date) return null;
           const y = date.getFullYear();
@@ -7277,29 +7387,22 @@
           const d = date.getDate();
           const val = y * 10000 + m * 100 + d;
           
-          const defaultWeekNames = {
-            w1: "Tuần 1: 22/06 - 27/06/2026",
-            w2: "Tuần 2: 29/06 - 04/07/2026",
-            w3: "Tuần 3: 06/07 - 11/07/2026",
-            w4: "Tuần 4: 13/07 - 18/07/2026",
-            w5: "Tuần 5: 20/07 - 25/07/2026"
-          };
-          
-          for (const wId of Object.keys(delayKpiData.weeks)) {
-            if (wId === 'all') continue;
-            let weekName = delayKpiData.weeks[wId].name;
+          for (let i = 1; i <= 500; i++) {
+            const wId = 'w' + i;
+            let weekName = delayKpiData.weeks[wId] && delayKpiData.weeks[wId].name;
             
-            const wNum = wId.replace('w', '');
-            const normStored = removeVietnameseAccents(weekName);
-            const regex = new RegExp('(tuan|t)\\s*' + wNum + '\\b');
-            if (!regex.test(normStored)) {
-              weekName = defaultWeekNames[wId] || "";
+            if (weekName) {
+              const wNum = wId.replace('w', '');
+              const normStored = removeVietnameseAccents(weekName);
+              const regex = new RegExp('(tuan|t)\\s*' + wNum + '\\b');
+              if (!regex.test(normStored)) {
+                weekName = getDefaultWeekName(wId);
+              }
+            } else {
+              weekName = getDefaultWeekName(wId);
             }
             
             let range = parseWeekRange(weekName);
-            if (!range && defaultWeekNames[wId]) {
-              range = parseWeekRange(defaultWeekNames[wId]);
-            }
             if (range && val >= range.startDateVal && val <= range.endDateVal) {
               return wId;
             }
@@ -7381,13 +7484,6 @@
           delayDetails[key] = [];
         }
         const weekNameMap = {};
-        const defaultWeekNames = {
-          w1: "Tuần 1: 22/06 - 27/06/2026",
-          w2: "Tuần 2: 29/06 - 04/07/2026",
-          w3: "Tuần 3: 06/07 - 11/07/2026",
-          w4: "Tuần 4: 13/07 - 18/07/2026",
-          w5: "Tuần 5: 20/07 - 25/07/2026"
-        };
 
         delayDataRows.forEach((row) => {
           const sampleCode = row[colDelayK]?.trim();
@@ -7408,7 +7504,7 @@
               const afterMatch = norm.substring(matchTuan.index + matchTuan[0].length).trim();
               if (!afterMatch.startsWith('/') && !afterMatch.startsWith('-')) {
                 const num = parseInt(numStr, 10);
-                if (num >= 1 && num <= 10) return 'w' + num;
+                if (num >= 1 && num <= 500) return 'w' + num;
               }
             }
             const matchT = norm.match(/\bt(\d+)\b/) || norm.match(/^t(\d+)\b/);
@@ -7417,7 +7513,7 @@
               const afterMatch = norm.substring(matchT.index + matchT[0].length).trim();
               if (!afterMatch.startsWith('/') && !afterMatch.startsWith('-')) {
                 const num = parseInt(numStr, 10);
-                if (num >= 1 && num <= 10) return 'w' + num;
+                if (num >= 1 && num <= 500) return 'w' + num;
               }
             }
             
@@ -7429,7 +7525,7 @@
               const val = year * 10000 + month * 100 + day;
               
               const wIds = [];
-              for (let i = 1; i <= 10; i++) wIds.push('w' + i);
+              for (let i = 1; i <= 500; i++) wIds.push('w' + i);
               for (const wId of wIds) {
                 let wName = delayKpiData.weeks[wId] && delayKpiData.weeks[wId].name;
                 if (wName) {
@@ -7441,7 +7537,7 @@
                   }
                 }
                 if (!wName) {
-                  wName = defaultWeekNames[wId] || "";
+                  wName = getDefaultWeekName(wId);
                 }
                 if (!wName) continue;
                 const range = parseWeekRange(wName);
@@ -7546,7 +7642,7 @@
               storedName = null;
             }
           }
-          let weekName = weekNameMap[wKey] || storedName || defaultWeekNames[wKey] || wKey;
+          let weekName = weekNameMap[wKey] || storedName || getDefaultWeekName(wKey) || wKey;
           
           delayKpiData.weeks[wKey] = {
             name: weekName,
