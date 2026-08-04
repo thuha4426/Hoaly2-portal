@@ -3212,14 +3212,24 @@
         <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
           <h4 style="font-size: 0.85rem; font-weight:600; margin-bottom: 0.5rem;"><i class="fa-solid fa-database"></i> Sao lưu & Phục hồi dữ liệu nhập tay</h4>
           <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.4;">
-            <i class="fa-solid fa-circle-info"></i> Do dữ liệu nhập tay (như số mẫu IR, cấu hình phân bổ tuần tháng 8, mục tiêu quý...) được lưu trực tiếp trên thiết bị hiện tại, bạn cần xuất file sao lưu để chuyển sang thiết bị hoặc tài khoản khác.
+            <i class="fa-solid fa-circle-info"></i> Do dữ liệu nhập tay (như số mẫu IR, cấu hình phân bổ tuần tháng 8, mục tiêu quý...) được lưu trực tiếp trên thiết bị hiện tại, bạn cần dùng các nút dưới đây để gửi/nhận dữ liệu qua Cloud hoặc xuất file sao lưu.
           </p>
+          
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <button class="btn btn-primary" onclick="pushToCloudManual()" style="flex: 1; justify-content: center; font-size: 0.78rem; padding: 0.4rem 0.75rem;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Gửi dữ liệu lên Cloud
+            </button>
+            <button class="btn btn-primary" onclick="pullFromCloudManual()" style="flex: 1; justify-content: center; font-size: 0.78rem; padding: 0.4rem 0.75rem;">
+              <i class="fa-solid fa-cloud-arrow-down"></i> Tải dữ liệu từ Cloud
+            </button>
+          </div>
+
           <div style="display: flex; gap: 0.5rem;">
             <button class="btn" onclick="exportLocalDataBackup()" style="flex: 1; justify-content: center; font-size: 0.78rem; padding: 0.4rem 0.75rem;">
-              <i class="fa-solid fa-download"></i> Xuất file sao lưu
+              <i class="fa-solid fa-download"></i> Xuất file sao lưu (JSON)
             </button>
             <button class="btn" onclick="document.getElementById('backup-file-input').click()" style="flex: 1; justify-content: center; font-size: 0.78rem; padding: 0.4rem 0.75rem;">
-              <i class="fa-solid fa-upload"></i> Phục hồi dữ liệu
+              <i class="fa-solid fa-upload"></i> Phục hồi từ file (JSON)
             </button>
             <input type="file" id="backup-file-input" style="display:none;" accept=".json" onchange="importLocalDataBackup(this)">
           </div>
@@ -4222,7 +4232,7 @@
         webAppUrl = settings.webAppUrl;
       } catch(e) {}
       
-      if (!webAppUrl) return;
+      if (!webAppUrl || !webAppUrl.includes('/exec') || webAppUrl.includes('/edit')) return;
       
       const backupData = {};
       for (let i = 0; i < localStorage.length; i++) {
@@ -4237,7 +4247,7 @@
           method: 'POST',
           mode: 'cors',
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'text/plain',
           },
           body: JSON.stringify({
             action: 'save',
@@ -4256,16 +4266,27 @@
     }
     
     async function pullFromCloud(silent = false) {
-      const syncSettings = localStorage.getItem('qc_oos_sync_settings');
-      if (!syncSettings) return;
-      
       let webAppUrl = '';
-      try {
-        const settings = JSON.parse(syncSettings);
-        webAppUrl = settings.webAppUrl;
-      } catch(e) {}
+      const inputEl = document.getElementById('sync-web-app-url');
+      if (inputEl && inputEl.value.trim()) {
+        webAppUrl = inputEl.value.trim();
+      } else {
+        const syncSettings = localStorage.getItem('qc_oos_sync_settings');
+        if (syncSettings) {
+          try {
+            const settings = JSON.parse(syncSettings);
+            webAppUrl = settings.webAppUrl || '';
+          } catch(e) {}
+        }
+      }
       
       if (!webAppUrl) return;
+      if (!webAppUrl.includes('/exec') || webAppUrl.includes('/edit')) {
+        if (!silent) {
+          showToast("Link Apps Script không đúng! Vui lòng dùng link Web App kết thúc bằng /exec (không dùng link chứa /edit).", "error");
+        }
+        return;
+      }
       
       if (!silent) {
         showToast("Đang đồng bộ dữ liệu từ đám mây...", "info");
@@ -4299,8 +4320,13 @@
             } else if (!silent) {
               showToast("Dữ liệu đám mây đã đồng bộ trùng khớp!", "success");
             }
-          } else if (!silent) {
-            showToast("Không tìm thấy dữ liệu trên đám mây.", "warning");
+          } else {
+            // Cloud is empty (first time setup). Push current local data to initialize the cloud.
+            console.log('[Cloud Sync] Cloud storage is empty. Initializing with local data...');
+            await pushToCloud();
+            if (!silent) {
+              showToast("Đã khởi tạo dữ liệu cục bộ lên đám mây thành công!", "success");
+            }
           }
         } else if (!silent) {
           showToast("Lỗi tải dữ liệu đám mây (HTTP " + response.status + ")", "error");
@@ -4311,6 +4337,68 @@
           showToast("Lỗi kết nối đồng bộ đám mây (CORS/Mạng)", "error");
         }
       }
+    }
+
+    async function pushToCloudManual() {
+      let webAppUrl = '';
+      const inputEl = document.getElementById('sync-web-app-url');
+      if (inputEl && inputEl.value.trim()) {
+        webAppUrl = inputEl.value.trim();
+      } else {
+        const syncSettings = localStorage.getItem('qc_oos_sync_settings');
+        if (syncSettings) {
+          try {
+            const settings = JSON.parse(syncSettings);
+            webAppUrl = settings.webAppUrl || '';
+          } catch(e) {}
+        }
+      }
+      
+      if (!webAppUrl) {
+        showToast("Vui lòng cấu hình link Apps Script trước!", "error");
+        return;
+      }
+      if (!webAppUrl.includes('/exec') || webAppUrl.includes('/edit')) {
+        showToast("Link Apps Script không đúng! Vui lòng dùng link Web App kết thúc bằng /exec (không dùng link chứa /edit).", "error");
+        return;
+      }
+      
+      showToast("Đang gửi dữ liệu lên đám mây...", "info");
+      
+      const backupData = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('qc_') && key !== 'qc_oos_sync_settings') {
+          backupData[key] = localStorage.getItem(key);
+        }
+      }
+      
+      try {
+        const response = await fetch(webAppUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'text/plain',
+          },
+          body: JSON.stringify({
+            action: 'save',
+            data: JSON.stringify(backupData)
+          })
+        });
+        
+        if (response.ok) {
+          showToast("Đã gửi dữ liệu cục bộ lên đám mây thành công!", "success");
+        } else {
+          showToast("Gửi dữ liệu thất bại (HTTP " + response.status + ")", "error");
+        }
+      } catch(err) {
+        console.error(err);
+        showToast("Lỗi kết nối gửi dữ liệu đám mây.", "error");
+      }
+    }
+
+    async function pullFromCloudManual() {
+      await pullFromCloud(false);
     }
 
     // --- LOCAL DATA BACKUP & RESTORE ---
