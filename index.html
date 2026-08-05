@@ -538,6 +538,7 @@
     .badge.pl { background: rgba(16, 185, 129, 0.1); color: #059669; }
     
     .badge.status-active { background: rgba(16, 185, 129, 0.1); color: #059669; }
+    .badge.status-apprentice { background: rgba(14, 165, 233, 0.1); color: #0ea5e9; }
     .badge.status-probation { background: rgba(245, 158, 11, 0.1); color: #d97706; }
     .badge.status-resigned { background: rgba(239, 68, 68, 0.1); color: #dc2626; }
     .badge.status-offline { background: #f1f5f9; color: #64748b; }
@@ -1781,6 +1782,13 @@
             </select>
           </div>
           <div class="filter-group">
+            <label for="modeling-view-mode">Chế độ xem</label>
+            <select id="modeling-view-mode" class="form-control">
+              <option value="month" selected>Xem theo Tháng</option>
+              <option value="week">Xem theo Tuần</option>
+            </select>
+          </div>
+          <div id="modeling-quarter-filter-group" class="filter-group">
             <label for="modeling-filter-quarter">Quý</label>
             <select id="modeling-filter-quarter" class="form-control">
               <option value="ALL">Tất cả các quý</option>
@@ -1790,9 +1798,38 @@
               <option value="Q4">Quý 4</option>
             </select>
           </div>
+          <div id="modeling-month-filter-group" class="filter-group" style="display: none;">
+            <label for="modeling-filter-month">Tháng</label>
+            <select id="modeling-filter-month" class="form-control">
+              <option value="all" selected>Tất cả các tháng</option>
+              <option value="01">Tháng 1</option>
+              <option value="02">Tháng 2</option>
+              <option value="03">Tháng 3</option>
+              <option value="04">Tháng 4</option>
+              <option value="05">Tháng 5</option>
+              <option value="06">Tháng 6</option>
+              <option value="07">Tháng 7</option>
+              <option value="08">Tháng 8</option>
+              <option value="09">Tháng 9</option>
+              <option value="10">Tháng 10</option>
+              <option value="11">Tháng 11</option>
+              <option value="12">Tháng 12</option>
+            </select>
+          </div>
+          <div id="modeling-week-filter-group" class="filter-group" style="display: none;">
+            <label for="modeling-filter-week">Tuần</label>
+            <select id="modeling-filter-week" class="form-control">
+              <option value="ALL" selected>Tất cả các tuần</option>
+              <option value="1">Tuần 1 (01 - 07)</option>
+              <option value="2">Tuần 2 (08 - 14)</option>
+              <option value="3">Tuần 3 (15 - 21)</option>
+              <option value="4">Tuần 4 (22 - 28)</option>
+              <option value="5">Tuần 5 (29 - Hết tháng)</option>
+            </select>
+          </div>
           <div class="filter-group">
-            <label for="modeling-search-input">Tìm kiếm nhân viên/mẫu</label>
-            <input type="text" id="modeling-search-input" class="form-control" placeholder="Nhập tháng (ví dụ: 7)...">
+            <label for="modeling-search-input">Tìm kiếm</label>
+            <input type="text" id="modeling-search-input" class="form-control" placeholder="Tìm kiếm...">
           </div>
           <button class="btn btn-primary" onclick="openAddModelingMonthlyModal()" style="margin-left:auto;">
             <i class="fa-solid fa-plus"></i> Đăng ký tháng mới
@@ -1928,6 +1965,13 @@
             <div class="kpi-label">Nhân sự chính thức <i class="fa-solid fa-square-poll-horizontal" style="font-size:0.75rem; opacity:0.6; margin-left:2px;"></i></div>
           </div>
         </div>
+        <div class="kpi-card" onclick="showKPIStaffList('apprentice')" style="cursor: pointer;">
+          <div class="kpi-icon info" style="background:rgba(14, 165, 233, 0.1); color: #0ea5e9;"><i class="fa-solid fa-user-clock"></i></div>
+          <div class="kpi-info">
+            <div id="kpi-pers-apprentice" class="kpi-value">0</div>
+            <div class="kpi-label">Nhân sự học việc <i class="fa-solid fa-square-poll-horizontal" style="font-size:0.75rem; opacity:0.6; margin-left:2px;"></i></div>
+          </div>
+        </div>
         <div class="kpi-card" onclick="showKPIStaffList('probation')" style="cursor: pointer;">
           <div class="kpi-icon warning"><i class="fa-solid fa-user-graduate"></i></div>
           <div class="kpi-info">
@@ -2025,7 +2069,8 @@
               <option value="HPLC">Tổ HPLC</option>
               <option value="Test">Tổ Test</option>
               <option value="IR/chất chuẩn">Tổ IR/chất chuẩn</option>
-              <option value="Học/thử việc">Học việc / Thử việc</option>
+              <option value="Học việc">Học việc</option>
+              <option value="Thử việc">Thử việc</option>
               <option value="Nghỉ việc">Đã nghỉ việc</option>
             </select>
           </div>
@@ -2080,6 +2125,17 @@
             <option value="10">Tháng 10</option>
             <option value="11">Tháng 11</option>
             <option value="12">Tháng 12</option>
+          </select>
+        </div>
+        <div class="filter-group" id="oos-week-filter-group" style="display: none;">
+          <label for="filter-week">Tuần</label>
+          <select id="filter-week" class="form-control">
+            <option value="Tất cả" selected>Tất cả các tuần</option>
+            <option value="1">Tuần 1 (01 - 07)</option>
+            <option value="2">Tuần 2 (08 - 14)</option>
+            <option value="3">Tuần 3 (15 - 21)</option>
+            <option value="4">Tuần 4 (22 - 28)</option>
+            <option value="5">Tuần 5 (29 - Hết tháng)</option>
           </select>
         </div>
         <div class="filter-group">
@@ -2417,6 +2473,17 @@
             <option value="10">Tháng 10</option>
             <option value="11">Tháng 11</option>
             <option value="12">Tháng 12</option>
+          </select>
+        </div>
+        <div id="method-week-filter-group" class="filter-group" style="display: none;">
+          <label for="method-filter-week">Tuần</label>
+          <select id="method-filter-week" class="form-control">
+            <option value="ALL" selected>Tất cả các tuần</option>
+            <option value="1">Tuần 1 (01 - 07)</option>
+            <option value="2">Tuần 2 (08 - 14)</option>
+            <option value="3">Tuần 3 (15 - 21)</option>
+            <option value="4">Tuần 4 (22 - 28)</option>
+            <option value="5">Tuần 5 (29 - Hết tháng)</option>
           </select>
         </div>
         <div id="method-quarter-filter-group" class="filter-group" style="display: none;">
@@ -3581,23 +3648,21 @@
       { maNV: "018574", name: "Nguyễn Văn Thoan", joinDate: "14/07/2025", monthlyStatus: {"2026-01": "Test", "2026-02": "Test", "2026-03": "Test", "2026-04": "Test", "2026-05": "Test", "2026-06": "Test", "2026-07": "Test", "2026-08": ""} },
       { maNV: "018717", name: "lê thị quỳnh trang", joinDate: "11/08/2025", monthlyStatus: {"2026-01": "IR/chất chuẩn", "2026-02": "IR/chất chuẩn", "2026-03": "Nghỉ việc", "2026-04": "", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": ""} },
       { maNV: "018839", name: "Cao Thị Tuyết Nhung", joinDate: "15/09/2025", monthlyStatus: {"2026-01": "HPLC", "2026-02": "HPLC", "2026-03": "HPLC", "2026-04": "HPLC", "2026-05": "HPLC", "2026-06": "HPLC", "2026-07": "HPLC", "2026-08": ""} },
-      { maNV: "018997", name: "Lê Thị Nhung", joinDate: "20/10/2025", monthlyStatus: {"2026-01": "Hoc/thử việc", "2026-02": "Hoc/thử việc", "2026-03": "Hoc/thử việc", "2026-04": "Hoc/thử việc", "2026-05": "IR/chất chuẩn", "2026-06": "IR/chất chuẩn", "2026-07": "IR/chất chuẩn", "2026-08": ""} },
+      { maNV: "018997", name: "Lê Thị Nhung", joinDate: "20/10/2025", monthlyStatus: {"2026-01": "Học việc", "2026-02": "Học việc", "2026-03": "Thử việc", "2026-04": "Thử việc", "2026-05": "IR/chất chuẩn", "2026-06": "IR/chất chuẩn", "2026-07": "IR/chất chuẩn", "2026-08": ""} },
       { maNV: "018998", name: "Nguyễn Bảo Long", joinDate: "20/10/2025", monthlyStatus: {"2026-01": "NL", "2026-02": "NL", "2026-03": "NL", "2026-04": "NL", "2026-05": "NL", "2026-06": "NL", "2026-07": "NL", "2026-08": ""} },
-      { maNV: "019036", name: "Nguyễn Phi Nhung", joinDate: "03/11/2025", monthlyStatus: {"2026-01": "Hoc/thử việc", "2026-02": "Hoc/thử việc", "2026-03": "NL", "2026-04": "NL", "2026-05": "HPLC", "2026-06": "HPLC", "2026-07": "HPLC", "2026-08": ""} },
-      { maNV: "019079", name: "Nguyễn Thị Thu Hường", joinDate: "17/11/2025", monthlyStatus: {"2026-01": "Hoc/thử việc", "2026-02": "Hoc/thử việc", "2026-03": "Nghỉ việc", "2026-04": "", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": ""} },
-      { maNV: "019082", name: "Hồ Tuệ Tâm", joinDate: "17/11/2025", monthlyStatus: {"2026-01": "Hoc/thử việc", "2026-02": "Hoc/thử việc", "2026-03": "Nghỉ việc", "2026-04": "", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": ""} },
+      { maNV: "019036", name: "Nguyễn Phi Nhung", joinDate: "03/11/2025", monthlyStatus: {"2026-01": "Học việc", "2026-02": "Thử việc", "2026-03": "NL", "2026-04": "NL", "2026-05": "HPLC", "2026-06": "HPLC", "2026-07": "HPLC", "2026-08": ""} },
+      { maNV: "019079", name: "Nguyễn Thị Thu Hường", joinDate: "17/11/2025", monthlyStatus: {"2026-01": "Học việc", "2026-02": "Thử việc", "2026-03": "Nghỉ việc", "2026-04": "", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": ""} },
+      { maNV: "019082", name: "Hồ Tuệ Tâm", joinDate: "17/11/2025", monthlyStatus: {"2026-01": "Học việc", "2026-02": "Thử việc", "2026-03": "Nghỉ việc", "2026-04": "", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": ""} },
       { maNV: "019092", name: "Đỗ Thị Tố Uyên", joinDate: "24/11/2025", monthlyStatus: {"2026-01": "HPLC", "2026-02": "HPLC", "2026-03": "HPLC", "2026-04": "HPLC", "2026-05": "HPLC", "2026-06": "HPLC", "2026-07": "Newbie test", "2026-08": ""} },
-      { maNV: "019307", name: "Nguyễn Thị Minh Anh", joinDate: "27/01/2026", monthlyStatus: {"2026-01": "Hoc/thử việc", "2026-02": "Nghỉ việc", "2026-03": "", "2026-04": "", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": ""} },
-      { maNV: "019369", name: "Nhữ Thanh Hà", joinDate: "05/03/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "Hoc/thử việc", "2026-04": "Nghỉ việc", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": ""} },
-      { maNV: "019389", name: "Trịnh Thị Ánh Tuyết", joinDate: "09/03/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "Hoc/thử việc", "2026-04": "Hoc/thử việc", "2026-05": "Hoc/thử việc", "2026-06": "Hoc/thử việc", "2026-07": "HPLC", "2026-08": ""} },
-      { maNV: "019416", name: "Hoàng Thị Minh Nguyệt", joinDate: "16/03/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "Hoc/thử việc", "2026-04": "Hoc/thử việc", "2026-05": "Hoc/thử việc", "2026-06": "Hoc/thử việc", "2026-07": "HPLC", "2026-08": ""} },
-      { maNV: "019467", name: "Lê Thị Hường", joinDate: "23/03/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "Hoc/thử việc", "2026-04": "Hoc/thử việc", "2026-05": "Hoc/thử việc", "2026-06": "Hoc/thử việc", "2026-07": "IR/chất chuẩn", "2026-08": ""} },
-      { maNV: "019468", name: "Nghiêm Thị Lan Anh", joinDate: "23/03/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "Hoc/thử việc", "2026-04": "Nghỉ việc", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": ""} },
-      { maNV: "019782", name: "Trần Thị Dung", joinDate: "21/05/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "", "2026-04": "", "2026-05": "Hoc/thử việc", "2026-06": "", "2026-07": "Hoc/thử việc", "2026-08": ""} },
-      { maNV: "020029", name: "Nguyễn Thị Khánh Linh", joinDate: "25/06/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "", "2026-04": "", "2026-05": "", "2026-06": "Hoc/thử việc", "2026-07": "Hoc/thử việc", "2026-08": ""} },
-      { maNV: "020035", name: "Nguyễn Văn Nam", joinDate: "29/06/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "", "2026-04": "", "2026-05": "", "2026-06": "Hoc/thử việc", "2026-07": "Hoc/thử việc", "2026-08": ""} },
-      { maNV: "020057", name: "Phan Thanh Thủy", joinDate: "01/07/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "", "2026-04": "", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": "Hoc/thử việc"} },
-      { maNV: "", name: "Trần Thu Thủy", joinDate: "29/06/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "", "2026-04": "", "2026-05": "", "2026-06": "Hoc/thử việc", "2026-07": "Hoc/thử việc", "2026-08": ""} }
+      { maNV: "019389", name: "Trịnh Thị Ánh Tuyết", joinDate: "09/03/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "Học việc", "2026-04": "Học việc", "2026-05": "Thử việc", "2026-06": "Thử việc", "2026-07": "HPLC", "2026-08": ""} },
+      { maNV: "019416", name: "Hoàng Thị Minh Nguyệt", joinDate: "16/03/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "Học việc", "2026-04": "Học việc", "2026-05": "Thử việc", "2026-06": "Thử việc", "2026-07": "HPLC", "2026-08": ""} },
+      { maNV: "019467", name: "Lê Thị Hường", joinDate: "23/03/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "Học việc", "2026-04": "Học việc", "2026-05": "Thử việc", "2026-06": "Thử việc", "2026-07": "IR/chất chuẩn", "2026-08": ""} },
+      { maNV: "019468", name: "Nghiêm Thị Lan Anh", joinDate: "23/03/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "Học việc", "2026-04": "Nghỉ việc", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": ""} },
+      { maNV: "019782", name: "Trần Thị Dung", joinDate: "21/05/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "", "2026-04": "", "2026-05": "Học việc", "2026-06": "", "2026-07": "Thử việc", "2026-08": ""} },
+      { maNV: "020029", name: "Nguyễn Thị Khánh Linh", joinDate: "25/06/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "", "2026-04": "", "2026-05": "", "2026-06": "Học việc", "2026-07": "Thử việc", "2026-08": ""} },
+      { maNV: "020035", name: "Nguyễn Văn Nam", joinDate: "29/06/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "", "2026-04": "", "2026-05": "", "2026-06": "Học việc", "2026-07": "Thử việc", "2026-08": ""} },
+      { maNV: "020057", name: "Phan Thanh Thủy", joinDate: "01/07/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "", "2026-04": "", "2026-05": "", "2026-06": "", "2026-07": "", "2026-08": "Học việc"} },
+      { maNV: "", name: "Trần Thu Thủy", joinDate: "29/06/2026", monthlyStatus: {"2026-01": "", "2026-02": "", "2026-03": "", "2026-04": "", "2026-05": "", "2026-06": "Học việc", "2026-07": "Thử việc", "2026-08": ""} }
     ];
 
     const DEFAULT_METHODS_DATA = [
@@ -3705,6 +3770,9 @@
     window.addEventListener('DOMContentLoaded', async () => {
       loadData();
       initUI();
+      if (typeof toggleOOSWeekFilter === 'function') toggleOOSWeekFilter();
+      if (typeof toggleMethodWeekFilter === 'function') toggleMethodWeekFilter();
+      if (typeof window.toggleModelingWeekFilter === 'function') window.toggleModelingWeekFilter();
       renderDashboard();
       
       // Tự động kéo dữ liệu từ đám mây (nếu có cấu hình Apps Script)
@@ -3984,9 +4052,41 @@
       document.getElementById('training-filter-quarter').addEventListener('change', () => { renderDashboard(); });
       document.getElementById('training-search-input').addEventListener('input', () => { renderDashboard(); });
 
+      window.toggleModelingWeekFilter = () => {
+        const viewMode = document.getElementById('modeling-view-mode').value;
+        const monthVal = document.getElementById('modeling-filter-month').value;
+        const weekFilterGrp = document.getElementById('modeling-week-filter-group');
+        if (weekFilterGrp) {
+          if (viewMode === 'week' && monthVal !== 'all') {
+            weekFilterGrp.style.display = 'flex';
+          } else {
+            weekFilterGrp.style.display = 'none';
+            document.getElementById('modeling-filter-week').value = 'ALL';
+          }
+        }
+      };
+
       // Event Listeners for Modeling Tab
       document.getElementById('modeling-filter-year').addEventListener('change', () => { renderDashboard(); });
+      document.getElementById('modeling-view-mode').addEventListener('change', (e) => {
+        const mode = e.target.value;
+        if (mode === 'quarter') {
+          document.getElementById('modeling-quarter-filter-group').style.display = 'block';
+          document.getElementById('modeling-month-filter-group').style.display = 'none';
+          document.getElementById('modeling-week-filter-group').style.display = 'none';
+        } else {
+          document.getElementById('modeling-quarter-filter-group').style.display = 'none';
+          document.getElementById('modeling-month-filter-group').style.display = 'block';
+        }
+        window.toggleModelingWeekFilter();
+        renderDashboard();
+      });
       document.getElementById('modeling-filter-quarter').addEventListener('change', () => { renderDashboard(); });
+      document.getElementById('modeling-filter-month').addEventListener('change', () => {
+        window.toggleModelingWeekFilter();
+        renderDashboard();
+      });
+      document.getElementById('modeling-filter-week').addEventListener('change', () => { renderDashboard(); });
       document.getElementById('modeling-search-input').addEventListener('input', () => { renderDashboard(); });
 
       // Event Listeners for Improvement Tab
@@ -3994,9 +4094,27 @@
       document.getElementById('improvement-filter-quarter').addEventListener('change', () => { renderDashboard(); });
       document.getElementById('improvement-search-input').addEventListener('input', () => { renderDashboard(); });
 
+      window.toggleOOSWeekFilter = () => {
+        const monthVal = document.getElementById('filter-month').value;
+        const weekFilterGrp = document.getElementById('oos-week-filter-group');
+        if (weekFilterGrp) {
+          if (monthVal === 'Tất cả') {
+            weekFilterGrp.style.display = 'none';
+            document.getElementById('filter-week').value = 'Tất cả';
+          } else {
+            weekFilterGrp.style.display = 'flex';
+          }
+        }
+      };
+
       // Event Listeners for Filters (OOS)
       document.getElementById('filter-year').addEventListener('change', () => { currentPage = 1; renderDashboard(); });
-      document.getElementById('filter-month').addEventListener('change', () => { currentPage = 1; renderDashboard(); });
+      document.getElementById('filter-month').addEventListener('change', () => {
+        window.toggleOOSWeekFilter();
+        currentPage = 1; 
+        renderDashboard(); 
+      });
+      document.getElementById('filter-week').addEventListener('change', () => { currentPage = 1; renderDashboard(); });
       document.getElementById('filter-type').addEventListener('change', () => { currentPage = 1; renderDashboard(); });
       
       // Table Filter (OOS)
@@ -4023,9 +4141,28 @@
       
       document.getElementById('pers-filter-quarter').addEventListener('change', () => { renderDashboard(); });
 
+      window.toggleMethodWeekFilter = () => {
+        const viewMode = document.getElementById('method-view-mode').value;
+        const monthVal = document.getElementById('method-filter-month').value;
+        const weekFilterGrp = document.getElementById('method-week-filter-group');
+        if (weekFilterGrp) {
+          if (viewMode === 'month' && monthVal !== 'all') {
+            weekFilterGrp.style.display = 'flex';
+          } else {
+            weekFilterGrp.style.display = 'none';
+            document.getElementById('method-filter-week').value = 'ALL';
+          }
+        }
+      };
+
       // Event Listeners for Filters (Method Testing)
       document.getElementById('method-filter-year').addEventListener('change', () => { methodCurrentPage = 1; renderDashboard(); });
-      document.getElementById('method-filter-month').addEventListener('change', () => { methodCurrentPage = 1; renderDashboard(); });
+      document.getElementById('method-filter-month').addEventListener('change', () => {
+        window.toggleMethodWeekFilter();
+        methodCurrentPage = 1; 
+        renderDashboard(); 
+      });
+      document.getElementById('method-filter-week').addEventListener('change', () => { methodCurrentPage = 1; renderDashboard(); });
       document.getElementById('method-filter-quarter').addEventListener('change', () => { methodCurrentPage = 1; renderDashboard(); });
       document.getElementById('method-filter-reward-status').addEventListener('change', () => { methodCurrentPage = 1; renderDashboard(); });
       document.getElementById('method-search').addEventListener('input', () => { methodCurrentPage = 1; filterAndRenderMethodTable(); });
@@ -4076,6 +4213,7 @@
           document.getElementById('method-month-filter-group').style.display = 'block';
           document.getElementById('method-quarter-filter-group').style.display = 'none';
         }
+        window.toggleMethodWeekFilter();
         methodCurrentPage = 1;
         renderDashboard();
       });
@@ -4676,19 +4814,119 @@
     /* =============== MODELING TAB JAVASCRIPT LOGIC =============== */
     function renderModelingTab() {
       const year = document.getElementById('modeling-filter-year').value;
-      const quarter = document.getElementById('modeling-filter-quarter').value;
-      const search = document.getElementById('modeling-search-input').value.trim().toLowerCase();
-      const months = getQuarterMonths(quarter);
-      const monthNums = months.map(m => parseInt(m).toString());
+      const viewMode = document.getElementById('modeling-view-mode').value;
       
-      const filtered = modelingData.filter(item => {
-        const matchesYear = item.nam && item.nam.toString() === year.toString();
-        const matchesPeriod = quarter === 'ALL' || monthNums.includes(item.thang.toString());
-        const matchesSearch = !search || item.thang.toString().includes(search);
-        return matchesYear && matchesPeriod && matchesSearch;
-      });
-      
-      // Update Modeling Stats
+      let filtered = []; // Array of aggregated rows to show in table & chart
+      let chartLabels = [];
+      let sxData = [];
+      let ncData = [];
+      let nlData = [];
+      let plData = [];
+      let nuocData = [];
+      let irData = [];
+
+      const getSumForGroup = (items, filterFn) => {
+        let total = 0, sx = 0, nc = 0, nl = 0, pl = 0, nuoc = 0, ir = 0;
+        items.filter(filterFn).forEach(x => {
+          sx += x.sx || 0;
+          nc += x.nc || 0;
+          nl += x.nl || 0;
+          pl += x.pl || 0;
+          nuoc += x.nuoc || 0;
+          ir += x.ir || 0;
+          total += x.tong || 0;
+        });
+        return { sx, nc, nl, pl, nuoc, ir, tong: total };
+      };
+
+      if (viewMode === 'month') {
+        // Mode Month: Group by Month (1-12)
+        const quarter = document.getElementById('modeling-filter-quarter').value;
+        const search = document.getElementById('modeling-search-input').value.trim().toLowerCase();
+        const months = getQuarterMonths(quarter);
+        const monthNums = months.map(m => parseInt(m).toString());
+
+        const sortedMonths = [...monthNums].sort((a, b) => parseInt(a) - parseInt(b));
+        sortedMonths.forEach(m => {
+          // Sum up all weeks for this month
+          const monthData = getSumForGroup(modelingData, x => 
+            x.nam && x.nam.toString() === year.toString() &&
+            x.thang && parseInt(x.thang).toString() === m.toString()
+          );
+
+          if (!search || m.includes(search)) {
+            filtered.push({
+              id: `model_m_${year}_${m}`,
+              label: `Tháng ${m}`,
+              type: 'month',
+              nam: year,
+              thang: m,
+              ...monthData
+            });
+
+            chartLabels.push(`Tháng ${m}`);
+            sxData.push(monthData.sx);
+            ncData.push(monthData.nc);
+            nlData.push(monthData.nl);
+            plData.push(monthData.pl);
+            nuocData.push(monthData.nuoc);
+            irData.push(monthData.ir);
+          }
+        });
+      } else {
+        // Mode Week: Group by Week of Month
+        const selectedMonth = document.getElementById('modeling-filter-month').value;
+        const selectedWeek = document.getElementById('modeling-filter-week').value;
+        const search = document.getElementById('modeling-search-input').value.trim().toLowerCase();
+
+        let monthsToInclude = [];
+        if (selectedMonth === 'all') {
+          monthsToInclude = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+        } else {
+          monthsToInclude = [selectedMonth];
+        }
+
+        monthsToInclude.forEach(mStr => {
+          const m = parseInt(mStr).toString();
+          const weeks = selectedWeek === 'ALL' ? ['1', '2', '3', '4', '5'] : [selectedWeek];
+          
+          weeks.forEach(w => {
+            // Find data for this specific week
+            const weekData = getSumForGroup(modelingData, x => 
+              x.nam && x.nam.toString() === year.toString() &&
+              x.thang && parseInt(x.thang).toString() === m &&
+              x.tuan && x.tuan.toString() === w.toString()
+            );
+
+            // Only show week if there is some data, or if we are filtering for a specific month
+            const hasData = weekData.tong > 0;
+            if (selectedMonth !== 'all' || hasData) {
+              const label = selectedMonth === 'all' ? `T${m} - Tuần ${w}` : `Tuần ${w}`;
+              if (!search || label.toLowerCase().includes(search)) {
+                filtered.push({
+                  id: `model_w_${year}_${mStr}_${w}`,
+                  label: label,
+                  type: 'week',
+                  nam: year,
+                  thang: mStr,
+                  tuan: w,
+                  ...weekData
+                });
+
+                chartLabels.push(label);
+                sxData.push(weekData.sx);
+                ncData.push(weekData.nc);
+                nlData.push(weekData.nl);
+                plData.push(weekData.pl);
+                nuocData.push(weekData.nuoc);
+                irData.push(weekData.ir);
+              }
+            }
+          });
+        });
+      }
+
+      // Update Modeling Stats (KPIs)
       let total = 0, sx = 0, nc = 0, nl = 0, pl = 0, nuoc = 0, ir = 0;
       filtered.forEach(x => {
         total += x.tong || 0;
@@ -4704,27 +4942,7 @@
       document.getElementById('model-stat-pass-rate').textContent = sx;
       document.getElementById('model-stat-avg-score').textContent = nl;
 
-      // Render or Update modeling chart
-      const sortedMonths = [...monthNums].sort((a, b) => parseInt(a) - parseInt(b));
-      const labels = sortedMonths.map(m => `Tháng ${m}`);
-      
-      const sxData = [];
-      const ncData = [];
-      const nlData = [];
-      const plData = [];
-      const nuocData = [];
-      const irData = [];
-      
-      sortedMonths.forEach(m => {
-        const item = modelingData.find(x => x.nam.toString() === year.toString() && x.thang.toString() === m.toString()) || { sx: 0, nc: 0, nl: 0, pl: 0, nuoc: 0, ir: 0 };
-        sxData.push(item.sx || 0);
-        ncData.push(item.nc || 0);
-        nlData.push(item.nl || 0);
-        plData.push(item.pl || 0);
-        nuocData.push(item.nuoc || 0);
-        irData.push(item.ir || 0);
-      });
-
+      // Render chart
       const chartCanvas = document.getElementById('model-trend-chart');
       if (chartCanvas) {
         const ctx = chartCanvas.getContext('2d');
@@ -4735,7 +4953,7 @@
         modelTrendChart = new Chart(ctx, {
           type: 'bar',
           data: {
-            labels: labels,
+            labels: chartLabels,
             datasets: [
               { label: 'SX (Sản xuất)', data: sxData, backgroundColor: '#3b82f6' },
               { label: 'NC (Nghiên cứu)', data: ncData, backgroundColor: '#10b981' },
@@ -4777,27 +4995,29 @@
         });
       }
 
+      // Render Table
       const container = document.getElementById('modeling-table-content');
       if (!container) return;
-      
+
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="ov-empty-state"><i class="fa-solid fa-circle-info"></i> Không tìm thấy dữ liệu làm mẫu phù hợp.</div>`;
+        container.innerHTML = `<div class="ov-empty-state"><i class="fa-solid fa-circle-info"></i> Không tìm thấy dữ liệu hiệu suất làm mẫu phù hợp.</div>`;
         return;
       }
-      
+
+      const firstColHeader = viewMode === 'month' ? 'THÁNG' : 'THỜI GIAN';
       let html = `
         <table class="ov-table">
           <thead>
             <tr>
-              <th>Tháng</th>
+              <th>${firstColHeader}</th>
               <th>SX</th>
               <th>NC</th>
               <th>NL</th>
               <th>PL</th>
-              <th>Nước</th>
+              <th>NƯỚC</th>
               <th>IR</th>
-              <th style="font-weight:700;">Tổng</th>
-              <th>Thao tác</th>
+              <th>TỔNG</th>
+              <th>THAO TÁC</th>
             </tr>
           </thead>
           <tbody>
@@ -4806,7 +5026,7 @@
       filtered.forEach(item => {
         html += `
           <tr>
-            <td><strong>Tháng ${item.thang}</strong></td>
+            <td style="font-weight:600;">${item.label}</td>
             <td>${item.sx}</td>
             <td>${item.nc}</td>
             <td>${item.nl}</td>
@@ -4840,7 +5060,26 @@
     }
 
     function editModelingMonthly(id) {
-      const item = modelingData.find(x => x.id === id);
+      let item = modelingData.find(x => x.id === id);
+      if (!item) {
+        // If we are editing an aggregated month row (id is model_m_YYYY_M)
+        if (id.startsWith('model_m_')) {
+          const parts = id.split('_'); // ['', 'm', 'year', 'month']
+          const year = parts[2];
+          const month = parts[3];
+          // Find or create a record for Tuần 1 of that month
+          item = modelingData.find(x => x.nam.toString() === year.toString() && x.thang.toString() === month.toString());
+          if (!item) {
+            item = {
+              id: `model_w_${year}_${month}_1`,
+              nam: year,
+              thang: month,
+              tuan: '1',
+              sx: 0, nc: 0, nl: 0, pl: 0, nuoc: 0, ir: 0, tong: 0
+            };
+          }
+        }
+      }
       if (!item) return;
       document.getElementById('modeling-modal-title').textContent = 'Cập nhật số liệu Làm mẫu';
       document.getElementById('model-id').value = item.id;
@@ -4878,6 +5117,19 @@
         const idx = modelingData.findIndex(x => x.id === id);
         if (idx !== -1) {
           modelingData[idx] = { ...modelingData[idx], sx, nc, nl, pl, nuoc, ir, tong };
+        } else {
+          // If we edited a month but it didn't find the week, push a new week 1 record
+          const parts = id.split('_');
+          const year = parts[2];
+          const month = parts[3];
+          const tuan = parts[4] || '1';
+          modelingData.push({
+            id: id,
+            nam: year,
+            thang: month,
+            tuan: tuan,
+            sx, nc, nl, pl, nuoc, ir, tong
+          });
         }
       } else {
         const exists = modelingData.some(x => x.nam.toString() === year.toString() && x.thang.toString() === monthStr);
@@ -4886,9 +5138,10 @@
           return;
         }
         modelingData.push({
-          id: `model_m_${year}_${monthStr}`,
+          id: `model_w_${year}_${monthStr}_1`,
           nam: year,
           thang: monthStr,
+          tuan: '1',
           sx, nc, nl, pl, nuoc, ir, tong
         });
       }
@@ -5003,6 +5256,24 @@
       
       const d = new Date(dateStr);
       return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : dateStr;
+    }
+
+    function getWeekFromDateString(dateStr) {
+      if (!dateStr) return null;
+      let day = 0;
+      if (dateStr.includes('-')) {
+        const parts = dateStr.split('-');
+        day = parseInt(parts[2], 10);
+      } else if (dateStr.includes('/')) {
+        const parts = dateStr.split('/');
+        day = parseInt(parts[0], 10);
+      }
+      if (isNaN(day) || day <= 0) return null;
+      if (day <= 7) return '1';
+      if (day <= 14) return '2';
+      if (day <= 21) return '3';
+      if (day <= 28) return '4';
+      return '5';
     }
 
     function getQuarterMonths(quarter) {
@@ -5276,9 +5547,25 @@
       const container = document.getElementById('ov-modeling-content');
       if (!container) return;
       
-      const filtered = modelingData.filter(item => {
-        return monthNums.includes(item.thang.toString());
+      // Aggregate weekly items to monthly items for the Overview display
+      const monthlyMap = {};
+      modelingData.forEach(item => {
+        if (item.nam && item.nam.toString() === year.toString() && item.thang && monthNums.includes(item.thang.toString())) {
+          const m = item.thang.toString();
+          if (!monthlyMap[m]) {
+            monthlyMap[m] = { thang: m, sx: 0, nc: 0, nl: 0, pl: 0, nuoc: 0, ir: 0, tong: 0 };
+          }
+          monthlyMap[m].sx += item.sx || 0;
+          monthlyMap[m].nc += item.nc || 0;
+          monthlyMap[m].nl += item.nl || 0;
+          monthlyMap[m].pl += item.pl || 0;
+          monthlyMap[m].nuoc += item.nuoc || 0;
+          monthlyMap[m].ir += item.ir || 0;
+          monthlyMap[m].tong += item.tong || 0;
+        }
       });
+
+      const filtered = Object.values(monthlyMap).sort((a, b) => parseInt(a.thang) - parseInt(b.thang));
       
       if (filtered.length === 0) {
         container.innerHTML = `<div class="ov-empty-state"><i class="fa-solid fa-circle-info"></i> Không có dữ liệu làm mẫu trong quý này.</div>`;
@@ -5530,18 +5817,21 @@
       
       const lastMonth = monthsInQuarter[monthsInQuarter.length - 1];
       
-      // Calculate active, official, probation at the end of the quarter
+      // Calculate active, official, probation, apprentice at the end of the quarter
       let activeCount = 0;
       let officialCount = 0;
       let probationCount = 0;
+      let apprenticeCount = 0;
       
       personnelData.forEach(p => {
         const status = getPersonnelStatus(p, year, lastMonth);
         const hasJoined = status !== '' && status !== 'Nghỉ việc';
         if (hasJoined) {
           activeCount++;
-          const statusLower = status.toLowerCase();
-          if (statusLower.includes('thử việc') || statusLower.includes('học')) {
+          const statusLower = removeVietnameseAccents(status);
+          if (statusLower.includes('hoc')) {
+            apprenticeCount++;
+          } else if (statusLower.includes('thu') || statusLower.includes('newbie')) {
             probationCount++;
           } else {
             officialCount++;
@@ -5585,12 +5875,12 @@
             const prevStatus = getPersonnelStatus(p, year, prevMonth);
             
             if (currStatus && currStatus !== '' && currStatus !== 'Nghỉ việc') {
-              const currLower = currStatus.toLowerCase();
-              const currIsProbation = currLower.includes('thử việc') || currLower.includes('học') || currLower.includes('newbie');
+              const currLower = removeVietnameseAccents(currStatus);
+              const currIsProbation = currLower.includes('thu') || currLower.includes('hoc') || currLower.includes('newbie');
               
               if (prevStatus && prevStatus !== '' && prevStatus !== 'Nghỉ việc') {
-                const prevLower = prevStatus.toLowerCase();
-                const prevIsProbation = prevLower.includes('thử việc') || prevLower.includes('học') || prevLower.includes('newbie');
+                const prevLower = removeVietnameseAccents(prevStatus);
+                const prevIsProbation = prevLower.includes('thu') || prevLower.includes('hoc') || prevLower.includes('newbie');
                 
                 if (prevIsProbation && !currIsProbation) {
                   becameOfficialCount++;
@@ -5605,6 +5895,7 @@
         activeCount,
         officialCount,
         probationCount,
+        apprenticeCount,
         resignedCount,
         newCount,
         becameOfficialCount,
@@ -5629,6 +5920,7 @@
         // Update KPIs with quarterly aggregation
         animateValue('kpi-pers-total', qData.activeCount);
         animateValue('kpi-pers-official', qData.officialCount);
+        animateValue('kpi-pers-apprentice', qData.apprenticeCount);
         animateValue('kpi-pers-probation', qData.probationCount);
         animateValue('kpi-pers-new', qData.newCount);
         animateValue('kpi-pers-resigned', qData.resignedCount);
@@ -5688,7 +5980,8 @@
       }
 
       // Chuẩn hóa Nghỉ việc
-      if (statusFound.toLowerCase().includes('nghỉ') || statusFound.toLowerCase().includes('ghỉ')) {
+      const statusFoundNorm = removeVietnameseAccents(statusFound);
+      if (statusFoundNorm.includes('nghi') || statusFoundNorm.includes('ghi')) {
         return 'Nghỉ việc';
       }
 
@@ -5706,8 +5999,14 @@
         
         // Nếu họ nhận việc trong hoặc trước tháng này:
         if (joinDate.year < targetYearInt || (joinDate.year === targetYearInt && joinDate.month <= targetMonthInt)) {
-          // Mặc định là Học/thử việc cho người mới vào nếu chưa điền cột trạng thái
-          return 'Học/thử việc';
+          const diffMonths = (targetYearInt - joinDate.year) * 12 + (targetMonthInt - joinDate.month);
+          if (diffMonths >= 0 && diffMonths <= 1) {
+            return 'Học việc';
+          } else if (diffMonths > 1 && diffMonths <= 3) {
+            return 'Thử việc';
+          } else {
+            return 'Thử việc'; // Mặc định hết thời gian học việc là thử việc
+          }
         }
       }
 
@@ -5716,13 +6015,14 @@
 
     function getRoleLevel(role) {
       if (!role) return 0;
-      const r = role.toLowerCase().trim();
-      if (r === 'trưởng nhóm' || r === 'tưởng nhóm') return 5;
-      if (r.includes('test')) return 4;
-      if (r.includes('ir') || r.includes('chuẩn')) return 4;
-      if (r.includes('hplc')) return 3;
-      if (r.includes('nl') || r.includes('phụ') || r.includes('pl')) return 2;
-      if (r.includes('học') || r.includes('thử việc') || (r.includes('newbie') && !r.includes('test'))) return 1;
+      const r = removeVietnameseAccents(role);
+      if (r === 'truong nhom' || r === 'tuong nhom') return 6;
+      if (r.includes('test')) return 5;
+      if (r.includes('ir') || r.includes('chuan')) return 5;
+      if (r.includes('hplc')) return 4;
+      if (r.includes('nl') || r.includes('phu') || r.includes('pl')) return 3;
+      if (r.includes('thu')) return 2;
+      if (r.includes('hoc') || (r.includes('newbie') && !r.includes('test'))) return 1;
       return 0; // Nghỉ việc or empty
     }
 
@@ -5878,6 +6178,7 @@
       let activeCount = 0;
       let officialCount = 0;
       let probationCount = 0;
+      let apprenticeCount = 0;
       let resignedCount = 0;
       let newCount = 0;
       let becameOfficialCount = 0;
@@ -5893,9 +6194,11 @@
         if (hasJoined) {
           activeCount++;
           
-          // 2. Official vs Probation
-          const statusLower = status.toLowerCase();
-          if (statusLower.includes('thử việc') || statusLower.includes('học')) {
+          // 2. Official vs Probation vs Apprentice
+          const statusLower = removeVietnameseAccents(status);
+          if (statusLower.includes('hoc')) {
+            apprenticeCount++;
+          } else if (statusLower.includes('thu') || statusLower.includes('newbie')) {
             probationCount++;
           } else {
             officialCount++;
@@ -5925,12 +6228,12 @@
           const prevStatus = getPersonnelStatus(p, year, prevMonth);
           
           if (currStatus && currStatus !== '' && currStatus !== 'Nghỉ việc') {
-            const currLower = currStatus.toLowerCase();
-            const currIsProbation = currLower.includes('thử việc') || currLower.includes('học') || currLower.includes('newbie');
+            const currLower = removeVietnameseAccents(currStatus);
+            const currIsProbation = currLower.includes('thu') || currLower.includes('hoc') || currLower.includes('newbie');
             
             if (prevStatus && prevStatus !== '' && prevStatus !== 'Nghỉ việc') {
-              const prevLower = prevStatus.toLowerCase();
-              const prevIsProbation = prevLower.includes('thử việc') || prevLower.includes('học') || prevLower.includes('newbie');
+              const prevLower = removeVietnameseAccents(prevStatus);
+              const prevIsProbation = prevLower.includes('thu') || prevLower.includes('hoc') || prevLower.includes('newbie');
               
               if (prevIsProbation && !currIsProbation) {
                 becameOfficialCount++;
@@ -5942,6 +6245,7 @@
 
       animateValue('kpi-pers-total', activeCount);
       animateValue('kpi-pers-official', officialCount);
+      animateValue('kpi-pers-apprentice', apprenticeCount);
       animateValue('kpi-pers-probation', probationCount);
       animateValue('kpi-pers-new', newCount);
       animateValue('kpi-pers-resigned', resignedCount);
@@ -5957,8 +6261,11 @@
         if (status && status !== '' && status !== 'Nghỉ việc') {
           let role = status;
           if (role === 'Tưởng nhóm') role = 'Trưởng nhóm';
-          if (role.toLowerCase().includes('thử việc') || role.toLowerCase().includes('học')) {
-            role = 'Học/Thử việc';
+          const roleNorm = removeVietnameseAccents(role);
+          if (roleNorm.includes('hoc')) {
+            role = 'Học việc';
+          } else if (roleNorm.includes('thu')) {
+            role = 'Thử việc';
           }
           groups[role] = (groups[role] || 0) + 1;
         }
@@ -6016,6 +6323,7 @@
       
       const totalCounts = [];
       const officialCounts = [];
+      const apprenticeCounts = [];
       const probationCounts = [];
       const resignedCounts = [];
       const newCounts = [];
@@ -6027,6 +6335,7 @@
 
         let active = 0;
         let official = 0;
+        let apprentice = 0;
         let probation = 0;
         let resigned = 0;
         let newlyJoined = 0;
@@ -6037,8 +6346,10 @@
           
           if (hasJoined) {
             active++;
-            const statusLower = status.toLowerCase();
-            if (statusLower.includes('thử việc') || statusLower.includes('học') || statusLower.includes('newbie')) {
+            const statusLower = removeVietnameseAccents(status);
+            if (statusLower.includes('hoc')) {
+              apprentice++;
+            } else if (statusLower.includes('thu') || statusLower.includes('newbie')) {
               probation++;
             } else {
               official++;
@@ -6060,6 +6371,7 @@
 
         totalCounts.push(active);
         officialCounts.push(official);
+        apprenticeCounts.push(apprentice);
         probationCounts.push(probation);
         resignedCounts.push(resigned);
         newCounts.push(newlyJoined);
@@ -6096,7 +6408,17 @@
               pointHoverRadius: 5
             },
             {
-              label: 'Học/Thử việc',
+              label: 'Học việc',
+              data: apprenticeCounts,
+              borderColor: '#0ea5e9',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              fill: false,
+              tension: 0.3,
+              pointBackgroundColor: '#0ea5e9',
+            },
+            {
+              label: 'Thử việc',
               data: probationCounts,
               borderColor: '#f59e0b',
               backgroundColor: 'transparent',
@@ -6153,8 +6475,10 @@
         if (displayStatus === 'Nghỉ việc') {
           type = 'resigned';
         } else if (displayStatus !== '') {
-          const statusLower = displayStatus.toLowerCase();
-          if (statusLower.includes('thử việc') || statusLower.includes('học')) {
+          const statusLower = removeVietnameseAccents(displayStatus);
+          if (statusLower.includes('hoc')) {
+            type = 'apprentice';
+          } else if (statusLower.includes('thu') || statusLower.includes('newbie')) {
             type = 'probation';
           } else {
             type = 'official';
@@ -6177,7 +6501,9 @@
         if (filterRole !== 'Tất cả') {
           if (filterRole === 'Nghỉ việc') {
             return p.type === 'resigned';
-          } else if (filterRole === 'Học/thử việc') {
+          } else if (filterRole === 'Học việc') {
+            return p.type === 'apprentice';
+          } else if (filterRole === 'Thử việc') {
             return p.type === 'probation';
           } else {
             return p.role.toLowerCase().includes(filterRole.toLowerCase());
@@ -6203,6 +6529,8 @@
         let statusBadge = '';
         if (p.type === 'official') {
           statusBadge = '<span class="badge status-active">Chính thức</span>';
+        } else if (p.type === 'apprentice') {
+          statusBadge = '<span class="badge status-apprentice">Học việc</span>';
         } else if (p.type === 'probation') {
           statusBadge = '<span class="badge status-probation">Thử việc</span>';
         } else if (p.type === 'resigned') {
@@ -6244,8 +6572,10 @@
       let badgeClass = 'status-offline';
       if (currentStatus === 'Nghỉ việc') badgeClass = 'status-resigned';
       else if (currentStatus !== '') {
-        const statusLower = currentStatus.toLowerCase();
-        if (statusLower.includes('thử việc') || statusLower.includes('học')) {
+        const statusLower = removeVietnameseAccents(currentStatus);
+        if (statusLower.includes('hoc')) {
+          badgeClass = 'status-apprentice';
+        } else if (statusLower.includes('thu') || statusLower.includes('newbie')) {
           badgeClass = 'status-probation';
         } else {
           badgeClass = 'status-active';
@@ -6269,8 +6599,10 @@
         let tBadgeClass = 'status-offline';
         if (status === 'Nghỉ việc') tBadgeClass = 'status-resigned';
         else if (status !== '') {
-          const statusLower = status.toLowerCase();
-          if (statusLower.includes('thử việc') || statusLower.includes('học')) {
+          const statusLower = removeVietnameseAccents(status);
+          if (statusLower.includes('hoc')) {
+            tBadgeClass = 'status-apprentice';
+          } else if (statusLower.includes('thu') || statusLower.includes('newbie')) {
             tBadgeClass = 'status-probation';
           } else {
             tBadgeClass = 'status-active';
@@ -6333,8 +6665,8 @@
         list = personnelData.filter(p => {
           const status = getPersonnelStatus(p, selectedYear, selectedMonth);
           if (status !== '' && status !== 'Nghỉ việc') {
-            const lower = status.toLowerCase();
-            return !lower.includes('thử việc') && !lower.includes('học') && !(lower.includes('newbie') && !lower.includes('test'));
+            const lower = removeVietnameseAccents(status);
+            return !lower.includes('thu') && !lower.includes('hoc') && !(lower.includes('newbie') && !lower.includes('test'));
           }
           return false;
         }).map(p => ({
@@ -6343,13 +6675,28 @@
           role: getPersonnelStatus(p, selectedYear, selectedMonth)
         }));
       } 
+      else if (category === 'apprentice') {
+        title = `Danh sách Nhân sự học việc${labelSuffix}`;
+        list = personnelData.filter(p => {
+          const status = getPersonnelStatus(p, selectedYear, selectedMonth);
+          if (status !== '' && status !== 'Nghỉ việc') {
+            const lower = removeVietnameseAccents(status);
+            return lower.includes('hoc');
+          }
+          return false;
+        }).map(p => ({
+          maNV: p.maNV,
+          name: p.name,
+          role: getPersonnelStatus(p, selectedYear, selectedMonth)
+        }));
+      }
       else if (category === 'probation') {
         title = `Danh sách Nhân sự thử việc${labelSuffix}`;
         list = personnelData.filter(p => {
           const status = getPersonnelStatus(p, selectedYear, selectedMonth);
           if (status !== '' && status !== 'Nghỉ việc') {
-            const lower = status.toLowerCase();
-            return lower.includes('thử việc') || lower.includes('học') || (lower.includes('newbie') && !lower.includes('test'));
+            const lower = removeVietnameseAccents(status);
+            return (lower.includes('thu') || (lower.includes('newbie') && !lower.includes('test'))) && !lower.includes('hoc');
           }
           return false;
         }).map(p => ({
@@ -6404,12 +6751,12 @@
               const prevStatus = getPersonnelStatus(p, selectedYear, prevMonth);
               
               if (currStatus && currStatus !== '' && currStatus !== 'Nghỉ việc') {
-                const currLower = currStatus.toLowerCase();
-                const currIsProbation = currLower.includes('thử việc') || currLower.includes('học') || currLower.includes('newbie');
+                const currLower = removeVietnameseAccents(currStatus);
+                const currIsProbation = currLower.includes('thu') || currLower.includes('hoc') || currLower.includes('newbie');
                 
                 if (prevStatus && prevStatus !== '' && prevStatus !== 'Nghỉ việc') {
-                  const prevLower = prevStatus.toLowerCase();
-                  const prevIsProbation = prevLower.includes('thử việc') || prevLower.includes('học') || prevLower.includes('newbie');
+                  const prevLower = removeVietnameseAccents(prevStatus);
+                  const prevIsProbation = prevLower.includes('thu') || prevLower.includes('hoc') || prevLower.includes('newbie');
                   
                   if (prevIsProbation && !currIsProbation) {
                     matchSet.add(p);
@@ -6435,12 +6782,22 @@
         tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:1.5rem; color:var(--text-muted);">Không có nhân sự nào trong danh mục này.</td></tr>`;
       } else {
         list.forEach((p, idx) => {
+          const roleLower = removeVietnameseAccents(p.role);
+          let bClass = 'status-active';
+          if (roleLower.includes('hoc')) {
+            bClass = 'status-apprentice';
+          } else if (roleLower.includes('thu') || roleLower.includes('newbie')) {
+            bClass = 'status-probation';
+          } else if (roleLower.includes('nghỉ')) {
+            bClass = 'status-resigned';
+          }
+
           tbody.innerHTML += `
             <tr>
               <td>${idx + 1}</td>
               <td style="font-weight:600; color:var(--color-primary);">${p.maNV || '-'}</td>
               <td style="font-weight:500;">${p.name}</td>
-              <td><span class="badge status-active" style="font-size:0.7rem;">${p.role}</span></td>
+              <td><span class="badge ${bClass}" style="font-size:0.7rem;">${p.role}</span></td>
             </tr>
           `;
         });
@@ -6456,6 +6813,7 @@
       // 1. Filter Data
       const selectedYear = document.getElementById('filter-year').value;
       const selectedMonth = document.getElementById('filter-month').value;
+      const selectedWeek = document.getElementById('filter-week') ? document.getElementById('filter-week').value : 'Tất cả';
       const selectedType = document.getElementById('filter-type').value;
 
       filteredData = oosData.filter(item => {
@@ -6470,6 +6828,11 @@
         if (selectedYear !== 'Tất cả' && year !== selectedYear) return false;
         // Check Month
         if (selectedMonth !== 'Tất cả' && monthNum !== selectedMonth) return false;
+        // Check Week
+        if (selectedMonth !== 'Tất cả' && selectedWeek !== 'Tất cả') {
+          const itemWeek = getWeekFromDateString(item.date);
+          if (itemWeek !== selectedWeek) return false;
+        }
         // Check Type
         if (selectedType !== 'Tất cả' && item.type !== selectedType) return false;
 
@@ -7998,9 +8361,17 @@
       });
 
       // Filter data for the selected period (by test month)
-      const filteredPeriod = filteredYear.filter(m => {
+      let filteredPeriod = filteredYear.filter(m => {
         return monthsList.includes(m.month);
       });
+
+      // Lọc theo tuần nếu ở chế độ xem theo tháng và chọn một tháng cụ thể
+      const selectedWeek = document.getElementById('method-filter-week') ? document.getElementById('method-filter-week').value : 'ALL';
+      if (viewMode === 'month' && selectedMonth !== 'all' && selectedWeek !== 'ALL') {
+        filteredPeriod = filteredPeriod.filter(m => {
+          return getWeekFromDateString(m.date) === selectedWeek;
+        });
+      }
 
       const isViSinhMethod = (m) => {
         const meth = (m.method || '').toLowerCase().trim();
@@ -8207,9 +8578,15 @@
         
         // Filter by reward status
         if (rewardStatus === 'rewarded') {
-          return (m.reward || 0) > 0;
+          if ((m.reward || 0) === 0) return false;
         } else if (rewardStatus === 'unrewarded') {
-          return (m.reward || 0) === 0;
+          if ((m.reward || 0) > 0) return false;
+        }
+
+        // Lọc theo tuần
+        const selectedWeek = document.getElementById('method-filter-week') ? document.getElementById('method-filter-week').value : 'ALL';
+        if (viewMode === 'month' && selectedMonth !== 'all' && selectedWeek !== 'ALL') {
+          if (getWeekFromDateString(m.date) !== selectedWeek) return false;
         }
         return true;
       });
@@ -8988,11 +9365,26 @@
     function mapCSVToTraining(rows) {
       if (rows.length <= 1) return [];
       
-      const indicators = ['chủ đề', 'người đào tạo', 'người tham gia', 'trạng thái'];
-      const { index: headerRowIdx, headers } = findHeaderRow(rows, indicators);
+      // Mở rộng các chỉ số nhận diện dòng tiêu đề để tương thích với nhiều kiểu tên cột khác nhau
+      const indicators = ['ngay', 'chu de', 'giang vien', 'hoc vien', 'nguoi dao tao', 'nguoi tham gia', 'trang thai', 'topic', 'trainer', 'trainees', 'status'];
+      let { index: headerRowIdx, headers } = findHeaderRow(rows, indicators);
       
+      // Fallback: Nếu không tìm thấy dòng tiêu đề bằng findHeaderRow, thử tìm dòng chứa các từ khóa ngày/chủ đề trong 5 dòng đầu tiên
+      if (headerRowIdx === -1) {
+        for (let i = 0; i < Math.min(rows.length, 5); i++) {
+          const rowNorm = rows[i].map(c => removeVietnameseAccents(c));
+          if (rowNorm.some(c => c.includes('ngay') || c.includes('chu de') || c.includes('topic'))) {
+            headerRowIdx = i;
+            headers = rowNorm;
+            break;
+          }
+        }
+      }
+      
+      if (headerRowIdx === -1) return [];
+
       const colMap = {
-        date: headers.findIndex(h => h.includes('ngay')),
+        date: headers.findIndex(h => h.includes('ngay') || h.includes('date')),
         topic: headers.findIndex(h => h.includes('chu de') || h.includes('noi dung') || h.includes('topic')),
         trainer: headers.findIndex(h => h.includes('nguoi dao tao') || h.includes('giang vien') || h.includes('trainer')),
         trainees: headers.findIndex(h => h.includes('nguoi tham gia') || h.includes('hoc vien') || h.includes('trainees')),
@@ -9123,12 +9515,16 @@
 
         const mKey = targetPeriod.month;
         const yKey = targetPeriod.year;
-        const combinedKey = `${yKey}_${mKey}`;
+        
+        // Tính tuần dựa trên ngày trích xuất được
+        const weekVal = day <= 7 ? '1' : day <= 14 ? '2' : day <= 21 ? '3' : day <= 28 ? '4' : '5';
+        const combinedKey = `${yKey}_${mKey}_${weekVal}`;
 
         if (!monthMap[combinedKey]) {
           monthMap[combinedKey] = {
             nam: yKey,
             thang: mKey,
+            tuan: weekVal,
             sx: 0,
             nc: 0,
             nl: 0,
@@ -9176,9 +9572,10 @@
         const tong = sx + nc + nl + pl + nuoc + ir;
         
         return {
-          id: `model_m_${mObj.nam}_${mObj.thang}`,
+          id: `model_w_${mObj.nam}_${mObj.thang}_${mObj.tuan}`,
           nam: mObj.nam,
           thang: mObj.thang,
+          tuan: mObj.tuan,
           sx,
           nc,
           nl,
