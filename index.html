@@ -1268,6 +1268,73 @@
         flex-direction: column;
       }
     }
+
+    /* Custom Multi-select Dropdown for Week Comparison */
+    .multiselect-container {
+      position: relative;
+      min-width: 220px;
+    }
+    .multiselect-button {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      min-height: 38px;
+      transition: var(--transition);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .multiselect-button:hover {
+      background: #f8fafc;
+      border-color: var(--border-hover);
+    }
+    .multiselect-button:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary-glow);
+    }
+    .multiselect-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      margin-top: 0.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      z-index: 500;
+      display: none;
+      max-height: 250px;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+    .multiselect-dropdown.show {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+    .multiselect-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.825rem;
+      color: var(--text-main);
+      transition: background 0.2s;
+    }
+    .multiselect-option:hover {
+      background: #f1f5f9;
+    }
+    .multiselect-option input[type="checkbox"] {
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -1295,7 +1362,7 @@
       </div>
       <div class="sidebar-tabs">
         <button class="sidebar-tab nav-tab active" data-tab="tab-overview">
-          <i class="fa-solid fa-gauge-high"></i> Tổng Quản
+          <i class="fa-solid fa-gauge-high"></i> Tổng quan
         </button>
         <button class="sidebar-tab nav-tab" data-tab="tab-targets">
           <i class="fa-solid fa-bullseye"></i> Mục tiêu Quý
@@ -2127,15 +2194,11 @@
             <option value="12">Tháng 12</option>
           </select>
         </div>
-        <div class="filter-group" id="oos-week-filter-group" style="display: none;">
+        <div class="filter-group" id="oos-week-filter-group">
           <label for="filter-week">Tuần</label>
           <select id="filter-week" class="form-control">
             <option value="Tất cả" selected>Tất cả các tuần</option>
-            <option value="1">Tuần 1 (01 - 07)</option>
-            <option value="2">Tuần 2 (08 - 14)</option>
-            <option value="3">Tuần 3 (15 - 21)</option>
-            <option value="4">Tuần 4 (22 - 28)</option>
-            <option value="5">Tuần 5 (29 - Hết tháng)</option>
+            <option value="4_weeks">4 tuần gần nhất</option>
           </select>
         </div>
         <div class="filter-group">
@@ -2187,8 +2250,8 @@
         </div>
       </div>
 
-      <!-- Charts Grid (Month Trend + Cause Breakdown) -->
-      <div class="grid-2" id="charts-grid-container">
+      <!-- Charts Grid (Month Trend) -->
+      <div id="charts-grid-container" style="display: grid; grid-template-columns: 1fr; gap: 1.25rem;">
         <!-- Chart 1: Monthly Trend -->
         <div class="glass-card" id="card-monthly-trend-container">
           <div class="card-title">
@@ -2196,15 +2259,6 @@
           </div>
           <div class="chart-container">
             <canvas id="chart-monthly-trend"></canvas>
-          </div>
-        </div>
-        <!-- Chart 2: Cause Breakdown -->
-        <div class="glass-card">
-          <div class="card-title">
-            <i class="fa-solid fa-chart-pie"></i> Phân tích nguyên nhân OOS
-          </div>
-          <div class="chart-container">
-            <canvas id="chart-cause-breakdown"></canvas>
           </div>
         </div>
       </div>
@@ -3245,13 +3299,15 @@
             <label for="sync-gid-retrieved">GID tab Lấy mẫu (Tổng mẫu)</label>
             <input type="text" id="sync-gid-retrieved" class="form-control" style="width:100%;" placeholder="1577407961">
           </div>
-          <div class="sync-form-group"></div>
+          <div class="sync-form-group">
+            <label for="sync-gid-ir">GID tab IR</label>
+            <input type="text" id="sync-gid-ir" class="form-control" style="width:100%;" placeholder="37569359">
+          </div>
         </div>
         
         <button id="btn-save-sync" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:0.75rem; margin-bottom:1rem;">
           <i class="fa-solid fa-arrows-rotate"></i> Kết nối & Đồng bộ Sheets
         </button>
-
         <!-- Hướng dẫn công bố web -->
         <div style="background: rgba(var(--color-primary-rgb), 0.05); border: 1px solid rgba(var(--color-primary-rgb), 0.2); border-radius: 8px; padding: 0.75rem; margin-bottom: 1.5rem; font-size: 0.73rem;">
           <p style="font-weight: 700; color: var(--color-primary); margin-bottom: 0.25rem;"><i class="fa-solid fa-circle-info"></i> HƯỚNG DẪN CÔNG BỐ GOOGLE SHEETS:</p>
@@ -3684,6 +3740,7 @@
 
     let oosData = [];
     let filteredData = [];
+    let tableFilteredData = [];
     let personnelData = [];
     let filteredPersonnelData = [];
     let methodsData = [];
@@ -3692,6 +3749,7 @@
     // New state variables for Overview
     let trainingData = [];
     let modelingData = [];
+    let irRawData = [];
     let improvementData = [];
     let overviewTargets = {};
 
@@ -3747,6 +3805,8 @@
     let methodCurrentPage = 1;
     const itemsPerPage = 8;
     let isMethodMoneyUnlocked = false;
+    let lastOOSYear = '';
+    let lastOOSMonth = '';
     
     // Chart instances
     let monthlyChart = null;
@@ -3842,6 +3902,18 @@
         modelingData = [...DEFAULT_MODELING_DATA];
       }
 
+      // 5b. Load IR Raw Data
+      const storedIR = localStorage.getItem('qc_ir_raw_data');
+      if (storedIR) {
+        try {
+          irRawData = JSON.parse(storedIR);
+        } catch(e) {
+          irRawData = [];
+        }
+      } else {
+        irRawData = [];
+      }
+
       // 6. Load Improvement Data
       const storedImprovement = localStorage.getItem('qc_improvement_data_v4');
       if (storedImprovement) {
@@ -3895,6 +3967,9 @@
         if (document.getElementById('sync-gid-retrieved')) {
           document.getElementById('sync-gid-retrieved').value = settings.gidRetrieved || '1577407961';
         }
+        if (document.getElementById('sync-gid-ir')) {
+          document.getElementById('sync-gid-ir').value = settings.gidIR || '37569359';
+        }
         if (document.getElementById('sync-web-app-url')) {
           document.getElementById('sync-web-app-url').value = settings.webAppUrl || '';
         }
@@ -3907,11 +3982,12 @@
           gidPl: '',
           gidPers: DEFAULT_GID_PERS,
           gidMethod: DEFAULT_GID_METHOD,
-          gidTraining: '',
+          gidTraining: '1226735028',
           gidModeling: DEFAULT_GID_MODELING,
           gidImprovement: '',
           gidDelay: '1365140269',
           gidRetrieved: '1577407961',
+          gidIR: '37569359',
           webAppUrl: ''
         };
         localStorage.setItem('qc_oos_sync_settings', JSON.stringify(defaultSettings));
@@ -3936,6 +4012,9 @@
         }
         if (document.getElementById('sync-gid-retrieved')) {
           document.getElementById('sync-gid-retrieved').value = defaultSettings.gidRetrieved;
+        }
+        if (document.getElementById('sync-gid-ir')) {
+          document.getElementById('sync-gid-ir').value = defaultSettings.gidIR;
         }
         if (document.getElementById('sync-web-app-url')) {
           document.getElementById('sync-web-app-url').value = defaultSettings.webAppUrl;
@@ -4095,15 +4174,9 @@
       document.getElementById('improvement-search-input').addEventListener('input', () => { renderDashboard(); });
 
       window.toggleOOSWeekFilter = () => {
-        const monthVal = document.getElementById('filter-month').value;
         const weekFilterGrp = document.getElementById('oos-week-filter-group');
         if (weekFilterGrp) {
-          if (monthVal === 'Tất cả') {
-            weekFilterGrp.style.display = 'none';
-            document.getElementById('filter-week').value = 'Tất cả';
-          } else {
-            weekFilterGrp.style.display = 'flex';
-          }
+          weekFilterGrp.style.display = 'flex';
         }
       };
 
@@ -4114,7 +4187,10 @@
         currentPage = 1; 
         renderDashboard(); 
       });
-      document.getElementById('filter-week').addEventListener('change', () => { currentPage = 1; renderDashboard(); });
+      const filterWeekEl = document.getElementById('filter-week');
+      if (filterWeekEl) {
+        filterWeekEl.addEventListener('change', () => { currentPage = 1; renderDashboard(); });
+      }
       document.getElementById('filter-type').addEventListener('change', () => { currentPage = 1; renderDashboard(); });
       
       // Table Filter (OOS)
@@ -4265,7 +4341,7 @@
         }
       });
       document.getElementById('btn-next-page').addEventListener('click', () => {
-        const maxPage = Math.ceil(filteredData.length / itemsPerPage);
+        const maxPage = Math.ceil(tableFilteredData.length / itemsPerPage);
         if (currentPage < maxPage) {
           currentPage++;
           renderTableOnly();
@@ -4323,6 +4399,23 @@
           if (e.target === overlay) closeModal(overlay.id);
         });
       });
+
+      // Custom multiselect dropdown toggle event for OOS Week filter
+      const msBtn = document.getElementById('filter-week-btn');
+      const msDropdown = document.getElementById('filter-week-dropdown');
+      if (msBtn && msDropdown) {
+        msBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          msDropdown.classList.toggle('show');
+        });
+        
+        document.addEventListener('click', (e) => {
+          const container = document.getElementById('filter-week-container');
+          if (container && !container.contains(e.target)) {
+            msDropdown.classList.remove('show');
+          }
+        });
+      }
     }
 
     // --- MODAL UTILS ---
@@ -4815,6 +4908,8 @@
     function renderModelingTab() {
       const year = document.getElementById('modeling-filter-year').value;
       const viewMode = document.getElementById('modeling-view-mode').value;
+      const selectedMonth = document.getElementById('modeling-filter-month').value;
+      updateWeekDropdownOptions(year, selectedMonth, true, 'modeling-filter-week');
       
       let filtered = []; // Array of aggregated rows to show in table & chart
       let chartLabels = [];
@@ -4826,16 +4921,42 @@
       let irData = [];
 
       const getSumForGroup = (items, filterFn) => {
-        let total = 0, sx = 0, nc = 0, nl = 0, pl = 0, nuoc = 0, ir = 0;
-        items.filter(filterFn).forEach(x => {
+        const matched = items.filter(filterFn);
+        const manualItems = matched.filter(x => x.isManual);
+        const rawItems = matched.filter(x => !x.isManual);
+
+        let sx = 0, nc = 0, nl = 0, pl = 0, nuoc = 0, ir = 0;
+        manualItems.forEach(x => {
           sx += x.sx || 0;
           nc += x.nc || 0;
           nl += x.nl || 0;
           pl += x.pl || 0;
           nuoc += x.nuoc || 0;
           ir += x.ir || 0;
-          total += x.tong || 0;
         });
+
+        const uniqueNL = new Set();
+        const uniquePL = new Set();
+        const uniqueNuoc = new Set();
+        const uniqueNC = new Set();
+
+        rawItems.forEach(x => {
+          if (x.type === 'NL') uniqueNL.add(x.soK);
+          else if (x.type === 'PL') uniquePL.add(x.soK);
+          else if (x.type === 'Nuoc') uniqueNuoc.add(x.soK);
+          else if (x.type === 'SX') {
+            if (x.isSxValid) sx += 1;
+          } else {
+            uniqueNC.add(x.soK);
+          }
+        });
+
+        nl += uniqueNL.size;
+        pl += uniquePL.size;
+        nuoc += uniqueNuoc.size;
+        nc += uniqueNC.size;
+
+        const total = sx + nc + nl + pl + nuoc + ir;
         return { sx, nc, nl, pl, nuoc, ir, tong: total };
       };
 
@@ -4888,23 +5009,38 @@
 
         monthsToInclude.forEach(mStr => {
           const m = parseInt(mStr).toString();
-          const weeks = selectedWeek === 'ALL' ? ['1', '2', '3', '4', '5'] : [selectedWeek];
+          let weeks = [];
+          if (selectedWeek === 'ALL') {
+            const weeksList = getWeeksForMonth(year, mStr, true);
+            weeks = weeksList.map(w => w.weekNum);
+          } else {
+            weeks = [selectedWeek];
+          }
           
+          const weeksList = getWeeksForMonth(year, mStr, true);
+          const firstWeekLabel = weeksList.length > 0 ? weeksList[0].weekNum : '1';
+
           weeks.forEach(w => {
             // Find data for this specific week
-            const weekData = getSumForGroup(modelingData, x => 
-              x.nam && x.nam.toString() === year.toString() &&
-              x.thang && parseInt(x.thang).toString() === m &&
-              x.tuan && x.tuan.toString() === w.toString()
-            );
+            const weekData = getSumForGroup(modelingData, x => {
+              const matchesPeriod = x.nam && x.nam.toString() === year.toString() &&
+                                    x.thang && parseInt(x.thang).toString() === m;
+              if (!matchesPeriod) return false;
+              
+              const isTuanMatch = x.tuan && (
+                x.tuan.toString() === w.toString() || 
+                ((x.tuan.toString() === '1' || x.tuan.toString() === 'ALL') && w.toString() === firstWeekLabel.toString())
+              );
+              return isTuanMatch;
+            });
 
             // Only show week if there is some data, or if we are filtering for a specific month
             const hasData = weekData.tong > 0;
             if (selectedMonth !== 'all' || hasData) {
-              const label = selectedMonth === 'all' ? `T${m} - Tuần ${w}` : `Tuần ${w}`;
+              const label = w;
               if (!search || label.toLowerCase().includes(search)) {
                 filtered.push({
-                  id: `model_w_${year}_${mStr}_${w}`,
+                  id: `model_w_${year}_${mStr}_${w.replace(/\s+/g, '')}`,
                   label: label,
                   type: 'week',
                   nam: year,
@@ -5116,7 +5252,7 @@
       if (id) {
         const idx = modelingData.findIndex(x => x.id === id);
         if (idx !== -1) {
-          modelingData[idx] = { ...modelingData[idx], sx, nc, nl, pl, nuoc, ir, tong };
+          modelingData[idx] = { ...modelingData[idx], sx, nc, nl, pl, nuoc, ir, tong, isManual: true };
         } else {
           // If we edited a month but it didn't find the week, push a new week 1 record
           const parts = id.split('_');
@@ -5128,7 +5264,8 @@
             nam: year,
             thang: month,
             tuan: tuan,
-            sx, nc, nl, pl, nuoc, ir, tong
+            sx, nc, nl, pl, nuoc, ir, tong,
+            isManual: true
           });
         }
       } else {
@@ -5142,7 +5279,8 @@
           nam: year,
           thang: monthStr,
           tuan: '1',
-          sx, nc, nl, pl, nuoc, ir, tong
+          sx, nc, nl, pl, nuoc, ir, tong,
+          isManual: true
         });
       }
       
@@ -5258,22 +5396,142 @@
       return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : dateStr;
     }
 
+    function getWeeksForMonth(year, month, isReporting) {
+      const yearNum = parseInt(year);
+      const monthNum = parseInt(month);
+      if (isNaN(yearNum) || isNaN(monthNum)) return [];
+      
+      let startYear = yearNum;
+      let startMonth = monthNum;
+      let startDateNum = 1;
+      let endYear = yearNum;
+      let endMonth = monthNum;
+      let endDateNum = 0;
+      
+      if (isReporting) {
+        startMonth = monthNum - 1;
+        if (startMonth < 1) {
+          startMonth = 12;
+          startYear = yearNum - 1;
+        }
+        startDateNum = 21;
+        endDateNum = 20;
+      }
+      
+      const start = new Date(startYear, startMonth - 1, startDateNum);
+      let end;
+      if (isReporting) {
+        end = new Date(endYear, endMonth - 1, endDateNum);
+      } else {
+        end = new Date(yearNum, monthNum, 0);
+      }
+      
+      // Find the Saturday containing or preceding the start date
+      const startSaturday = new Date(start);
+      const day = start.getDay();
+      const diff = day === 6 ? 0 : -(day + 1); // If Saturday (6), diff is 0. If Sunday (0), diff is -1. If Monday (1), diff is -2...
+      startSaturday.setDate(start.getDate() + diff);
+      startSaturday.setHours(0,0,0,0);
+      
+      const weeks = [];
+      let current = new Date(startSaturday);
+      let wIdx = 1;
+      
+      while (current <= end) {
+        const wStart = new Date(current);
+        const wEnd = new Date(current);
+        wEnd.setDate(current.getDate() + 6); // ends on Friday (7 days total)
+        wEnd.setHours(23,59,59,999);
+        
+        const pad = (num) => String(num).padStart(2, '0');
+        const startStr = `${pad(wStart.getDate())}/${pad(wStart.getMonth() + 1)}`;
+        const endStr = `${pad(wEnd.getDate())}/${pad(wEnd.getMonth() + 1)}`;
+        
+        weeks.push({
+          weekNum: `${startStr} - ${endStr}`,
+          startDate: wStart,
+          endDate: wEnd,
+          label: `Tuần ${wIdx}: ${startStr} - ${endStr}`
+        });
+        
+        current.setDate(current.getDate() + 7);
+        wIdx++;
+      }
+      return weeks;
+    }
+
+    function getWeekBoundariesForDate(date) {
+      const start = new Date(date);
+      const day = date.getDay();
+      const diff = day === 6 ? 0 : -(day + 1);
+      start.setDate(date.getDate() + diff);
+      start.setHours(0,0,0,0);
+      
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      end.setHours(23,59,59,999);
+      
+      return { start, end };
+    }
+
+    function getWeekRangeString(date) {
+      const { start, end } = getWeekBoundariesForDate(date);
+      const pad = (num) => String(num).padStart(2, '0');
+      return `${pad(start.getDate())}/${pad(start.getMonth() + 1)} - ${pad(end.getDate())}/${pad(end.getMonth() + 1)}`;
+    }
+
+    function updateWeekDropdownOptions(year, month, isReporting, selectElementId) {
+      const selectEl = document.getElementById(selectElementId);
+      if (!selectEl) return;
+      
+      const currentSelectedVal = selectEl.value;
+      selectEl.innerHTML = '';
+      
+      const allOpt = document.createElement('option');
+      if (selectElementId === 'filter-week') {
+        allOpt.value = 'Tất cả';
+        allOpt.textContent = 'Tất cả các tuần';
+      } else {
+        allOpt.value = 'ALL';
+        allOpt.textContent = 'Tất cả các tuần';
+      }
+      selectEl.appendChild(allOpt);
+
+      if (selectElementId === 'filter-week') {
+        const last4Opt = document.createElement('option');
+        last4Opt.value = '4_weeks';
+        last4Opt.textContent = '4 tuần gần nhất';
+        selectEl.appendChild(last4Opt);
+      }
+      
+      if (month !== 'Tất cả' && month !== 'all' && month !== 'ALL') {
+        const weeks = getWeeksForMonth(year, month, isReporting);
+        weeks.forEach(w => {
+          const opt = document.createElement('option');
+          opt.value = w.weekNum;
+          opt.textContent = w.label;
+          selectEl.appendChild(opt);
+        });
+      }
+      
+      selectEl.value = currentSelectedVal;
+      if (!selectEl.value) {
+        selectEl.selectedIndex = 0;
+      }
+    }
+
     function getWeekFromDateString(dateStr) {
       if (!dateStr) return null;
-      let day = 0;
-      if (dateStr.includes('-')) {
-        const parts = dateStr.split('-');
-        day = parseInt(parts[2], 10);
-      } else if (dateStr.includes('/')) {
-        const parts = dateStr.split('/');
-        day = parseInt(parts[0], 10);
-      }
-      if (isNaN(day) || day <= 0) return null;
-      if (day <= 7) return '1';
-      if (day <= 14) return '2';
-      if (day <= 21) return '3';
-      if (day <= 28) return '4';
-      return '5';
+      const parsed = parseSheetDate(dateStr);
+      const parts = parsed.split('-');
+      if (parts.length < 3) return null;
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      const d = parseInt(parts[2], 10);
+      if (isNaN(y) || isNaN(m) || isNaN(d)) return null;
+      
+      const targetDate = new Date(y, m - 1, d);
+      return getWeekRangeString(targetDate);
     }
 
     function getQuarterMonths(quarter) {
@@ -5289,8 +5547,7 @@
       let activeSet = new Set();
       personnelData.forEach(p => {
         months.forEach(m => {
-          const key = `${year}-${m}`;
-          const status = (p.monthlyStatus && p.monthlyStatus[key]) || '';
+          const status = getPersonnelStatus(p, year, m);
           if (status && status !== 'Nghỉ việc' && status !== 'Nghỉ') {
             activeSet.add(p.maNV || p.name);
           }
@@ -5303,7 +5560,7 @@
       const months = getQuarterMonths(quarter);
       let productsSet = new Set();
       methodsData.forEach(item => {
-        if (item.year === year && months.includes(item.month)) {
+        if (item.year && item.year.toString() === year.toString() && item.month && months.includes(item.month.toString().padStart(2, '0'))) {
           const res = (item.result || '').toLowerCase().trim();
           if (res === 'đạt' || res === 'dat') {
             productsSet.add(item.product);
@@ -5343,14 +5600,41 @@
       const months = getQuarterMonths(quarter);
       const monthNums = months.map(m => parseInt(m).toString());
       
-      const filtered = modelingData.filter(item => {
-        return item.nam && item.nam.toString() === year.toString() && item.thang && monthNums.includes(item.thang.toString());
-      });
+      const matched = modelingData.filter(item => 
+        item.nam && item.nam.toString() === year.toString() && 
+        item.thang && monthNums.includes(parseInt(item.thang).toString())
+      );
       
+      const manualItems = matched.filter(x => x.isManual);
+      const rawItems = matched.filter(x => !x.isManual);
+
       let sum = 0;
-      filtered.forEach(x => {
+      manualItems.forEach(x => {
         sum += x.tong || 0;
       });
+
+      monthNums.forEach(m => {
+        const monthRaw = rawItems.filter(x => parseInt(x.thang).toString() === m);
+        const uniqueNL = new Set();
+        const uniquePL = new Set();
+        const uniqueNuoc = new Set();
+        const uniqueNC = new Set();
+        let sx = 0;
+
+        monthRaw.forEach(x => {
+          if (x.type === 'NL') uniqueNL.add(x.soK);
+          else if (x.type === 'PL') uniquePL.add(x.soK);
+          else if (x.type === 'Nuoc') uniqueNuoc.add(x.soK);
+          else if (x.type === 'SX') {
+            if (x.isSxValid) sx += 1;
+          } else {
+            uniqueNC.add(x.soK);
+          }
+        });
+
+        sum += sx + uniqueNC.size + uniqueNL.size + uniquePL.size + uniqueNuoc.size;
+      });
+
       return sum;
     }
 
@@ -5376,7 +5660,14 @@
         xayDungApp: quarter === 'Q3' && year === '2026' ? "Xây dựng app làm hồ sơ tự động" : ""
       };
 
-      return overviewTargets[key] || defaultTargets;
+      const userTargets = overviewTargets[key] || {};
+      const target = {};
+      for (const k in defaultTargets) {
+        target[k] = (userTargets[k] !== undefined && userTargets[k] !== null && userTargets[k] !== 0 && userTargets[k] !== '') 
+                    ? userTargets[k] 
+                    : defaultTargets[k];
+      }
+      return target;
     }
 
     function renderOverviewDashboard() {
@@ -5386,13 +5677,12 @@
       // Helper to check if a date string falls in the selected year and quarter
       const isDateInQuarter = (dateStr, qYear, qQuarter) => {
         if (!dateStr) return false;
-        const dateObj = new Date(dateStr);
-        if (isNaN(dateObj.getTime())) return false;
-        
-        const y = dateObj.getFullYear().toString();
-        if (y !== qYear) return false;
-        
-        const month = dateObj.getMonth() + 1; // 1-12
+        const parsed = parseSheetDate(dateStr); // returns YYYY-MM-DD
+        const parts = parsed.split('-');
+        if (parts.length < 3) return false;
+        const y = parts[0];
+        if (y !== qYear.toString()) return false;
+        const month = parseInt(parts[1], 10);
         if (qQuarter === 'Q1') return month >= 1 && month <= 3;
         if (qQuarter === 'Q2') return month >= 4 && month <= 6;
         if (qQuarter === 'Q3') return month >= 7 && month <= 9;
@@ -5547,25 +5837,61 @@
       const container = document.getElementById('ov-modeling-content');
       if (!container) return;
       
-      // Aggregate weekly items to monthly items for the Overview display
       const monthlyMap = {};
-      modelingData.forEach(item => {
-        if (item.nam && item.nam.toString() === year.toString() && item.thang && monthNums.includes(item.thang.toString())) {
-          const m = item.thang.toString();
-          if (!monthlyMap[m]) {
-            monthlyMap[m] = { thang: m, sx: 0, nc: 0, nl: 0, pl: 0, nuoc: 0, ir: 0, tong: 0 };
-          }
-          monthlyMap[m].sx += item.sx || 0;
-          monthlyMap[m].nc += item.nc || 0;
-          monthlyMap[m].nl += item.nl || 0;
-          monthlyMap[m].pl += item.pl || 0;
-          monthlyMap[m].nuoc += item.nuoc || 0;
-          monthlyMap[m].ir += item.ir || 0;
-          monthlyMap[m].tong += item.tong || 0;
+      monthNums.forEach(m => {
+        monthlyMap[m] = { thang: m, sx: 0, nc: 0, nl: 0, pl: 0, nuoc: 0, ir: 0, tong: 0 };
+      });
+
+      const matched = modelingData.filter(item => 
+        item.nam && item.nam.toString() === year.toString() && 
+        item.thang && monthNums.includes(parseInt(item.thang).toString())
+      );
+
+      // Add manual items
+      matched.filter(x => x.isManual).forEach(x => {
+        const m = parseInt(x.thang).toString();
+        if (monthlyMap[m]) {
+          monthlyMap[m].sx += x.sx || 0;
+          monthlyMap[m].nc += x.nc || 0;
+          monthlyMap[m].nl += x.nl || 0;
+          monthlyMap[m].pl += x.pl || 0;
+          monthlyMap[m].nuoc += x.nuoc || 0;
+          monthlyMap[m].ir += x.ir || 0;
+          monthlyMap[m].tong += x.tong || 0;
         }
       });
 
-      const filtered = Object.values(monthlyMap).sort((a, b) => parseInt(a.thang) - parseInt(b.thang));
+      // Calculate raw items by month
+      monthNums.forEach(m => {
+        const monthRaw = matched.filter(x => !x.isManual && parseInt(x.thang).toString() === m);
+        const uniqueNL = new Set();
+        const uniquePL = new Set();
+        const uniqueNuoc = new Set();
+        const uniqueNC = new Set();
+        let sx = 0;
+
+        monthRaw.forEach(x => {
+          if (x.type === 'NL') uniqueNL.add(x.soK);
+          else if (x.type === 'PL') uniquePL.add(x.soK);
+          else if (x.type === 'Nuoc') uniqueNuoc.add(x.soK);
+          else if (x.type === 'SX') {
+            if (x.isSxValid) sx += 1;
+          } else {
+            uniqueNC.add(x.soK);
+          }
+        });
+
+        if (monthlyMap[m]) {
+          monthlyMap[m].sx += sx;
+          monthlyMap[m].nc += uniqueNC.size;
+          monthlyMap[m].nl += uniqueNL.size;
+          monthlyMap[m].pl += uniquePL.size;
+          monthlyMap[m].nuoc += uniqueNuoc.size;
+          monthlyMap[m].tong += sx + uniqueNC.size + uniqueNL.size + uniquePL.size + uniqueNuoc.size;
+        }
+      });
+
+      const filtered = Object.values(monthlyMap).filter(x => x.tong > 0).sort((a, b) => parseInt(a.thang) - parseInt(b.thang));
       
       if (filtered.length === 0) {
         container.innerHTML = `<div class="ov-empty-state"><i class="fa-solid fa-circle-info"></i> Không có dữ liệu làm mẫu trong quý này.</div>`;
@@ -5802,8 +6128,8 @@
         const quarter = document.getElementById('pers-filter-quarter').value;
         if (quarter === 'Q1') return '03';
         if (quarter === 'Q2') return '06';
-        if (quarter === 'Q3') return '07';
-        if (quarter === 'Q4') return '08';
+        if (quarter === 'Q3') return '09';
+        if (quarter === 'Q4') return '12';
       }
       return document.getElementById('pers-filter-month').value;
     }
@@ -5812,8 +6138,8 @@
       let monthsInQuarter = [];
       if (quarter === 'Q1') monthsInQuarter = ['01', '02', '03'];
       else if (quarter === 'Q2') monthsInQuarter = ['04', '05', '06'];
-      else if (quarter === 'Q3') monthsInQuarter = ['07', '08'];
-      else if (quarter === 'Q4') monthsInQuarter = ['08'];
+      else if (quarter === 'Q3') monthsInQuarter = ['07', '08', '09'];
+      else if (quarter === 'Q4') monthsInQuarter = ['10', '11', '12'];
       
       const lastMonth = monthsInQuarter[monthsInQuarter.length - 1];
       
@@ -5972,7 +6298,7 @@
       let statusFound = '';
       for (let i = targetMonthIdx; i >= 0; i--) {
         const mKey = `${year}-${months[i]}`;
-        const val = (p.monthlyStatus[mKey] || '').toString().trim();
+        const val = (p.monthlyStatus && p.monthlyStatus[mKey] || '').toString().trim();
         if (val !== '') {
           statusFound = val;
           break;
@@ -5985,19 +6311,15 @@
         return 'Nghỉ việc';
       }
 
-      // 2. Nếu tìm thấy trạng thái hoạt động khác, trả về trạng thái đó
-      if (statusFound !== '') {
-        return statusFound;
-      }
-
-      // 3. Nếu ô trống và chưa bao giờ có trạng thái hoạt động:
-      // Check ngày nhận việc để xem họ đã nhận việc chưa
+      // 2. Sử dụng joinDate để tính toán động nếu ô hiện tại trống
+      // (Nhằm tránh việc nhân viên đã hết thời gian học việc/thử việc nhưng vẫn bị tính là học việc/thử việc do cột trống)
+      const currentCellVal = (p.monthlyStatus && p.monthlyStatus[`${year}-${month.toString().padStart(2, '0')}`] || '').toString().trim();
+      
       const joinDate = parseJoinDate(p.joinDate);
-      if (joinDate) {
-        const targetMonthInt = parseInt(month);
-        const targetYearInt = parseInt(year);
+      if (joinDate && currentCellVal === '') {
+        const targetMonthInt = parseInt(month, 10);
+        const targetYearInt = parseInt(year, 10);
         
-        // Nếu họ nhận việc trong hoặc trước tháng này:
         if (joinDate.year < targetYearInt || (joinDate.year === targetYearInt && joinDate.month <= targetMonthInt)) {
           const diffMonths = (targetYearInt - joinDate.year) * 12 + (targetMonthInt - joinDate.month);
           if (diffMonths >= 0 && diffMonths <= 1) {
@@ -6005,12 +6327,18 @@
           } else if (diffMonths > 1 && diffMonths <= 3) {
             return 'Thử việc';
           } else {
-            return 'Thử việc'; // Mặc định hết thời gian học việc là thử việc
+            // Nếu đã quá 3 tháng, ưu tiên trả về chức vụ cụ thể tìm thấy trước đó (như HPLC, NL...)
+            // Nếu không có chức vụ cụ thể, trả về 'Chính thức'
+            if (statusFound !== '' && !statusFoundNorm.includes('hoc') && !statusFoundNorm.includes('thu')) {
+              return statusFound;
+            }
+            return 'Chính thức';
           }
         }
       }
 
-      return '';
+      // 3. Nếu không có joinDate hoặc ô hiện tại có giá trị, trả về trạng thái tìm thấy gần nhất
+      return statusFound;
     }
 
     function getRoleLevel(role) {
@@ -6810,29 +7138,58 @@
     // =============== OOS LOGIC ================
     // ==========================================
     function renderOOSDashboard() {
-      // 1. Filter Data
       const selectedYear = document.getElementById('filter-year').value;
       const selectedMonth = document.getElementById('filter-month').value;
-      const selectedWeek = document.getElementById('filter-week') ? document.getElementById('filter-week').value : 'Tất cả';
+      
+      // Update custom week dropdown for OOS only if Month or Year changes
+      if (selectedYear !== lastOOSYear || selectedMonth !== lastOOSMonth) {
+        lastOOSYear = selectedYear;
+        lastOOSMonth = selectedMonth;
+        updateWeekDropdownOptions(selectedYear, selectedMonth, false, 'filter-week');
+      }
+
       const selectedType = document.getElementById('filter-type').value;
+      const selectedWeek = document.getElementById('filter-week') ? document.getElementById('filter-week').value : 'Tất cả';
+
+      // 4 weeks rolling boundary setup:
+      let rollingStart = null;
+      let rollingEnd = null;
+      if (selectedWeek === '4_weeks') {
+        const today = new Date();
+        const day = today.getDay();
+        const diffToFriday = day === 6 ? 6 : 5 - day;
+        rollingEnd = new Date(today);
+        rollingEnd.setDate(today.getDate() + diffToFriday);
+        rollingEnd.setHours(23,59,59,999);
+        
+        rollingStart = new Date(rollingEnd);
+        rollingStart.setDate(rollingEnd.getDate() - 27);
+        rollingStart.setHours(0,0,0,0);
+      }
 
       filteredData = oosData.filter(item => {
         if (!item.date) return false;
         const dateObj = new Date(item.date);
         if (isNaN(dateObj.getTime())) return false;
         
-        const year = dateObj.getFullYear().toString();
-        const monthNum = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+        // If filtering by rolling 4 weeks, bypass normal year/month filters
+        if (selectedWeek === '4_weeks') {
+          if (dateObj < rollingStart || dateObj > rollingEnd) return false;
+        } else {
+          const year = dateObj.getFullYear().toString();
+          const monthNum = (dateObj.getMonth() + 1).toString().padStart(2, '0');
 
-        // Check Year
-        if (selectedYear !== 'Tất cả' && year !== selectedYear) return false;
-        // Check Month
-        if (selectedMonth !== 'Tất cả' && monthNum !== selectedMonth) return false;
-        // Check Week
-        if (selectedMonth !== 'Tất cả' && selectedWeek !== 'Tất cả') {
-          const itemWeek = getWeekFromDateString(item.date);
-          if (itemWeek !== selectedWeek) return false;
+          // Check Year
+          if (selectedYear !== 'Tất cả' && year !== selectedYear) return false;
+          // Check Month
+          if (selectedMonth !== 'Tất cả' && monthNum !== selectedMonth) return false;
+          // Check Week
+          if (selectedWeek !== 'Tất cả') {
+            const itemWeekRange = getWeekRangeString(dateObj);
+            if (itemWeekRange !== selectedWeek) return false;
+          }
         }
+        
         // Check Type
         if (selectedType !== 'Tất cả' && item.type !== selectedType) return false;
 
@@ -6846,17 +7203,31 @@
       const trendCard = document.getElementById('card-monthly-trend-container');
       const gridContainer = document.getElementById('charts-grid-container');
 
-      if (selectedMonth === 'Tất cả') {
+      if (selectedWeek === '4_weeks') {
+        // Show weekly comparison chart for the last 4 weeks!
         trendCard.style.display = 'block';
-        gridContainer.style.gridTemplateColumns = '1fr 1fr';
+        gridContainer.style.gridTemplateColumns = '1fr';
+        const trendCardTitle = document.querySelector('#card-monthly-trend-container .card-title');
+        if (trendCardTitle) trendCardTitle.innerHTML = '<i class="fa-solid fa-chart-line"></i> So sánh sự cố OOS 4 tuần gần nhất';
+        renderWeeklyComparisonChart();
+      } else if (selectedMonth === 'Tất cả') {
+        trendCard.style.display = 'block';
+        gridContainer.style.gridTemplateColumns = '1fr';
+        const trendCardTitle = document.querySelector('#card-monthly-trend-container .card-title');
+        if (trendCardTitle) trendCardTitle.innerHTML = '<i class="fa-solid fa-chart-line"></i> Xu hướng OOS theo tháng';
         renderMonthlyTrendChart(selectedYear);
-      } else {
+      } else if (selectedWeek !== 'Tất cả') {
+        // Hide trend chart since we only view 1 week
         trendCard.style.display = 'none';
         gridContainer.style.gridTemplateColumns = '1fr';
+      } else {
+        // Show comparison chart for weeks of this month
+        trendCard.style.display = 'block';
+        gridContainer.style.gridTemplateColumns = '1fr';
+        const trendCardTitle = document.querySelector('#card-monthly-trend-container .card-title');
+        if (trendCardTitle) trendCardTitle.innerHTML = '<i class="fa-solid fa-chart-line"></i> So sánh sự cố OOS giữa các tuần';
+        renderWeeklyComparisonChart();
       }
-
-      // 4. Render Cause Breakdown Chart
-      renderCauseChart();
 
       // 5. Render OOS Deep Analysis Dashboard
       renderOOSDeepAnalysis();
@@ -6864,6 +7235,7 @@
       // 6. Render Top Materials & Top KNVs
       renderTopMaterialsList();
       renderTopKNVsList();
+
 
       // 7. Render Table
       filterAndRenderTable();
@@ -7139,6 +7511,136 @@
       });
     }
 
+    function getLast4Weeks() {
+      const weeks = [];
+      const today = new Date();
+      const day = today.getDay();
+      const diffToFriday = day === 6 ? 6 : 5 - day;
+      const currentFriday = new Date(today);
+      currentFriday.setDate(today.getDate() + diffToFriday);
+      
+      for (let i = 3; i >= 0; i--) {
+        const fri = new Date(currentFriday);
+        fri.setDate(currentFriday.getDate() - i * 7);
+        const sat = new Date(fri);
+        sat.setDate(fri.getDate() - 6);
+        
+        const pad = (num) => String(num).padStart(2, '0');
+        const satStr = `${pad(sat.getDate())}/${pad(sat.getMonth() + 1)}`;
+        const friStr = `${pad(fri.getDate())}/${pad(fri.getMonth() + 1)}`;
+        
+        weeks.push({
+          weekNum: `${satStr} - ${friStr}`,
+          startDate: sat,
+          endDate: fri
+        });
+      }
+      return weeks;
+    }
+
+    function renderWeeklyComparisonChart() {
+      const selectedType = document.getElementById('filter-type').value;
+      const selectedMonth = document.getElementById('filter-month').value;
+      const selectedYear = document.getElementById('filter-year').value;
+      const selectedWeek = document.getElementById('filter-week') ? document.getElementById('filter-week').value : 'Tất cả';
+      
+      let selectedWeeks = [];
+      if (selectedWeek === '4_weeks') {
+        const last4 = getLast4Weeks();
+        selectedWeeks = last4.map(w => w.weekNum);
+      } else if (selectedMonth !== 'Tất cả') {
+        const filterYear = (selectedYear === 'Tất cả' || !selectedYear) ? '2026' : selectedYear;
+        const weeks = getWeeksForMonth(filterYear, selectedMonth, true);
+        selectedWeeks = weeks.map(w => w.weekNum);
+      } else {
+        const last4 = getLast4Weeks();
+        selectedWeeks = last4.map(w => w.weekNum);
+      }
+      
+      const nlWeeklyCounts = new Array(selectedWeeks.length).fill(0);
+      const plWeeklyCounts = new Array(selectedWeeks.length).fill(0);
+      
+      oosData.forEach(item => {
+        if (!item.date) return;
+        const dateObj = new Date(item.date);
+        if (isNaN(dateObj.getTime())) return;
+        
+        // Lọc theo loại (Type)
+        if (selectedType !== 'Tất cả' && item.type !== selectedType) return;
+        
+        const itemWeekRange = getWeekRangeString(dateObj);
+        const wIdx = selectedWeeks.indexOf(itemWeekRange);
+        if (wIdx !== -1) {
+          if (item.type === 'NL') {
+            nlWeeklyCounts[wIdx]++;
+          } else if (item.type === 'PL') {
+            plWeeklyCounts[wIdx]++;
+          }
+        }
+      });
+      
+      const ctx = document.getElementById('chart-monthly-trend').getContext('2d');
+      if (monthlyChart) monthlyChart.destroy();
+      
+      const datasets = [];
+      if (selectedType === 'Tất cả' || selectedType === 'NL') {
+        datasets.push({
+          label: 'Nguyên liệu',
+          data: nlWeeklyCounts,
+          backgroundColor: '#3b82f6',
+          borderRadius: 4,
+          barPercentage: 0.4
+        });
+      }
+      if (selectedType === 'Tất cả' || selectedType === 'PL') {
+        datasets.push({
+          label: 'Phụ liệu',
+          data: plWeeklyCounts,
+          backgroundColor: '#10b981',
+          borderRadius: 4,
+          barPercentage: 0.4
+        });
+      }
+      
+      monthlyChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: selectedWeeks,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { color: '#475569', font: { size: 10 } }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: '#0f172a',
+              titleColor: '#f8fafc',
+              bodyColor: '#f8fafc',
+              borderColor: 'rgba(255, 255, 255, 0.1)',
+              borderWidth: 1
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#64748b', font: { size: 10 } }
+            },
+            y: {
+              grid: { color: '#e2e8f0' },
+              ticks: { color: '#64748b', font: { size: 10 }, stepSize: 1 },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
     function renderCauseChart() {
       const causes = ["Lỗi do NL", "Lỗi do KNV", "Lỗi do tiêu chuẩn", "Làm lại/Đổi tay KNV đạt", "OOS Vi sinh (VS)"];
       
@@ -7269,7 +7771,7 @@
     }
 
     function renderTopKNVsList() {
-      const knvErrorCases = filteredData.filter(d => d.causes.knv === true);
+      const knvErrorCases = filteredData.filter(d => getQcSubcategory(d) === 'knvThaoTac');
       const totalKnvErrors = knvErrorCases.length;
 
       const container = document.getElementById('top-knvs-list');
@@ -7318,11 +7820,31 @@
       });
     }
 
+    function parseOOSDateToSort(dateStr) {
+      if (!dateStr) return '0000-00-00';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        return dateStr;
+      }
+      const parts = dateStr.split(/[\/\-\.]/);
+      if (parts.length === 3) {
+        if (parts[0].length === 4) {
+          return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+        } else {
+          return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+      }
+      const d = new Date(dateStr);
+      if (!isNaN(d.getTime())) {
+        return d.toISOString().split('T')[0];
+      }
+      return '0000-00-00';
+    }
+
     function filterAndRenderTable() {
       const searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
       const filterTableReason = document.getElementById('filter-table-reason').value;
 
-      const tableFilteredData = filteredData.filter(item => {
+      tableFilteredData = filteredData.filter(item => {
         const matchSearch = 
           item.soK.toLowerCase().includes(searchQuery) ||
           item.materialName.toLowerCase().includes(searchQuery) ||
@@ -7341,7 +7863,16 @@
         return true;
       });
 
-      filteredData = tableFilteredData;
+      // Sắp xếp theo ngày mới nhất lên đầu (Descending)
+      tableFilteredData.sort((a, b) => {
+        const dateA = parseOOSDateToSort(a.date);
+        const dateB = parseOOSDateToSort(b.date);
+        if (dateA !== dateB) {
+          return dateB.localeCompare(dateA);
+        }
+        return b.soK.localeCompare(a.soK);
+      });
+
       currentPage = 1;
       renderTableOnly();
     }
@@ -7350,7 +7881,7 @@
       const tbody = document.getElementById('data-table-body');
       tbody.innerHTML = '';
 
-      const total = filteredData.length;
+      const total = tableFilteredData.length;
       const maxPage = Math.max(1, Math.ceil(total / itemsPerPage));
       
       if (currentPage > maxPage) currentPage = maxPage;
@@ -7369,7 +7900,7 @@
       
       document.getElementById('pagination-info').textContent = `Hiển thị ${startIdx + 1} - ${endIdx} của ${total} ca`;
 
-      const pageData = filteredData.slice(startIdx, endIdx);
+      const pageData = tableFilteredData.slice(startIdx, endIdx);
 
       pageData.forEach(d => {
         let causeBadges = '';
@@ -7471,6 +8002,10 @@
           let oosRows = [];
           let hasOOS = false;
           let hasPers = false;
+          let hasModeling = false;
+          let hasIR = false;
+          let parsedModeling = [];
+          let parsedIR = [];
 
           if (isExcel) {
             const data = new Uint8Array(e.target.result);
@@ -7489,6 +8024,18 @@
                     localStorage.setItem('qc_personnel_data_v4', JSON.stringify(personnelData));
                     hasPers = true;
                   }
+                } else if (nameLower === 'ir' || nameLower.includes('ir_') || nameLower.includes('_ir')) {
+                  const parsed = mapCSVToIR(sheetRows);
+                  if (parsed.length > 0) {
+                    parsedIR = parsed;
+                    hasIR = true;
+                  }
+                } else if (nameLower.includes('hiệu suất') || nameLower.includes('hieu suat') || nameLower.includes('modeling')) {
+                  const parsed = mapCSVToModeling(sheetRows);
+                  if (parsed.length > 0) {
+                    parsedModeling = parsed;
+                    hasModeling = true;
+                  }
                 } else {
                   // OOS sheets
                   let defaultType = 'NL';
@@ -7503,12 +8050,25 @@
                 }
               }
             });
+
+            // Post-process IR and Modeling
+            if (hasIR && parsedIR.length > 0) {
+              irRawData = parsedIR;
+              localStorage.setItem('qc_ir_raw_data', JSON.stringify(irRawData));
+            }
+            if (hasModeling && parsedModeling.length > 0) {
+              modelingData = mergeIRDataIntoModeling(parsedModeling, irRawData);
+              localStorage.setItem('qc_modeling_data_v4', JSON.stringify(modelingData));
+            } else if (hasIR && parsedIR.length > 0) {
+              modelingData = mergeIRDataIntoModeling(modelingData, irRawData);
+              localStorage.setItem('qc_modeling_data_v4', JSON.stringify(modelingData));
+            }
           } else {
             // CSV
             const csvText = e.target.result;
             const csvRows = parseCSV(csvText);
             
-            // Check if it's OOS or Personnel
+            // Check if it's OOS, Personnel, or IR
             const firstRowStr = (csvRows[0] || []).join(',').toLowerCase();
             if (firstRowStr.includes('ngày') || firstRowStr.includes('số k') || firstRowStr.includes('tiêu chí')) {
               oosRows = mapCSVToOOS(csvRows, 'NL');
@@ -7520,10 +8080,19 @@
                 localStorage.setItem('qc_personnel_data_v4', JSON.stringify(personnelData));
                 hasPers = true;
               }
+            } else if (firstRowStr.includes('người thực hiện') || firstRowStr.includes('yêu cầu kn') || firstRowStr.includes('ngày trả kq')) {
+              const parsed = mapCSVToIR(csvRows);
+              if (parsed.length > 0) {
+                irRawData = parsed;
+                localStorage.setItem('qc_ir_raw_data', JSON.stringify(irRawData));
+                hasIR = true;
+                modelingData = mergeIRDataIntoModeling(modelingData, irRawData);
+                localStorage.setItem('qc_modeling_data_v4', JSON.stringify(modelingData));
+              }
             }
           }
 
-          if (!hasOOS && !hasPers) {
+          if (!hasOOS && !hasPers && !hasIR && !hasModeling) {
             showToast("Không tìm thấy dữ liệu hợp lệ trong tệp!", "error");
             return;
           }
@@ -7535,7 +8104,13 @@
             message += `Đã nạp ${oosData.length} ca OOS. `;
           }
           if (hasPers) {
-            message += `Đã nạp ${personnelData.length} nhân viên.`;
+            message += `Đã nạp ${personnelData.length} nhân viên. `;
+          }
+          if (hasIR) {
+            message += `Đã nạp ${irRawData.length} dòng dữ liệu IR. `;
+          }
+          if (hasModeling) {
+            message += `Đã nạp ${modelingData.length} tuần hiệu suất. `;
           }
 
           showToast(message, "success");
@@ -7569,6 +8144,7 @@
       const gidImprovement = document.getElementById('sync-gid-improvement')?.value.trim() || '';
       const gidDelay = document.getElementById('sync-gid-delay')?.value.trim() || '';
       const gidRetrieved = document.getElementById('sync-gid-retrieved')?.value.trim() || '';
+      const gidIR = document.getElementById('sync-gid-ir')?.value.trim() || '';
 
       if (!urlInput) {
         if (!silent) showToast("Vui lòng điền link Google Sheet chính!", "error");
@@ -7616,6 +8192,7 @@
         gidImprovement,
         gidDelay,
         gidRetrieved,
+        gidIR,
         webAppUrl: webAppUrlInput
       }));
       
@@ -7677,6 +8254,8 @@
         throw new Error(`Không thể tải dữ liệu sau 5 lần thử. Vui lòng kiểm tra:\n1. Google Sheet đã được Công bố lên web (Publish to web) chưa?\n2. Link Sheet có đúng định dạng /pub?output=csv không?\n3. Kết nối mạng có ổn định không?\nURL: ${url}`);
       };
 
+      let failedTabs = [];
+
       // 1. Fetch tab Personnel (Nhân sự)
       if (gidPers) {
         try {
@@ -7689,11 +8268,11 @@
             successCount++;
           } else {
             console.error("Lỗi đồng bộ tab Nhân sự HTTP status: " + response.status);
-            if (!silent) showToast("Không thể tải dữ liệu Nhân sự (Lỗi HTTP " + response.status + ")", "warning");
+            failedTabs.push("Nhân sự");
           }
         } catch (e) {
           console.error("Lỗi kết nối đồng bộ tab Nhân sự:", e);
-          if (!silent) showToast("Lỗi kết nối đồng bộ tab Nhân sự (CORS/Mạng)", "warning");
+          failedTabs.push("Nhân sự");
         }
       }
 
@@ -7709,11 +8288,11 @@
             successCount++;
           } else {
             console.error("Lỗi đồng bộ tab Nguyên liệu HTTP status: " + response.status);
-            if (!silent) showToast("Không thể tải dữ liệu OOS Nguyên liệu (Lỗi HTTP " + response.status + ")", "warning");
+            failedTabs.push("OOS Nguyên liệu");
           }
         } catch (e) {
           console.error("Lỗi kết nối đồng bộ tab Nguyên liệu:", e);
-          if (!silent) showToast("Lỗi kết nối đồng bộ tab Nguyên liệu (CORS/Mạng)", "warning");
+          failedTabs.push("OOS Nguyên liệu");
         }
       }
 
@@ -7729,11 +8308,11 @@
             successCount++;
           } else {
             console.error("Lỗi đồng bộ tab Phụ liệu HTTP status: " + response.status);
-            if (!silent) showToast("Không thể tải dữ liệu OOS Phụ liệu (Lỗi HTTP " + response.status + ")", "warning");
+            failedTabs.push("OOS Phụ liệu");
           }
         } catch (e) {
           console.error("Lỗi kết nối đồng bộ tab Phụ liệu:", e);
-          if (!silent) showToast("Lỗi kết nối đồng bộ tab Phụ liệu (CORS/Mạng)", "warning");
+          failedTabs.push("OOS Phụ liệu");
         }
       }
 
@@ -7749,11 +8328,11 @@
             successCount++;
           } else {
             console.error("Lỗi đồng bộ tab Test phương pháp HTTP status: " + response.status);
-            if (!silent) showToast("Không thể tải dữ liệu Test phương pháp (Lỗi HTTP " + response.status + ")", "warning");
+            failedTabs.push("Test phương pháp");
           }
         } catch (e) {
           console.error("Lỗi kết nối đồng bộ tab Test phương pháp:", e);
-          if (!silent) showToast("Lỗi kết nối đồng bộ tab Test phương pháp (CORS/Mạng)", "warning");
+          failedTabs.push("Test phương pháp");
         }
       }
 
@@ -7767,9 +8346,13 @@
             const rows = parseCSV(csvText);
             parsedTraining = mapCSVToTraining(rows);
             successCount++;
+          } else {
+            console.error("Lỗi đồng bộ tab Đào tạo HTTP status: " + response.status);
+            failedTabs.push("Đào tạo");
           }
         } catch (e) {
-          console.error("Lỗi đồng bộ tab Đào tạo:", e);
+          console.error("Lỗi kết nối đồng bộ tab Đào tạo:", e);
+          failedTabs.push("Đào tạo");
         }
       }
 
@@ -7780,12 +8363,38 @@
           const response = await fetchWithFallback(url);
           if (response.ok) {
             const csvText = await response.text();
+            console.log("[DEBUG Sync Modeling] csvText length:", csvText.length, "First 200 chars:", csvText.substring(0, 200));
             const rows = parseCSV(csvText);
             parsedModeling = mapCSVToModeling(rows);
             successCount++;
+          } else {
+            console.error("Lỗi đồng bộ tab Hiệu suất làm mẫu HTTP status: " + response.status);
+            failedTabs.push("Hiệu suất làm mẫu");
           }
         } catch (e) {
-          console.error("Lỗi đồng bộ tab Hiệu suất làm mẫu:", e);
+          console.error("Lỗi kết nối đồng bộ tab Hiệu suất làm mẫu:", e);
+          failedTabs.push("Hiệu suất làm mẫu");
+        }
+      }
+
+      // 6.5. Fetch tab IR
+      let parsedIR = [];
+      if (gidIR) {
+        try {
+          const url = buildUrl(gidIR);
+          const response = await fetchWithFallback(url);
+          if (response.ok) {
+            const csvText = await response.text();
+            const rows = parseCSV(csvText);
+            parsedIR = mapCSVToIR(rows);
+            successCount++;
+          } else {
+            console.error("Lỗi đồng bộ tab IR HTTP status: " + response.status);
+            failedTabs.push("IR");
+          }
+        } catch (e) {
+          console.error("Lỗi kết nối đồng bộ tab IR:", e);
+          failedTabs.push("IR");
         }
       }
 
@@ -7799,9 +8408,13 @@
             const rows = parseCSV(csvText);
             parsedImprovement = mapCSVToImprovement(rows);
             successCount++;
+          } else {
+            console.error("Lỗi đồng bộ tab Cải tiến HTTP status: " + response.status);
+            failedTabs.push("Cải tiến");
           }
         } catch (e) {
-          console.error("Lỗi đồng bộ tab Cải tiến:", e);
+          console.error("Lỗi kết nối đồng bộ tab Cải tiến:", e);
+          failedTabs.push("Cải tiến");
         }
       }
 
@@ -7815,9 +8428,13 @@
             const csvText = await response.text();
             parsedDelayCSV = parseCSV(csvText);
             successCount++;
+          } else {
+            console.error("Lỗi đồng bộ tab Chậm phiếu HTTP status: " + response.status);
+            failedTabs.push("Chậm phiếu");
           }
         } catch (e) {
           console.error("Lỗi đồng bộ tab Chậm phiếu:", e);
+          failedTabs.push("Chậm phiếu");
         }
       }
 
@@ -7831,18 +8448,25 @@
             const csvText = await response.text();
             parsedRetrieveCSV = parseCSV(csvText);
             successCount++;
+          } else {
+            console.error("Lỗi đồng bộ tab Lấy mẫu HTTP status: " + response.status);
+            failedTabs.push("Lấy mẫu");
           }
         } catch (e) {
           console.error("Lỗi đồng bộ tab Lấy mẫu:", e);
+          failedTabs.push("Lấy mẫu");
         }
       }
 
       if (parsedNl.length === 0 && parsedPl.length === 0 && parsedPers.length === 0 && parsedMethods.length === 0 && parsedTraining.length === 0 && parsedModeling.length === 0 && parsedImprovement.length === 0) {
         if (!silent) {
-          showToast("❌ Đồng bộ thất bại! Kiểm tra: (1) Sheet đã Publish to web chưa? (2) Link có dạng /pub?output=csv không? (3) Mạng ổn định không? Xem chi tiết lỗi trong Console (F12).", "error");
+          showToast("❌ Đồng bộ thất bại! Hãy kiểm tra Google Sheet đã Công bố chưa hoặc xem F12.", "error");
         }
         return;
       }
+
+      // Lưu trữ danh sách lỗi đồng bộ để hiển thị ở thông báo cuối cùng
+      window.failedTabsDuringLastSync = failedTabs;
 
       // Load delayKpiData if saved
       const storedDelayKpi = localStorage.getItem('qc_delay_kpi_data');
@@ -7876,9 +8500,18 @@
         localStorage.setItem('qc_training_data_v4', JSON.stringify(trainingData));
       }
 
+      // Save IR raw data if updated
+      if (parsedIR.length > 0) {
+        irRawData = parsedIR;
+        localStorage.setItem('qc_ir_raw_data', JSON.stringify(irRawData));
+      }
+
       // Save Modeling data if updated
       if (parsedModeling.length > 0) {
-        modelingData = parsedModeling;
+        modelingData = mergeIRDataIntoModeling(parsedModeling, irRawData);
+        localStorage.setItem('qc_modeling_data_v4', JSON.stringify(modelingData));
+      } else if (parsedIR.length > 0) {
+        modelingData = mergeIRDataIntoModeling(modelingData, irRawData);
         localStorage.setItem('qc_modeling_data_v4', JSON.stringify(modelingData));
       }
 
@@ -7936,18 +8569,51 @@
         function getDefaultWeekName(wId) {
           const wNum = parseInt(wId.replace('w', ''), 10);
           if (isNaN(wNum) || wNum < 1) return "";
-          const startMonday = new Date(2026, 5, 22); // Month is 0-indexed, 5 is June
-          const monday = new Date(startMonday.getTime() + (wNum - 1) * 7 * 24 * 60 * 60 * 1000);
-          const saturday = new Date(monday.getTime() + 5 * 24 * 60 * 60 * 1000);
+          const startSaturday = new Date(2026, 5, 20); // June 20, 2026 is Saturday
+          const saturday = new Date(startSaturday.getTime() + (wNum - 1) * 7 * 24 * 60 * 60 * 1000);
+          const friday = new Date(saturday.getTime() + 6 * 24 * 60 * 60 * 1000);
           
           const pad = (n) => String(n).padStart(2, '0');
-          const dM = pad(monday.getDate());
-          const mM = pad(monday.getMonth() + 1);
           const dS = pad(saturday.getDate());
           const mS = pad(saturday.getMonth() + 1);
-          const yS = saturday.getFullYear();
+          const dF = pad(friday.getDate());
+          const mF = pad(friday.getMonth() + 1);
+          const yF = friday.getFullYear();
           
-          return `Tuần ${wNum}: ${dM}/${mM} - ${dS}/${mS}/${yS}`;
+          return `Tuần ${wNum}: ${dS}/${mS} - ${dF}/${mF}/${yF}`;
+        }
+
+        // Build a cache for all 500 weeks to speed up lookup!
+        const weekCache = [];
+        for (let i = 1; i <= 500; i++) {
+          const wId = 'w' + i;
+          let weekName = delayKpiData.weeks[wId] && delayKpiData.weeks[wId].name;
+          
+          if (weekName) {
+            const wNum = wId.replace('w', '');
+            const normStored = removeVietnameseAccents(weekName);
+            const regex = new RegExp('(tuan|t)\\s*' + wNum + '\\b');
+            if (!regex.test(normStored)) {
+              weekName = getDefaultWeekName(wId);
+            }
+          } else {
+            weekName = getDefaultWeekName(wId);
+          }
+          
+          let range = parseWeekRange(weekName);
+          if (!range) {
+            // Fallback to default week name if no valid range could be parsed
+            weekName = getDefaultWeekName(wId);
+            range = parseWeekRange(weekName);
+          }
+          
+          if (range) {
+            weekCache.push({
+              wId: wId,
+              start: range.startDateVal,
+              end: range.endDateVal
+            });
+          }
         }
 
         function getWeekFromDate(date) {
@@ -7957,24 +8623,10 @@
           const d = date.getDate();
           const val = y * 10000 + m * 100 + d;
           
-          for (let i = 1; i <= 500; i++) {
-            const wId = 'w' + i;
-            let weekName = delayKpiData.weeks[wId] && delayKpiData.weeks[wId].name;
-            
-            if (weekName) {
-              const wNum = wId.replace('w', '');
-              const normStored = removeVietnameseAccents(weekName);
-              const regex = new RegExp('(tuan|t)\\s*' + wNum + '\\b');
-              if (!regex.test(normStored)) {
-                weekName = getDefaultWeekName(wId);
-              }
-            } else {
-              weekName = getDefaultWeekName(wId);
-            }
-            
-            let range = parseWeekRange(weekName);
-            if (range && val >= range.startDateVal && val <= range.endDateVal) {
-              return wId;
+          for (let i = 0; i < weekCache.length; i++) {
+            const wc = weekCache[i];
+            if (val >= wc.start && val <= wc.end) {
+              return wc.wId;
             }
           }
           return null;
@@ -8094,25 +8746,10 @@
               const year = 2026;
               const val = year * 10000 + month * 100 + day;
               
-              const wIds = [];
-              for (let i = 1; i <= 500; i++) wIds.push('w' + i);
-              for (const wId of wIds) {
-                let wName = delayKpiData.weeks[wId] && delayKpiData.weeks[wId].name;
-                if (wName) {
-                  const wNum = wId.replace('w', '');
-                  const normStored = removeVietnameseAccents(wName);
-                  const regex = new RegExp('(tuan|t)\\s*' + wNum + '\\b');
-                  if (!regex.test(normStored)) {
-                    wName = null;
-                  }
-                }
-                if (!wName) {
-                  wName = getDefaultWeekName(wId);
-                }
-                if (!wName) continue;
-                const range = parseWeekRange(wName);
-                if (range && val >= range.startDateVal && val <= range.endDateVal) {
-                  return wId;
+              for (let i = 0; i < weekCache.length; i++) {
+                const wc = weekCache[i];
+                if (val >= wc.start && val <= wc.end) {
+                  return wc.wId;
                 }
               }
             }
@@ -8305,10 +8942,18 @@
 
       localStorage.setItem('qc_last_sync_time', Date.now().toString());
 
+      // Tự động đẩy dữ liệu vừa đồng bộ từ Sheets lên đám mây
+      await pushToCloud();
+
       if (silent) {
         showToast("Đã tự động cập nhật dữ liệu QC Portal mới nhất!", "success");
       } else {
-        showToast(`Đồng bộ thành công! Đã cập nhật dữ liệu từ Google Sheets.`, "success");
+        const failed = window.failedTabsDuringLastSync || [];
+        if (failed.length > 0) {
+          showToast(`Đồng bộ hoàn tất một phần. Thất bại tải các tab: ${failed.join(', ')}. Hãy kiểm tra lại cấu hình GID hoặc đảm bảo các tab này đã được Công bố lên web (Publish to web).`, "warning");
+        } else {
+          showToast(`Đồng bộ thành công tất cả dữ liệu từ Google Sheets!`, "success");
+        }
         closeModal('sync-modal');
       }
       
@@ -8568,6 +9213,8 @@
           monthsList = [selectedMonth];
         }
       }
+
+      updateWeekDropdownOptions(selectedYear, selectedMonth, false, 'method-filter-week');
 
       const rewardStatus = document.getElementById('method-filter-reward-status').value;
 
@@ -9407,6 +10054,175 @@
       }).filter(item => item !== null);
     }
 
+    function getReportingPeriodForDate(yearNum, monthNum, day) {
+      const date = new Date(yearNum, monthNum - 1, day);
+      const wDay = date.getDay();
+      const diff = wDay === 6 ? 6 : 5 - wDay;
+      
+      const friday = new Date(date);
+      friday.setDate(date.getDate() + diff);
+      
+      const fYear = friday.getFullYear();
+      const fMonth = friday.getMonth() + 1;
+      const fDay = friday.getDate();
+      
+      let repMonth = fMonth;
+      let repYear = fYear;
+      if (fDay >= 21) {
+        repMonth = fMonth + 1;
+        if (repMonth > 12) {
+          repMonth = 1;
+          repYear = fYear + 1;
+        }
+      }
+      
+      const saturday = new Date(friday);
+      saturday.setDate(friday.getDate() - 6);
+      const pad = (n) => String(n).padStart(2, '0');
+      const weekLabel = `${pad(saturday.getDate())}/${pad(saturday.getMonth() + 1)} - ${pad(friday.getDate())}/${pad(friday.getMonth() + 1)}`;
+      
+      return {
+        year: repYear.toString(),
+        month: pad(repMonth),
+        week: weekLabel
+      };
+    }
+
+    function mapCSVToIR(rows) {
+      if (rows.length <= 1) return [];
+      
+      const indicators = ['người thực hiện', 'trạng thái', 'số k', 'yêu cầu kn', 'ngày trả kq'];
+      const { index: headerRowIdx, headers } = findHeaderRow(rows, indicators);
+      
+      const colMap = {
+        nguoiThucHien: headers.findIndex(h => h.includes('nguoi thuc hien') || h.includes('nguoi th')),
+        trangThai: headers.findIndex(h => h.includes('trang thai')),
+        soK: headers.findIndex(h => h.includes('so k')),
+        yeuCauKN: headers.findIndex(h => h.includes('yeu cau kn') || h.includes('yeu cau')),
+        ngayTraKQ: headers.findIndex(h => h.includes('ngay tra kq') || h.includes('ngay tra')),
+        ngayTao: headers.findIndex(h => h.includes('ngay tao'))
+      };
+
+      const dataRows = rows.slice(headerRowIdx + 1);
+      
+      const list = [];
+      dataRows.forEach((row, idx) => {
+        const getVal = (colIdx) => (colIdx !== -1 && colIdx < row.length) ? (row[colIdx] || '').toString().trim() : '';
+        const soKVal = getVal(colMap.soK);
+        if (!soKVal) return;
+        
+        list.push({
+          idx: idx,
+          nguoiThucHien: getVal(colMap.nguoiThucHien),
+          trangThai: getVal(colMap.trangThai),
+          soK: soKVal,
+          yeuCauKN: getVal(colMap.yeuCauKN),
+          ngayTraKQ: getVal(colMap.ngayTraKQ) || getVal(colMap.ngayTao)
+        });
+      });
+      return list;
+    }
+
+    function mergeIRDataIntoModeling(modelingList, irRawList) {
+      const cleanStr = (str) => {
+        if (!str) return '';
+        return str.toString().normalize('NFD')
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .replace(/đ/g, 'd')
+                  .replace(/Đ/g, 'D')
+                  .trim().toLowerCase();
+      };
+
+      // Count IR rows per combinedKey
+      const irCounts = {};
+      const assignedRows = {};
+
+      irRawList.forEach(row => {
+        const dateStr = (row.ngayTraKQ || '').toString().trim();
+        if (!dateStr) return;
+
+        const parsedDate = parseSheetDate(dateStr);
+        const parts = parsedDate.split('-');
+        if (parts.length < 3) return;
+
+        const yearNum = parseInt(parts[0], 10);
+        const monthNum = parseInt(parts[1], 10);
+        const day = parseInt(parts[2], 10);
+
+        if (isNaN(yearNum) || isNaN(monthNum) || isNaN(day)) return;
+
+        // Apply filters
+        // 1. Trạng thái đạt
+        const statusClean = cleanStr(row.trangThai);
+        if (statusClean !== 'dat') return;
+
+        // 2. Người thực hiện
+        const testerClean = cleanStr(row.nguoiThucHien);
+        const isPhamHaThu = testerClean.includes('pham ha thu');
+
+        // 3. Yêu cầu kiểm nghiệm
+        const reqClean = cleanStr(row.yeuCauKN);
+        const isSpecialKN = reqClean.includes('pho ir') || reqClean.includes('hoa hoc');
+
+        // Condition
+        const isMatched = isPhamHaThu || (!isPhamHaThu && isSpecialKN);
+        if (!isMatched) return;
+
+        // Deduplication and assignment
+        const period = getReportingPeriodForDate(yearNum, monthNum, day);
+        const rowUniqueId = row.idx !== undefined ? row.idx : (row.soK + '_' + dateStr);
+        
+        if (assignedRows[rowUniqueId] !== undefined) {
+          const prevAssigned = assignedRows[rowUniqueId];
+          if (prevAssigned.year !== period.year || prevAssigned.month !== period.month || prevAssigned.week !== period.week) {
+            return;
+          }
+        } else {
+          assignedRows[rowUniqueId] = period;
+        }
+
+        const combinedKey = `${period.year}_${period.month}_${period.week}`;
+        irCounts[combinedKey] = (irCounts[combinedKey] || 0) + 1;
+      });
+
+      // Update modelingList
+      let updatedModelingList = modelingList.map(item => {
+        const combinedKey = `${item.nam}_${item.thang}_${item.tuan}`;
+        const irCount = irCounts[combinedKey] || 0;
+        const total = item.sx + item.nc + item.nl + item.pl + item.nuoc + irCount;
+        return {
+          ...item,
+          ir: irCount,
+          tong: total
+        };
+      });
+
+      // Add missing periods if any
+      Object.keys(irCounts).forEach(combinedKey => {
+        const exists = updatedModelingList.some(item => `${item.nam}_${item.thang}_${item.tuan}` === combinedKey);
+        if (!exists) {
+          const [y, m, w] = combinedKey.split('_');
+          const irCount = irCounts[combinedKey];
+          updatedModelingList.push({
+            id: `model_w_${y}_${m}_${w}`,
+            nam: y,
+            thang: m,
+            tuan: w,
+            sx: 0,
+            nc: 0,
+            nl: 0,
+            pl: 0,
+            nuoc: 0,
+            ir: irCount,
+            tong: irCount,
+            isManual: true
+          });
+        }
+      });
+
+      return updatedModelingList;
+    }
+
     function mapCSVToModeling(rows) {
       if (rows.length <= 1) return [];
       
@@ -9434,10 +10250,14 @@
         nhom: headers.findIndex(h => h === 'nhóm' || h === 'nhom')
       };
 
+      console.log("[DEBUG Modeling] colMap indexes:", colMap);
       if (colMap.soK === -1 || colMap.nhom === -1 || colMap.thoiGian === -1) {
         console.warn("Required columns (Số K, Nhóm, Thời gian) not found.");
         return [];
       }
+      
+      const allGroups = Array.from(new Set(rows.slice(headerRowIdx + 1).map(r => r[colMap.nhom]).filter(Boolean)));
+      console.log("[DEBUG Modeling] Nhóm values found in sheet:", allGroups);
 
       const monthMap = {};
       const assignedMonths = {};
@@ -9449,28 +10269,6 @@
                   .replace(/đ/g, 'd')
                   .replace(/Đ/g, 'D')
                   .trim().toLowerCase();
-      };
-
-      // Helper to get reporting months for a date: Month M runs from M-1 / 20 to M / 20 in pure integer math
-      const getReportingMonthsForDate = (yearNum, monthNum, day) => {
-        const dateVal = yearNum * 10000 + monthNum * 100 + day;
-        const monthList = [];
-        for (let m = 1; m <= 12; m++) {
-          let startYear = yearNum;
-          let startMonth = m - 1;
-          if (startMonth < 1) {
-            startMonth = 12;
-            startYear = yearNum - 1;
-          }
-          const startVal = startYear * 10000 + startMonth * 100 + 20;
-          const endVal = yearNum * 10000 + m * 100 + 20;
-          
-          if (dateVal >= startVal && dateVal <= endVal) {
-            const repYear = (m === 1 && monthNum === 12) ? yearNum + 1 : yearNum;
-            monthList.push({ year: repYear.toString(), month: m.toString() });
-          }
-        }
-        return monthList;
       };
 
       const dataRows = rows.slice(headerRowIdx + 1);
@@ -9495,29 +10293,25 @@
         
         if (isNaN(yearNum) || isNaN(monthNum) || isNaN(day)) return;
 
-        const matchPeriods = getReportingMonthsForDate(yearNum, monthNum, day);
-        if (matchPeriods.length === 0) return;
-        
         const soKRaw = (row[colMap.soK] || '').toString().trim();
         const soKClean = soKRaw.toUpperCase();
         if (!soKRaw) return;
 
-        // Deduplication: Assign each Số K to the EARLIEST month it matches and exclude from later months
-        let targetPeriod = null;
+        const period = getReportingPeriodForDate(yearNum, monthNum, day);
+
+        // Deduplication: Assign each Số K to the EARLIEST period (year, month, week) it matches and exclude from later periods
         if (assignedMonths[soKClean] !== undefined) {
-          const prevAssignedMonth = assignedMonths[soKClean];
-          targetPeriod = matchPeriods.find(p => p.month === prevAssignedMonth);
-          if (!targetPeriod) return; // Exclude from later months (e.g. Month 8 if already in Month 7)
+          const prevAssigned = assignedMonths[soKClean]; // Stored as { year, month, week }
+          if (prevAssigned.year !== period.year || prevAssigned.month !== period.month || prevAssigned.week !== period.week) {
+            return; // Exclude from other weeks/months
+          }
         } else {
-          targetPeriod = matchPeriods[0];
-          assignedMonths[soKClean] = targetPeriod.month;
+          assignedMonths[soKClean] = period;
         }
 
-        const mKey = targetPeriod.month;
-        const yKey = targetPeriod.year;
-        
-        // Tính tuần dựa trên ngày trích xuất được
-        const weekVal = day <= 7 ? '1' : day <= 14 ? '2' : day <= 21 ? '3' : day <= 28 ? '4' : '5';
+        const weekVal = period.week;
+        const mKey = period.month;
+        const yKey = period.year;
         const combinedKey = `${yKey}_${mKey}_${weekVal}`;
 
         if (!monthMap[combinedKey]) {
@@ -9582,10 +10376,12 @@
           pl,
           nuoc,
           ir,
-          tong
+          tong,
+          isManual: true
         };
       });
       
+      console.log("[DEBUG Modeling] Parsed result rows count:", result.length, "Data:", result);
       return result;
     }
 
