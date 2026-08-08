@@ -3182,6 +3182,16 @@
             <span id="pers-modal-val-currentRole" class="modal-field-value"></span>
           </div>
         </div>
+        <div class="modal-grid-2">
+          <div class="modal-field">
+            <span class="modal-field-label">Ngày thử việc</span>
+            <span id="pers-modal-val-probationDate" class="modal-field-value"></span>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Ngày chính thức</span>
+            <span id="pers-modal-val-officialDate" class="modal-field-value"></span>
+          </div>
+        </div>
 
         <div class="modal-full-field" style="border-top:1px solid var(--border-color); padding-top:1rem; margin-top:1rem;">
           <span class="modal-field-label" style="margin-bottom:0.75rem; font-weight:600;">Lịch sử phân nhóm & thăng tiến (Tháng 1 - Tháng 8)</span>
@@ -6892,6 +6902,8 @@
       document.getElementById('pers-modal-val-name').textContent = p.name;
       document.getElementById('pers-modal-val-maNV').textContent = p.maNV || '-';
       document.getElementById('pers-modal-val-joinDate').textContent = p.joinDate || '-';
+      document.getElementById('pers-modal-val-probationDate').textContent = p.probationDate || '-';
+      document.getElementById('pers-modal-val-officialDate').textContent = p.officialDate || '-';
       
       const selectedYear = document.getElementById('pers-filter-year').value;
       const selectedMonth = document.getElementById('pers-filter-month').value;
@@ -8553,14 +8565,17 @@
           const regex = /(\d{1,2})\/(\d{1,2})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/;
           const match = weekStr.match(regex);
           if (match) {
-            const startDay = parseInt(match[1], 10);
-            const startMonth = parseInt(match[2], 10);
             const endDay = parseInt(match[3], 10);
             const endMonth = parseInt(match[4], 10);
             const year = parseInt(match[5], 10);
-            const startYear = startMonth > endMonth ? year - 1 : year;
-            const startDateVal = startYear * 10000 + startMonth * 100 + startDay;
-            const endDateVal = year * 10000 + endMonth * 100 + endDay;
+            
+            const endDate = new Date(year, endMonth - 1, endDay);
+            const startDate = new Date(endDate);
+            startDate.setDate(endDate.getDate() - 6);
+            
+            const pad = (n) => String(n).padStart(2, '0');
+            const startDateVal = startDate.getFullYear() * 10000 + (startDate.getMonth() + 1) * 100 + startDate.getDate();
+            const endDateVal = endDate.getFullYear() * 10000 + (endDate.getMonth() + 1) * 100 + endDate.getDate();
             return { startDateVal, endDateVal };
           }
           return null;
@@ -8569,18 +8584,18 @@
         function getDefaultWeekName(wId) {
           const wNum = parseInt(wId.replace('w', ''), 10);
           if (isNaN(wNum) || wNum < 1) return "";
-          const startSaturday = new Date(2026, 5, 20); // June 20, 2026 is Saturday
-          const saturday = new Date(startSaturday.getTime() + (wNum - 1) * 7 * 24 * 60 * 60 * 1000);
-          const friday = new Date(saturday.getTime() + 6 * 24 * 60 * 60 * 1000);
+          const startMonday = new Date(2026, 5, 22); // June 22, 2026 is Monday
+          const monday = new Date(startMonday.getTime() + (wNum - 1) * 7 * 24 * 60 * 60 * 1000);
+          const saturday = new Date(monday.getTime() + 5 * 24 * 60 * 60 * 1000);
           
           const pad = (n) => String(n).padStart(2, '0');
+          const dM = pad(monday.getDate());
+          const mM = pad(monday.getMonth() + 1);
           const dS = pad(saturday.getDate());
           const mS = pad(saturday.getMonth() + 1);
-          const dF = pad(friday.getDate());
-          const mF = pad(friday.getMonth() + 1);
-          const yF = friday.getFullYear();
+          const yS = saturday.getFullYear();
           
-          return `Tuần ${wNum}: ${dS}/${mS} - ${dF}/${mF}/${yF}`;
+          return `Tuần ${wNum}: ${dM}/${mM} - ${dS}/${mS}/${yS}`;
         }
 
         // Build a cache for all 500 weeks to speed up lookup!
@@ -8637,7 +8652,10 @@
         const retrieveIndicators = ['số k', 'ngày'];
         const { index: retrieveHeaderIdx, headers: retrieveHeaders } = findHeaderRow(parsedRetrieveCSV, retrieveIndicators);
         let colRetrieveK = retrieveHeaders.findIndex(h => h.includes('so k') || h.includes('ma so k') || h.includes('so lo'));
-        let colRetrieveDate = retrieveHeaders.findIndex(h => h.includes('ngay lay') || h.includes('ngay nhan') || h.includes('ngay nhap') || h === 'ngay');
+        let colRetrieveDate = retrieveHeaders.findIndex(h => h.includes('ngay lay'));
+        if (colRetrieveDate === -1) {
+          colRetrieveDate = retrieveHeaders.findIndex(h => h.includes('ngay nhan') || h.includes('ngay nhap') || h === 'ngay');
+        }
         
         if (colRetrieveK === -1) colRetrieveK = 2;
         if (colRetrieveDate === -1) colRetrieveDate = 25;
@@ -9390,9 +9408,20 @@
       pageData.forEach((m, idx) => {
         const globalIdx = startIdx + idx + 1;
         const resultLower = m.result.toLowerCase().trim();
-        const resBadge = (resultLower === 'đạt' || resultLower === 'dat') ? 
-          '<span class="badge status-active">Đạt</span>' : 
-          '<span class="badge status-resigned">Không đạt</span>';
+        const resultNoAccent = removeVietnameseAccents(resultLower);
+        let resBadge = '';
+
+        if (resultLower === 'đạt' || resultLower === 'dat') {
+          resBadge = '<span class="badge status-active">Đạt</span>';
+        } else if (resultNoAccent.includes('chua ok')) {
+          resBadge = `<span class="badge status-probation">${m.result}</span>`;
+        } else if (resultNoAccent.includes('chua tra')) {
+          resBadge = `<span class="badge status-offline">${m.result}</span>`;
+        } else if (resultNoAccent.includes('khong dat') || resultNoAccent.includes('k dat') || resultNoAccent.includes('ko dat')) {
+          resBadge = `<span class="badge status-resigned">${m.result}</span>`;
+        } else {
+          resBadge = m.result ? `<span class="badge status-offline">${m.result}</span>` : '-';
+        }
 
         tbody.innerHTML += `
           <tr>
@@ -9658,9 +9687,38 @@
       const indicators = ['mã nv', 'họ tên', 'ngày vào', 'nhân sự'];
       const { index: headerRowIdx, headers: headerRow } = findHeaderRow(rows, indicators);
       
-      let colMaNV = headerRow.findIndex(h => h.includes('ma') || h.includes('manv'));
-      let colName = headerRow.findIndex(h => h.includes('ten') || h.includes('ho & ten') || h.includes('ho ten') || h.includes('ho va ten'));
-      let colJoinDate = headerRow.findIndex(h => h.includes('ngay vao') || h.includes('ngay') || h.includes('nhan viec'));
+      let colMaNV = headerRow.findIndex(h => {
+        const s = (h || '').toString().toLowerCase();
+        return s.includes('ma') || s.includes('manv');
+      });
+      let colName = headerRow.findIndex(h => {
+        const s = (h || '').toString().toLowerCase();
+        return s.includes('ten') || s.includes('ho & ten') || s.includes('ho ten') || s.includes('ho va ten');
+      });
+      let colJoinDate = headerRow.findIndex(h => {
+        const s = (h || '').toString().toLowerCase();
+        const norm = removeVietnameseAccents(s);
+        return (norm.includes('ngay nhan') || norm.includes('nhan viec') || norm.includes('ngay vao')) && !norm.includes('thu viec') && !norm.includes('chinh thuc');
+      });
+      if (colJoinDate === -1) {
+        colJoinDate = headerRow.findIndex(h => {
+          const s = (h || '').toString().toLowerCase();
+          const norm = removeVietnameseAccents(s);
+          return norm.includes('ngay') && !norm.includes('thu viec') && !norm.includes('chinh thuc');
+        });
+      }
+      
+      let colProbationDate = headerRow.findIndex(h => {
+        const s = (h || '').toString().toLowerCase();
+        const norm = removeVietnameseAccents(s);
+        return norm.includes('thu viec');
+      });
+      
+      let colOfficialDate = headerRow.findIndex(h => {
+        const s = (h || '').toString().toLowerCase();
+        const norm = removeVietnameseAccents(s);
+        return norm.includes('chinh thuc');
+      });
       
       if (colMaNV === -1) colMaNV = 1;
       if (colName === -1) colName = 2;
@@ -9670,7 +9728,14 @@
       
       const r0 = rows[headerRowIdx] || [];
       const r1 = rows[headerRowIdx + 1] || [];
-      for (let colIdx = 4; colIdx < Math.max(r0.length, r1.length); colIdx++) {
+      
+      // monthly status columns start after the highest index of the non-month columns
+      const nonMonthCols = [colMaNV, colName, colJoinDate];
+      if (colProbationDate !== -1) nonMonthCols.push(colProbationDate);
+      if (colOfficialDate !== -1) nonMonthCols.push(colOfficialDate);
+      const maxNonMonthCol = Math.max(...nonMonthCols);
+      
+      for (let colIdx = maxNonMonthCol + 1; colIdx < Math.max(r0.length, r1.length); colIdx++) {
         let label = '';
         if (colIdx < r0.length) {
           const l0 = (r0[colIdx] || '').toString().trim();
@@ -9698,6 +9763,7 @@
       if (Object.keys(monthMap).length === 0) {
         const rawHeaders = rows[headerRowIdx] || [];
         rawHeaders.forEach((h, colIdx) => {
+          if (colIdx <= maxNonMonthCol) return;
           const normalized = normalizeMonthHeader(h);
           if (normalized) {
             monthMap[colIdx] = normalized;
@@ -9716,6 +9782,8 @@
         if (!name) return null;
         
         const joinDate = getVal(colJoinDate);
+        const probationDate = colProbationDate !== -1 ? getVal(colProbationDate) : '';
+        const officialDate = colOfficialDate !== -1 ? getVal(colOfficialDate) : '';
         
         const monthlyStatus = {};
         Object.keys(monthMap).forEach(colIdx => {
@@ -9728,6 +9796,8 @@
           maNV: maNV,
           name: name,
           joinDate: joinDate,
+          probationDate: probationDate,
+          officialDate: officialDate,
           monthlyStatus: monthlyStatus
         };
       }).filter(item => item !== null && item.name !== "");
@@ -10722,12 +10792,10 @@
         if (selectedWeeks.includes(wId)) {
           retNL += weekData.retNL;
           retPL += weekData.retPL;
-        }
-        
-        weekData.details.forEach(item => {
-          if (!seenDelayed.has(item.k)) {
-            seenDelayed.add(item.k);
-            if (selectedWeeks.includes(wId)) {
+          
+          weekData.details.forEach(item => {
+            if (!seenDelayed.has(item.k)) {
+              seenDelayed.add(item.k);
               if (item.type === 'NL') {
                 delNL++;
                 if (reasons[item.reason]) reasons[item.reason].nl++;
@@ -10737,8 +10805,8 @@
               }
               details.push(item);
             }
-          }
-        });
+          });
+        }
       });
       
       return {
@@ -10915,18 +10983,16 @@
         
         if (selectedWeeks.includes(wId)) {
           totalRet += (weekData.retNL + weekData.retPL);
-        }
-        
-        weekData.details.forEach(item => {
-          if (!seenDelayed.has(item.k)) {
-            seenDelayed.add(item.k);
-            if (selectedWeeks.includes(wId)) {
+          
+          weekData.details.forEach(item => {
+            if (!seenDelayed.has(item.k)) {
+              seenDelayed.add(item.k);
               if (item.reason === 'QC chậm') {
                 totalDelQC++;
               }
             }
-          }
-        });
+          });
+        }
       });
       
       return totalRet > 0 ? parseFloat((totalDelQC / totalRet * 100).toFixed(1)) : 0.0;
@@ -10998,19 +11064,17 @@
         
         if (selectedWeeks.includes(wId)) {
           totalRet += (weekData.retNL + weekData.retPL);
-        }
-        
-        weekData.details.forEach(item => {
-          if (!seenDelayed.has(item.k)) {
-            seenDelayed.add(item.k);
-            if (selectedWeeks.includes(wId)) {
+          
+          weekData.details.forEach(item => {
+            if (!seenDelayed.has(item.k)) {
+              seenDelayed.add(item.k);
               totalDelUnique++;
               if (item.reason === 'QC chậm') {
                 totalDelQC++;
               }
             }
-          }
-        });
+          });
+        }
       });
 
       const pctTotal = totalRet > 0 ? (totalDelUnique / totalRet * 100).toFixed(2) : '0.00';
@@ -11080,22 +11144,23 @@
       if (labelNL) labelNL.textContent = weekId === 'all' ? 'NL lấy trong tháng' : 'NL lấy trong tuần';
       if (labelPL) labelPL.textContent = weekId === 'all' ? 'PL lấy trong tháng' : 'PL lấy trong tuần';
 
-      const totalRetrieved = data.retNL + data.retPL;
-
-      const pctNL = totalRetrieved > 0 ? (data.delNL / totalRetrieved * 100).toFixed(2) : "0.00";
-      document.getElementById('kpi-val-nl').textContent = data.delNL + " / " + totalRetrieved;
+      // FIX: Chia % NL và % PL theo tổng NL + PL lấy được (data.retNL + data.retPL)
+      const totalRet = data.retNL + data.retPL;
+      const pctNL = totalRet > 0 ? (data.delNL / totalRet * 100).toFixed(2) : "0.00";
+      document.getElementById('kpi-val-nl').textContent = data.delNL + " / " + totalRet;
       document.getElementById('kpi-pct-nl').textContent = pctNL + "%";
       const barNL = document.getElementById('kpi-bar-nl');
-      barNL.style.width = pctNL + "%";
+      barNL.style.width = Math.min(parseFloat(pctNL), 100) + "%";
       barNL.style.backgroundColor = pctNL > 40 ? "#ef4444" : (pctNL > 10 ? "#f59e0b" : "#10b981");
       document.getElementById('kpi-val-nl').style.color = pctNL > 40 ? "#ef4444" : (pctNL > 10 ? "#d97706" : "#059669");
       document.getElementById('kpi-pct-nl').style.color = pctNL > 40 ? "#ef4444" : (pctNL > 10 ? "#d97706" : "#059669");
 
-      const pctPL = totalRetrieved > 0 ? (data.delPL / totalRetrieved * 100).toFixed(2) : "0.00";
-      document.getElementById('kpi-val-pl').textContent = data.delPL + " / " + totalRetrieved;
+      // FIX: Chia % PL theo tổng NL + PL
+      const pctPL = totalRet > 0 ? (data.delPL / totalRet * 100).toFixed(2) : "0.00";
+      document.getElementById('kpi-val-pl').textContent = data.delPL + " / " + totalRet;
       document.getElementById('kpi-pct-pl').textContent = pctPL + "%";
       const barPL = document.getElementById('kpi-bar-pl');
-      barPL.style.width = pctPL + "%";
+      barPL.style.width = Math.min(parseFloat(pctPL), 100) + "%";
       barPL.style.backgroundColor = pctPL > 40 ? "#ef4444" : (pctPL > 10 ? "#f59e0b" : "#10b981");
       document.getElementById('kpi-val-pl').style.color = pctPL > 40 ? "#ef4444" : (pctPL > 10 ? "#d97706" : "#059669");
       document.getElementById('kpi-pct-pl').style.color = pctPL > 40 ? "#ef4444" : (pctPL > 10 ? "#d97706" : "#059669");
@@ -11105,7 +11170,7 @@
 
       const reasons = ["Gửi viện", "QC chậm", "Chờ chuẩn", "Lý do khác"];
       const displayNames = {
-        "Gửi viện": "Mẫu gửi viện",
+        "Gửi viện": "Gửi viện",
         "QC chậm": "QC chậm / KNV chậm",
         "Chờ chuẩn": "Chờ chuẩn",
         "Lý do khác": "Lý do khác"
@@ -11130,29 +11195,29 @@
           chartDataValues.push(countTotal);
           chartLabels.push(displayNames[r] || r);
           
-          const totalRetrieved = data.retNL + data.retPL;
-          const pctCombined = totalRetrieved > 0 ? (countTotal / totalRetrieved * 100).toFixed(1) : "0.0";
-          const pctNLDetail = totalRetrieved > 0 ? (countNL / totalRetrieved * 100).toFixed(1) : "0.0";
-          const pctPLDetail = totalRetrieved > 0 ? (countPL / totalRetrieved * 100).toFixed(1) : "0.0";
-          
-          const fmtPct = p => p.endsWith('.0') ? parseFloat(p).toFixed(0) : p;
-          
-          const color = chartColors[idx];
-          const dispName = displayNames[r] || r;
-          
-          const row = document.createElement('div');
-          row.style.display = 'flex';
-          row.style.alignItems = 'baseline';
-          row.style.gap = '0.35rem';
-          row.style.color = 'var(--text-main)';
-          row.innerHTML = `
-            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background-color:${color}; flex-shrink:0;"></span>
-            <span style="font-weight:600;">${dispName}:</span>
-            <span>${fmtPct(pctCombined)}%</span>
-            <span style="color:var(--text-muted); font-size:0.73rem; margin-left:0.15rem;">(NL: ${fmtPct(pctNLDetail)}%, PL: ${fmtPct(pctPLDetail)}%)</span>
-          `;
-          legendContainer.appendChild(row);
-        });
+           const totalRetrieved = data.retNL + data.retPL;
+           const pctCombined = totalRetrieved > 0 ? (countTotal / totalRetrieved * 100).toFixed(1) : "0.0";
+           const pctNL = totalRetrieved > 0 ? (countNL / totalRetrieved * 100).toFixed(1) : "0.0";
+           const pctPL = totalRetrieved > 0 ? (countPL / totalRetrieved * 100).toFixed(1) : "0.0";
+           
+           const fmtPct = p => p.endsWith('.0') ? parseFloat(p).toFixed(0) : p;
+           
+           const color = chartColors[idx];
+           const dispName = displayNames[r] || r;
+           
+           const row = document.createElement('div');
+           row.style.display = 'flex';
+           row.style.alignItems = 'baseline';
+           row.style.gap = '0.35rem';
+           row.style.color = 'var(--text-main)';
+           row.innerHTML = `
+             <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background-color:${color}; flex-shrink:0;"></span>
+             <span style="font-weight:600;">${dispName}:</span>
+             <span>${fmtPct(pctCombined)}%</span>
+             <span style="color:var(--text-muted); font-size:0.73rem; margin-left:0.15rem;">(NL: ${countNL} (${fmtPct(pctNL)}%), PL: ${countPL} (${fmtPct(pctPL)}%))</span>
+           `;
+           legendContainer.appendChild(row);
+         });
 
         const canvas = document.getElementById('kpi-reasons-chart');
         if (canvas) {
@@ -11251,30 +11316,30 @@
             "Lý do khác": { nl: 7, pl: 1 }
           },
           details: [
-            { k: "M26-19", type: "NL", reason: "Mẫu gửi viện", note: "gửi viện" },
-            { k: "M26-597", type: "NL", reason: "chờ chuẩn", note: "Chờ chuẩn" },
-            { k: "M26-630", type: "NL", reason: "lý do khác", note: "Chờ xin MOA" },
-            { k: "M26-723", type: "NL", reason: "Mẫu gửi viện", note: "gửi viện" },
-            { k: "M26-828", type: "NL", reason: "Mẫu gửi viện", note: "Gửi viện" },
-            { k: "M26-869", type: "NL", reason: "Mẫu gửi viện", note: "gửi viện" },
-            { k: "M26-911", type: "NL", reason: "Mẫu gửi viện", note: "Gửi viện" },
-            { k: "M26-906", type: "NL", reason: "lý do khác", note: "thực tế k có mẫu này" },
-            { k: "M26-914", type: "NL", reason: "lý do khác", note: "Độ nhớt k đạt, làm lại nhiều lần" },
-            { k: "M26-932", type: "NL", reason: "lý do khác", note: "Hoạt lực khoảng khuẩn 30 ngày" },
+            { k: "M26-19", type: "NL", reason: "Gửi viện", note: "gửi viện" },
+            { k: "M26-597", type: "NL", reason: "Chờ chuẩn", note: "Chờ chuẩn" },
+            { k: "M26-630", type: "NL", reason: "Lý do khác", note: "Chờ xin MOA" },
+            { k: "M26-723", type: "NL", reason: "Gửi viện", note: "gửi viện" },
+            { k: "M26-828", type: "NL", reason: "Gửi viện", note: "Gửi viện" },
+            { k: "M26-869", type: "NL", reason: "Gửi viện", note: "gửi viện" },
+            { k: "M26-911", type: "NL", reason: "Gửi viện", note: "Gửi viện" },
+            { k: "M26-906", type: "NL", reason: "Lý do khác", note: "thực tế k có mẫu này" },
+            { k: "M26-914", type: "NL", reason: "Lý do khác", note: "Độ nhớt k đạt, làm lại nhiều lần" },
+            { k: "M26-932", type: "NL", reason: "Lý do khác", note: "Hoạt lực khoảng khuẩn 30 ngày" },
             { k: "M26-946", type: "NL", reason: "QC chậm", note: "KNV châm" },
-            { k: "M26-963", type: "NL", reason: "Mẫu gửi viện", note: "Hoạt lực kháng khuẩn" },
+            { k: "M26-963", type: "NL", reason: "Gửi viện", note: "Hoạt lực kháng khuẩn" },
             { k: "M26-915", type: "NL", reason: "QC chậm", note: "KNV châm" },
             { k: "M26-924", type: "NL", reason: "QC chậm", note: "KNV châm" },
-            { k: "M26-953", type: "NL", reason: "lý do khác", note: "K đạt chỉ số xà phòng làm lại -> Phản hồi ncc" },
+            { k: "M26-953", type: "NL", reason: "Lý do khác", note: "K đạt chỉ số xà phòng làm lại -> Phản hồi ncc" },
             { k: "M26-984", type: "NL", reason: "QC chậm", note: "Lấy mẫu báo sai k phải làm, thực tế có làm" },
-            { k: "M26-985", type: "NL", reason: "lý do khác", note: "" },
-            { k: "M26-954", type: "NL", reason: "lý do khác", note: "K lấy mẫu này" },
+            { k: "M26-985", type: "NL", reason: "Lý do khác", note: "" },
+            { k: "M26-954", type: "NL", reason: "Lý do khác", note: "K lấy mẫu này" },
             { k: "M26-952", type: "NL", reason: "QC chậm", note: "CHậm phiếu" },
-            { k: "BB26-343", type: "PL", reason: "Mẫu gửi viện", note: "Gửi viện" },
-            { k: "BB26-349", type: "PL", reason: "Mẫu gửi viện", note: "Gửi viện" },
-            { k: "BB26-354", type: "PL", reason: "lý do khác", note: "Màng k đạt-> chờ chốt-> Phản hồi nhà cc" },
-            { k: "BB26-380", type: "PL", reason: "Mẫu gửi viện", note: "gửi viện" },
-            { k: "BB26-379", type: "PL", reason: "Mẫu gửi viện", note: "gửi viện" },
+            { k: "BB26-343", type: "PL", reason: "Gửi viện", note: "Gửi viện" },
+            { k: "BB26-349", type: "PL", reason: "Gửi viện", note: "Gửi viện" },
+            { k: "BB26-354", type: "PL", reason: "Lý do khác", note: "Màng k đạt-> chờ chốt-> Phản hồi nhà cc" },
+            { k: "BB26-380", type: "PL", reason: "Gửi viện", note: "gửi viện" },
+            { k: "BB26-379", type: "PL", reason: "Gửi viện", note: "gửi viện" },
             { k: "BB26-408", type: "PL", reason: "QC chậm", note: "KNV chậm" }
           ]
         },
@@ -11289,14 +11354,14 @@
             "Lý do khác": { nl: 1, pl: 0 }
           },
           details: [
-            { k: "M26-903", type: "NL", reason: "Mẫu gửi viện", note: "" },
-            { k: "M26-902", type: "NL", reason: "Mẫu gửi viện", note: "Xong" },
+            { k: "M26-903", type: "NL", reason: "Gửi viện", note: "" },
+            { k: "M26-902", type: "NL", reason: "Gửi viện", note: "Xong" },
             { k: "M26-1011", type: "NL", reason: "QC chậm", note: "Chậm phân lịch ĐL, tạp" },
-            { k: "M26-1015", type: "NL", reason: "lý do khác", note: "K đạt so màu" },
+            { k: "M26-1015", type: "NL", reason: "Lý do khác", note: "K đạt so màu" },
             { k: "M26-1019", type: "NL", reason: "QC chậm", note: "Phân lịch chậm CBQ" },
             { k: "M26-1001", type: "NL", reason: "QC chậm", note: "KNV chậm" },
-            { k: "BB26-430", type: "PL", reason: "QC chậm", note: "KNV châm" },
-            { k: "BB26-429", type: "PL", reason: "QC chậm", note: "KNV châm" }
+            { k: "BB26-430", type: "PL", reason: "QC chậm", note: "KNV chậm" },
+            { k: "BB26-429", type: "PL", reason: "QC chậm", note: "KNV chậm" }
           ]
         },
         "w3": {
@@ -11310,12 +11375,12 @@
             "Lý do khác": { nl: 1, pl: 0 }
           },
           details: [
-            { k: "M26-1053", type: "NL", reason: "lý do khác", note: "tạp chạy 3 lần chưa chốt đc" },
-            { k: "M26-1042", type: "NL", reason: "QC chậm", note: "KNV châm" },
+            { k: "M26-1053", type: "NL", reason: "Lý do khác", note: "tạp chạy 3 lần chưa chốt đc" },
+            { k: "M26-1042", type: "NL", reason: "QC chậm", note: "KNV chậm" },
             { k: "M26-1062", type: "NL", reason: "QC chậm", note: "ghép lịch chạy ICP định lượng kali" },
-            { k: "M26-1063", type: "NL", reason: "QC chậm", note: "KNV châm" },
-            { k: "M26-1069", type: "NL", reason: "QC chậm", note: "KNV châm" },
-            { k: "BB26-431", type: "PL", reason: "Mẫu gửi viện", note: "Xong" }
+            { k: "M26-1063", type: "NL", reason: "QC chậm", note: "KNV chậm" },
+            { k: "M26-1069", type: "NL", reason: "QC chậm", note: "KNV chậm" },
+            { k: "BB26-431", type: "PL", reason: "Gửi viện", note: "Xong" }
           ]
         },
         "w4": {
@@ -11329,14 +11394,14 @@
             "Lý do khác": { nl: 2, pl: 1 }
           },
           details: [
-            { k: "M26-1083", type: "NL", reason: "QC chậm", note: "KNV châm" },
-            { k: "M26-1098", type: "NL", reason: "lý do khác", note: "" },
-            { k: "M26-1090", type: "NL", reason: "lý do khác", note: "NL vô khuẩn 14 ngày" },
-            { k: "M26-1080", type: "NL", reason: "QC chậm", note: "KNV châm" },
-            { k: "M26-1109", type: "NL", reason: "QC chậm", note: "KNV châm" },
-            { k: "M26-1087", type: "NL", reason: "QC chậm", note: "KNV châm" },
-            { k: "M26-1079", type: "NL", reason: "QC chậm", note: "KNV châm" },
-            { k: "BB26-454", type: "PL", reason: "lý do khác", note: "Phụ liệu vô khuẩn" }
+            { k: "M26-1083", type: "NL", reason: "QC chậm", note: "KNV chậm" },
+            { k: "M26-1098", type: "NL", reason: "Lý do khác", note: "" },
+            { k: "M26-1090", type: "NL", reason: "Lý do khác", note: "NL vô khuẩn 14 ngày" },
+            { k: "M26-1080", type: "NL", reason: "QC chậm", note: "KNV chậm" },
+            { k: "M26-1109", type: "NL", reason: "QC chậm", note: "KNV chậm" },
+            { k: "M26-1087", type: "NL", reason: "QC chậm", note: "KNV chậm" },
+            { k: "M26-1079", type: "NL", reason: "QC chậm", note: "KNV chậm" },
+            { k: "BB26-454", type: "PL", reason: "Lý do khác", note: "Phụ liệu vô khuẩn" }
           ]
         }
       }
